@@ -1,0 +1,64 @@
+version: '3.8'
+
+x-base: &base
+  networks:
+    - docker_net
+  restart: always
+
+volumes:
+  pgdata:
+
+services:
+  postgres:
+    <<: *base
+    image: postgres:18-alpine
+    container_name: postgres
+    ports:
+      - "127.0.0.1:5432:5432"
+    env_file:
+      - .env
+    volumes:
+      - ./postgres/db_backups:/backups
+      - ./containers/postgres:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $POSTGRES_USER" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    <<: *base
+    container_name: api
+    build:
+      context: ./src/apps/api
+      dockerfile: Dockerfile
+    volumes:
+      - ./src/apps/api:/app
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:3001:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  nginx:
+    <<: *base
+    container_name: nginx
+    build: ./containers/nginx
+    ports:
+      - "127.0.0.1:80:80"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./logs/nginx:/var/log/nginx
+      # - ./src/front:/var/www/html  # если есть фронт
+    depends_on:
+      - api
+    command: nginx -g "daemon off;"
+
+networks:
+  docker_net:
