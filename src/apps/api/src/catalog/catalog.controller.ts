@@ -10,6 +10,6 @@ export class CatalogController {
 
   @Get()
   async findAll() {
-    console.log(333333, '<<<<<<<33<<<<<<< 333333');
+    console.log(333333, '<<<<<<<3<<<<<<< 333333');
   }
 }
