@@ -9,20 +9,23 @@ export class Product {
   @Column({
     type: 'varchar',
     comment: 'Наименование товара',
+    unique: true,
   })
   title: string;
 
   @Column({
     type: 'varchar',
     comment: 'Символьный код товара',
+    unique: true,
   })
   code: string;
 
   @Column({
     type: 'varchar',
     comment: 'Путь к картинке товара',
+    nullable: true,
   })
-  image: string;
+  image?: string;
 
   @Column({
     type: 'float',
@@ -33,14 +36,16 @@ export class Product {
   @Column({
     type: 'varchar',
     comment: 'Цвет товара (hex)',
+    nullable: true,
   })
-  color: string;
+  color?: string;
 
   @Column({
     type: 'text',
     comment: 'Краткое описание товара',
+    nullable: true,
   })
-  preview_text: string;
+  preview_text?: string;
 
   @Column({
     type: 'integer',

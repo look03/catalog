@@ -9,26 +9,30 @@ export class Section {
   @Column({
     type: 'varchar',
     comment: 'Наименование раздела',
+    unique: true,
   })
   title: string;
 
   @Column({
     type: 'varchar',
     comment: 'Символьный код раздела',
+    unique: true,
   })
   code: string;
 
   @Column({
     type: 'varchar',
     comment: 'Путь к картинке раздела',
+    nullable: true,
   })
-  image: string;
+  image?: string;
 
   @Column({
     type: 'integer',
     comment: 'Привязка к родительскому разделу товара',
+    nullable: true,
   })
-  parent_section_id: number;
+  parent_section_id?: number;
 
   @Column({
     type: 'timestamp',

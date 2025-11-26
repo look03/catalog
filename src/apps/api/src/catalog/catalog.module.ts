@@ -5,9 +5,11 @@ import { Product } from './entities/product.entity';
 import { Section } from './entities/section.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { CreateSectionHandler, CreateProductHandler } from './handlers/';
+
 @Module({
   imports: [CqrsModule, TypeOrmModule.forFeature([Product, Section])],
   controllers: [CatalogController],
-  providers: [],
+  providers: [CreateSectionHandler, CreateProductHandler],
 })
 export class CatalogModule {}
