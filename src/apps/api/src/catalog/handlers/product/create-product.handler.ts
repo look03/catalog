@@ -30,7 +30,9 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
       const product = this.repo.create(fields);
       const result = await this.repo.save(product);
 
-      return result.id;
+      return {
+        id: result.id,
+      };
     } catch (error) {
       throw new InternalServerErrorException({
         success: false,
