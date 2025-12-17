@@ -10,18 +10,6 @@ export class SectionService {
     private readonly repo: Repository<Section>,
   ) {}
 
-  async findOneById(id: number): Promise<Section | null> {
-    return this.repo.findOneBy({ id });
-  }
-
-  create(fields: Partial<Section>): Section {
-    return this.repo.create(fields);
-  }
-
-  async save(section: Section): Promise<Section> {
-    return this.repo.save(section);
-  }
-
   async checkParentSection(
     parent_section_id: number | null | undefined,
   ): Promise<Section | undefined> {

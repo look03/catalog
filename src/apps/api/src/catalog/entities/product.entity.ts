@@ -72,5 +72,5 @@ export class Product {
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'brand_id' })
-  brand: Brand;
+  brand?: Brand;
 }

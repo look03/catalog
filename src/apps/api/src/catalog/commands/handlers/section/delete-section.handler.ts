@@ -1,9 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DeleteSectionCommand } from '../../impl/section/delete-section.command';
-import { Section } from '../../../entities/section.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { SectionService } from '../../../services/section.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Section } from '../../../entities/section.entity';
+import { Repository } from 'typeorm';
 
 @CommandHandler(DeleteSectionCommand)
 export class DeleteSectionHandler implements ICommandHandler<DeleteSectionCommand> {
@@ -20,7 +21,6 @@ export class DeleteSectionHandler implements ICommandHandler<DeleteSectionComman
       }
 
       await this.repo.remove(section);
-      return { success: true };
     } catch (error) {
       throw new InternalServerErrorException({
         success: false,

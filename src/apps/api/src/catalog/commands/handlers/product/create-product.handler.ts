@@ -1,12 +1,12 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateProductCommand } from '../../impl/product/create-product.command';
 import { Product } from '../../../entities/product.entity';
-import { Section } from '../../../entities/section.entity';
-import { Brand } from '../../../entities/brand.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
 import { transliterate } from '../../../../common/utils/transliteration.util';
+import { ProductService } from '../../../services/product.service';
+import { ProductSection } from '../../../entities/product-section.entity';
 
 @CommandHandler(CreateProductCommand)
 export class CreateProductHandler implements ICommandHandler<CreateProductCommand> {
@@ -14,43 +14,32 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
 
-    @InjectRepository(Section)
-    private readonly sectionRepository: Repository<Section>,
+    @InjectRepository(ProductSection)
+    private readonly repoProductSection: Repository<ProductSection>,
 
-    @InjectRepository(Brand)
-    private readonly brandRepository: Repository<Brand>,
+    private readonly productService: ProductService,
   ) {}
 
   async execute(command: CreateProductCommand) {
     try {
-      const sections = await this.sectionRepository.find({
-        where: {
-          id: In(command.section_ids),
-        },
-      });
-
-      let brandInfo: Brand | null = null;
-      if (command.brand_id) {
-        brandInfo = await this.brandRepository.findOneBy({
-          id: command.brand_id,
-        });
-      }
-
       const fields = {
         title: command.title,
         code: transliterate(command.title) ?? undefined,
         preview_text: command.preview_text ?? undefined,
         color: command.color ?? undefined,
         price: command.price,
-        brand: brandInfo ?? undefined,
-        productSections: sections.map((section) => ({ section })),
       };
 
       const product = this.productRepository.create(fields);
+      product.brand = await this.productService.getBrand(command.brand_id);
       const result = await this.productRepository.save(product);
 
+      // TODO: попробовать переписать
+      const productSections = await this.productService.getSections(command.section_ids, result);
+      await this.repoProductSection.save(productSections);
+
       return {
-        id: result.id,
+        product_id: result.id,
       };
     } catch (error) {
       throw new InternalServerErrorException({

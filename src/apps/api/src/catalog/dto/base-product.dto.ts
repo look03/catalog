@@ -9,7 +9,7 @@ import {
   IsInt,
 } from 'class-validator';
 
-export class CreateProductDto {
+export class BaseProductDto {
   @IsString()
   @IsNotEmpty()
   @Length(2, 255)
