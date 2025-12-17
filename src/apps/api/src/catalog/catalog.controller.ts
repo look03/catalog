@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, ParseIntPipe, Delete } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { CreateSectionCommand } from './commands/create-section.command';
+import { CreateSectionCommand } from './commands/impl/section/create-section.command';
 import { CreateProductDto } from './dto/create-product.dto';
-import { CreateSectionDto } from './dto/create-section.dto';
-import { CreateProductCommand } from './commands/create-product.command';
+import { BaseSectionDto } from './dto/base-section.dto';
+import { CreateProductCommand } from './commands/impl/product/create-product.command';
+import { UpdateSectionCommand } from './commands/impl/section/update-section.command';
+import { DeleteSectionCommand } from './commands/impl/section/delete-section.command';
 
 @Controller('catalog/')
 export class CatalogController {
@@ -13,8 +15,18 @@ export class CatalogController {
   ) {}
 
   @Post('section/')
-  createSection(@Body() dto: CreateSectionDto) {
+  createSection(@Body() dto: BaseSectionDto) {
     return this.commandBus.execute(new CreateSectionCommand(dto.title, dto.parent_section_id));
+  }
+
+  @Patch('section/:id')
+  updateSection(@Param('id', ParseIntPipe) id: number, @Body() dto: BaseSectionDto) {
+    return this.commandBus.execute(new UpdateSectionCommand(id, dto.title, dto.parent_section_id));
+  }
+
+  @Delete('section/:id')
+  deleteSection(@Param('id', ParseIntPipe) id: number) {
+    return this.commandBus.execute(new DeleteSectionCommand(id));
   }
 
   @Post('product/')
@@ -22,12 +34,11 @@ export class CatalogController {
     return this.commandBus.execute(
       new CreateProductCommand(
         dto.title,
-        dto.section_id,
-        dto.view_main_page,
-        dto.slider_on_main_page,
+        dto.section_ids,
         dto.price,
         dto.color,
         dto.preview_text,
+        dto.brand_id,
       ),
     );
   }

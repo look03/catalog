@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Product } from './product.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { ProductSection } from './product-section.entity';
 
 @Entity('sections')
 export class Section {
@@ -21,20 +21,6 @@ export class Section {
   code: string;
 
   @Column({
-    type: 'varchar',
-    comment: 'Путь к картинке раздела',
-    nullable: true,
-  })
-  image?: string;
-
-  @Column({
-    type: 'integer',
-    comment: 'Привязка к родительскому разделу товара',
-    nullable: true,
-  })
-  parent_section_id?: number;
-
-  @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
     comment: 'Дата создания товара',
@@ -49,6 +35,17 @@ export class Section {
   })
   updated_at: Date;
 
-  @OneToMany(() => Product, (product) => product.section_id)
-  products: Product[];
+  // Связи
+  @OneToMany(() => ProductSection, (ps) => ps.section)
+  productSections: ProductSection[];
+
+  @ManyToOne(() => Section, (section) => section.children, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'parent_section_id' })
+  parent_section?: Section;
+
+  @OneToMany(() => Section, (section) => section.parent_section)
+  children: Section[];
 }

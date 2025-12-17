@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsNumber, IsString, Length, IsOptional } from 'class-validator';
-export class CreateSectionDto {
+export class BaseSectionDto {
   @IsString()
   @IsNotEmpty()
   @Length(2, 255)

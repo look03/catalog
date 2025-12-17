@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CatalogController } from './catalog.controller';
-import { Product } from './entities/product.entity';
-import { Section } from './entities/section.entity';
+import { entities } from './entities';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { CreateSectionHandler, CreateProductHandler } from './handlers/';
+import { handlers } from './commands/handlers/';
+import { services } from './services';
 
 @Module({
-  imports: [CqrsModule, TypeOrmModule.forFeature([Product, Section])],
+  imports: [CqrsModule, TypeOrmModule.forFeature(entities)],
   controllers: [CatalogController],
-  providers: [CreateSectionHandler, CreateProductHandler],
+  providers: [...handlers, ...services],
+  exports: services,
 })
 export class CatalogModule {}

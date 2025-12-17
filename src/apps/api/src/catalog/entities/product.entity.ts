@@ -1,5 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { Section } from './section.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Image } from './images.entity';
+import { Brand } from './brand.entity';
+import { ProductSection } from './product-section.entity';
 
 @Entity('products')
 export class Product {
@@ -19,13 +21,6 @@ export class Product {
     unique: true,
   })
   code: string;
-
-  @Column({
-    type: 'varchar',
-    comment: 'Путь к картинке товара',
-    nullable: true,
-  })
-  image?: string;
 
   @Column({
     type: 'float',
@@ -48,24 +43,6 @@ export class Product {
   preview_text?: string;
 
   @Column({
-    type: 'integer',
-    comment: 'Привязка к разделу товара',
-  })
-  section_id: number;
-
-  @Column({
-    type: 'boolean',
-    comment: 'Признак отображения товара на главной странице',
-  })
-  view_main_page: boolean;
-
-  @Column({
-    type: 'boolean',
-    comment: 'Признак отображения товара в слайдере на главной странице',
-  })
-  slider_on_main_page: boolean;
-
-  @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
     comment: 'Дата создания товара',
@@ -80,6 +57,20 @@ export class Product {
   })
   updated_at: Date;
 
-  @ManyToOne(() => Section, (section) => section.products, { onDelete: 'CASCADE' })
-  section: Section;
+  // Связи
+  @OneToMany(() => ProductSection, (section) => section.product, { cascade: true })
+  productSections: ProductSection[];
+
+  @OneToMany(() => Image, (image) => image.product, {
+    cascade: true,
+    eager: true,
+  })
+  images: Image[];
+
+  @ManyToOne(() => Brand, (brand) => brand.products, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'brand_id' })
+  brand: Brand;
 }

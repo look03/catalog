@@ -1,4 +1,13 @@
-import { IsNotEmpty, IsNumber, IsString, Length, IsOptional, IsBoolean } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Length,
+  IsOptional,
+  IsArray,
+  ArrayNotEmpty,
+  IsInt,
+} from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -10,9 +19,10 @@ export class CreateProductDto {
   @IsNotEmpty()
   price: number;
 
-  @IsNotEmpty()
-  @IsNumber()
-  section_id: number;
+  @IsArray()
+  @ArrayNotEmpty({ message: 'Должен быть хотя бы один раздел' })
+  @IsInt({ each: true, message: 'Каждый элемент должен быть числом' })
+  section_ids: number[];
 
   @IsString()
   @IsOptional()
@@ -25,10 +35,6 @@ export class CreateProductDto {
   preview_text?: string;
 
   @IsOptional()
-  @IsBoolean()
-  view_main_page: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  slider_on_main_page: boolean;
+  @IsNumber()
+  brand_id: number;
 }

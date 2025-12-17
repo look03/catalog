@@ -1,29 +1,27 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CreateSectionCommand } from '../../commands/create-section.command';
-import { Section } from '../../entities/section.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { CreateSectionCommand } from '../../impl/section/create-section.command';
 import { InternalServerErrorException } from '@nestjs/common';
-import { transliterate } from '../../../common/utils/transliteration.util';
+import { transliterate } from '../../../../common/utils/transliteration.util';
+import { SectionService } from '../../../services/section.service';
 
 @CommandHandler(CreateSectionCommand)
 export class CreateSectionHandler implements ICommandHandler<CreateSectionCommand> {
-  constructor(
-    @InjectRepository(Section)
-    private readonly repo: Repository<Section>,
-  ) {}
+  constructor(private readonly sectionService: SectionService) {}
 
   async execute(command: CreateSectionCommand) {
     try {
       const fields = {
         title: command.title,
-        parent_section_id: command.parent_section_id ?? undefined,
         code: transliterate(command.title) ?? undefined,
-        image: undefined,
       };
 
-      const product = this.repo.create(fields);
-      const result = await this.repo.save(product);
+      const section = this.sectionService.create(fields);
+
+      section.parent_section = await this.sectionService.checkParentSection(
+        command.parent_section_id,
+      );
+
+      const result = await this.sectionService.save(section);
 
       return result.id;
     } catch (error) {
