@@ -5,25 +5,24 @@ x-base: &base
     - docker_net
   restart: always
 
-volumes:
-  pgdata:
-
 services:
   postgres:
     <<: *base
-    image: postgres:18-alpine
+    image: postgres:17-alpine
     container_name: postgres
     ports:
       - "127.0.0.1:5432:5432"
     env_file:
       - .env
     volumes:
+      - ./postgres/pgdata:/var/lib/postgresql/data:Z
       - ./postgres/db_backups:/backups
       - ./containers/postgres:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data
     command:
       - "postgres"
       - "-c"

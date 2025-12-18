@@ -1,4 +1,4 @@
-import { IsOptional, IsArray, IsInt } from 'class-validator';
+import { IsOptional, IsArray, IsInt, IsNumber } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 import { BaseProductDto } from './base-product.dto';
 
@@ -7,6 +7,7 @@ export class UpdateProductDto extends PartialType(BaseProductDto) {
   title?: string;
 
   @IsOptional()
+  @IsNumber()
   price?: number;
 
   @IsOptional()
