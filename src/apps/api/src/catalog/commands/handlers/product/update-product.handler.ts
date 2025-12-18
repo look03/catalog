@@ -1,50 +1,43 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateProductCommand } from '../../impl/product/update-product.command';
 import { Product } from '../../../entities/product.entity';
-import { Section } from '../../../entities/section.entity';
-import { Brand } from '../../../entities/brand.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ProductService } from '../../../services/product.service';
-import { ProductSection } from '../../../entities/product-section.entity';
 
 @CommandHandler(UpdateProductCommand)
 export class UpdateProductHandler implements ICommandHandler<UpdateProductCommand> {
   constructor(
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
-
-    @InjectRepository(ProductSection)
-    private readonly repoProductSection: Repository<ProductSection>,
-
+    private readonly dataSource: DataSource,
     private readonly productService: ProductService,
   ) {}
 
   async execute(command: UpdateProductCommand) {
     try {
-      const product = await this.productRepository.findOneBy({ id: command.id });
-      if (!product) {
-        throw new NotFoundException(`Product with id ${command.id} not found`);
-      }
+      return await this.dataSource.transaction(async (manager) => {
+        const product = await manager.findOne(Product, {
+          where: { id: command.id },
+          relations: ['brand'],
+        });
 
-      if (command.section_ids) {
-        await this.repoProductSection.delete({ product: { id: product.id } });
-        product.productSections = await this.productService.getSections(
-          command.section_ids,
-          product,
-        );
-      }
+        if (!product) {
+          throw new NotFoundException(`Product with id ${command.id} not found`);
+        }
 
-      if (command.brand_id) {
-        product.brand = await this.productService.getBrand(command.brand_id);
-      }
+        if (command.section_ids?.length) {
+          await this.productService.updateProductSections(product, command.section_ids, manager);
+        }
 
-      await this.productRepository.save(product);
+        if (command.brand_id) {
+          product.brand = await this.productService.getBrand(command.brand_id, manager);
+        }
+
+        return manager.save(product);
+      });
     } catch (error) {
       throw new InternalServerErrorException({
         success: false,
-        message: 'Failed to create section',
+        message: 'Failed to update product',
         details: error.message ?? error,
       });
     }
