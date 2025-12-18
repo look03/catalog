@@ -6,5 +6,6 @@ export class CreateProductCommand {
     public readonly color?: string,
     public readonly preview_text?: string,
     public readonly brand_id?: number,
+    public readonly images?: Express.Multer.File[],
   ) {}
 }

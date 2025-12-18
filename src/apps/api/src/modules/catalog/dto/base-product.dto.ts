@@ -9,6 +9,8 @@ import {
   IsInt,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import { TransformStringToNumberArray } from '../../../common/transforms/string-to-number-array.transformer';
 
 export class BaseProductDto {
   @IsString()
@@ -20,12 +22,14 @@ export class BaseProductDto {
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty({ example: '200', description: 'Цена товара' })
+  @Transform(({ value }) => Number(value))
   price: number;
 
   @IsArray()
   @ArrayNotEmpty({ message: 'Должен быть хотя бы один раздел' })
   @IsInt({ each: true, message: 'Каждый элемент должен быть числом' })
   @ApiProperty({ example: '[1, 2]', description: 'Разделы товара' })
+  @Transform(TransformStringToNumberArray())
   section_ids: number[];
 
   @IsString()
@@ -43,5 +47,6 @@ export class BaseProductDto {
   @IsOptional()
   @IsNumber()
   @ApiProperty({ example: '1', description: 'Id бренда' })
+  @Transform(({ value }) => Number(value))
   brand_id: number;
 }

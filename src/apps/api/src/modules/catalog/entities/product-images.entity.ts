@@ -1,15 +1,23 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Product } from './product.entity';
 
-@Entity('images')
-export class Image {
+@Entity('product_images')
+export class ProductImage {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({
     type: 'varchar',
+    comment: 'Наименование картинки',
+  })
+  filename: string;
+
+  @Column({ name: 'product_id' })
+  productId: number;
+
+  @Column({
+    type: 'varchar',
     comment: 'Путь к картинке',
-    unique: true,
   })
   path: string;
 

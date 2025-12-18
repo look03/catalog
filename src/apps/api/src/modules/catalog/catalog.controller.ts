@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, ParseIntPipe, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  ParseIntPipe,
+  Delete,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { BaseProductDto } from './dto/base-product.dto';
 import { BaseSectionDto } from './dto/base-section.dto';
@@ -10,6 +21,9 @@ import { UpdateSectionCommand } from './commands/impl/section/update-section.com
 import { DeleteSectionCommand } from './commands/impl/section/delete-section.command';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { UploadFiles } from '../../common/decorators/upload-files.decorator';
+const COUNT_FILES = 5;
 
 @ApiTags('catalog')
 @Controller('catalog/')
@@ -41,7 +55,8 @@ export class CatalogController {
 
   @Post('product/')
   @ApiOperation({ summary: 'Создать продукт' })
-  createProduct(@Body() dto: BaseProductDto) {
+  @UseInterceptors(FilesInterceptor('images', COUNT_FILES))
+  createProduct(@Body() dto: BaseProductDto, @UploadedFiles() images: Express.Multer.File[]) {
     return this.commandBus.execute(
       new CreateProductCommand(
         dto.title,
@@ -50,6 +65,7 @@ export class CatalogController {
         dto.color,
         dto.preview_text,
         dto.brand_id,
+        images,
       ),
     );
   }
@@ -57,7 +73,12 @@ export class CatalogController {
   @Patch('product/:id')
   @ApiOperation({ summary: 'Обновить продукт по id' })
   @ApiParam({ name: 'id', type: Number })
-  updateProduct(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateProductDto) {
+  @UploadFiles()
+  updateProduct(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateProductDto,
+    @UploadedFiles() images: Express.Multer.File[],
+  ) {
     return this.commandBus.execute(
       new UpdateProductCommand(
         id,
@@ -67,6 +88,7 @@ export class CatalogController {
         dto.color,
         dto.preview_text,
         dto.brand_id,
+        images,
       ),
     );
   }

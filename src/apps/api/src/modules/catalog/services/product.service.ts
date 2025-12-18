@@ -5,6 +5,8 @@ import { Product } from '../entities/product.entity';
 import { Brand } from '../entities/brand.entity';
 import { Section } from '../entities/section.entity';
 import { ProductSection } from '../entities/product-section.entity';
+import { ProductImage } from '../entities/product-images.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ProductService {
@@ -20,7 +22,41 @@ export class ProductService {
 
     @InjectRepository(Brand)
     private readonly repoBrand: Repository<Brand>,
+
+    private configService: ConfigService,
   ) {}
+
+  async updateProductImages(
+    product: Product,
+    manager: EntityManager,
+    files?: Express.Multer.File[],
+  ): Promise<void> {
+    try {
+      if (!files) {
+        return;
+      }
+
+      await manager.delete(ProductImage, { productId: product.id });
+
+      const dir = this.configService.get<string>('FILE_PATH_DIR') || '/uploads/';
+
+      const images = files.map((file) =>
+        manager.create(ProductImage, {
+          product,
+          filename: file.originalname,
+          path: `${dir}${file.originalname}`,
+        }),
+      );
+
+      await manager.save(ProductImage, images);
+    } catch (error) {
+      throw new InternalServerErrorException({
+        success: false,
+        message: 'Failed to create images',
+        details: error.message ?? error,
+      });
+    }
+  }
 
   async getSections(
     sectionIds: number[],
@@ -41,7 +77,11 @@ export class ProductService {
     return sections.map((section) => repoProductSection.create({ product, section }));
   }
 
-  async updateProductSections(product: Product, newSectionIds: number[], manager: EntityManager) {
+  async updateProductSections(
+    product: Product,
+    newSectionIds: number[],
+    manager: EntityManager,
+  ): Promise<void> {
     try {
       await manager.delete(ProductSection, { product: { id: product.id } });
 

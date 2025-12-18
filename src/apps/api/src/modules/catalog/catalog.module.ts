@@ -4,7 +4,7 @@ import { CatalogController } from './catalog.controller';
 import { entities } from './entities';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { handlers } from './commands/handlers/';
+import { handlers } from './commands/handlers';
 import { services } from './services';
 
 @Module({

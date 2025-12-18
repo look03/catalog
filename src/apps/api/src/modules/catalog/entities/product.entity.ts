@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { Image } from './images.entity';
 import { Brand } from './brand.entity';
 import { ProductSection } from './product-section.entity';
+import { ProductImage } from './product-images.entity';
 
 @Entity('products')
 export class Product {
@@ -61,11 +61,11 @@ export class Product {
   @OneToMany(() => ProductSection, (section) => section.product, { cascade: true })
   productSections: ProductSection[];
 
-  @OneToMany(() => Image, (image) => image.product, {
+  @OneToMany(() => ProductImage, (image) => image.product, {
     cascade: true,
     eager: true,
   })
-  images: Image[];
+  images: ProductImage[];
 
   @ManyToOne(() => Brand, (brand) => brand.products, {
     nullable: true,

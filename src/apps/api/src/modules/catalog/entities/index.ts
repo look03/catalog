@@ -1,7 +1,7 @@
 import { Product } from './product.entity';
-import { Image } from './images.entity';
+import { ProductImage } from './product-images.entity';
 import { Brand } from './brand.entity';
 import { Section } from './section.entity';
 import { ProductSection } from './product-section.entity';
 
-export const entities = [Product, Image, Brand, Section, ProductSection];
+export const entities = [Product, ProductImage, Brand, Section, ProductSection];

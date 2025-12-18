@@ -4,6 +4,9 @@ import { Product } from '../../../entities/product.entity';
 import { DataSource } from 'typeorm';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ProductService } from '../../../services/product.service';
+import { transliterate } from '../../../../../common/utils/transliteration.util';
+import { assignIfDefined } from '../../../../../common/utils/assing-if-defined.util';
+import type { UpdatableProductFields } from '../../../../../types/global.catalog';
 
 @CommandHandler(UpdateProductCommand)
 export class UpdateProductHandler implements ICommandHandler<UpdateProductCommand> {
@@ -24,6 +27,15 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
           throw new NotFoundException(`Product with id ${command.id} not found`);
         }
 
+        if (command.title) {
+          product.code = transliterate(command.title) as string;
+        }
+
+        assignIfDefined<
+          UpdatableProductFields,
+          readonly ('price' | 'color' | 'title' | 'preview_text')[]
+        >(product, command, ['price', 'color', 'title', 'preview_text'] as const);
+
         if (command.section_ids?.length) {
           await this.productService.updateProductSections(product, command.section_ids, manager);
         }
@@ -32,13 +44,20 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
           product.brand = await this.productService.getBrand(command.brand_id, manager);
         }
 
-        return manager.save(product);
+        await manager.save(product);
+
+        if (command.images?.length) {
+          await this.productService.updateProductImages(product, manager, command.images);
+        }
+
+        // TODO: сделать сагу на перенос файлов из папок
+        // TODO: добавить обновления эластика
       });
     } catch (error) {
       throw new InternalServerErrorException({
         success: false,
-        message: 'Failed to update product',
-        details: error.message ?? error,
+        message: error.message ?? 'Failed to update product',
+        details: error.details ?? error.message ?? error,
       });
     }
   }

@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateSectionCommand } from '../../impl/section/create-section.command';
 import { InternalServerErrorException } from '@nestjs/common';
-import { transliterate } from '../../../../common/utils/transliteration.util';
+import { transliterate } from '../../../../../common/utils/transliteration.util';
 import { SectionService } from '../../../services/section.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Section } from '../../../entities/section.entity';
