@@ -12,14 +12,14 @@ export class ProductFilesAndSearchSaga {
   constructor(private readonly fileStorage: FileStorageService) {}
 
   @Saga()
-  productCreated = (events$: Observable<ProductCreatedEvent>): Observable<void> =>
-    events$.pipe(
+  productCreated(events$: Observable<ProductCreatedEvent>): Observable<void> {
+    return events$.pipe(
       ofType(ProductCreatedEvent),
-      concatMap((event: ProductCreatedEvent) => {
+      concatMap((event) => {
         return from(this.fileStorage.moveFromTemp(event.images)).pipe(
           concatMap(() => {
             console.log(2222222);
-            return of(void 0); // явно возвращаем Observable<void>
+            return of(void 0);
           }),
           catchError(async (error) => {
             await this.fileStorage.cleanupTemp(event.images);
@@ -28,4 +28,5 @@ export class ProductFilesAndSearchSaga {
         );
       }),
     );
+  }
 }

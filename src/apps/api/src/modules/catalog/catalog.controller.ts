@@ -55,7 +55,7 @@ export class CatalogController {
 
   @Post('product/')
   @ApiOperation({ summary: 'Создать продукт' })
-  @UseInterceptors(FilesInterceptor('images', COUNT_FILES))
+  @UploadFiles()
   createProduct(@Body() dto: BaseProductDto, @UploadedFiles() images: Express.Multer.File[]) {
     return this.commandBus.execute(
       new CreateProductCommand(

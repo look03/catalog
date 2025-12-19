@@ -6,8 +6,8 @@ import { UpdateFiles } from '../../../types/global.catalog';
 
 @Injectable()
 export class FileStorageService {
-  private tempDir = path.resolve('./temp');
-  private uploadRoot = path.resolve('./uploads');
+  private tempDir = './tmp/uploads';
+  private uploadRoot = './uploads';
 
   getTmpDir() {
     return this.tempDir;
@@ -24,7 +24,7 @@ export class FileStorageService {
 
     try {
       const targetDir = path.dirname(files[0].destPath);
-
+      console.log(targetDir, '<<<<<<<<<<<<<< targetDir');
       await fs.mkdir(targetDir, { recursive: true });
 
       for (const file of files) {

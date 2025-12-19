@@ -39,6 +39,7 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
           manager,
           command.images,
         );
+        console.log(pathImages, '<<<<<<<<<<<<<< pathImages');
 
         this.eventBus.publish(
           new ProductCreatedEvent(
