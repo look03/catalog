@@ -2,6 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { Saga, ofType } from '@nestjs/cqrs';
 import { ProductCreatedEvent } from '../events/product-created.event';
+import { ProductUpdatedEvent } from '../events/product-updated.event';
 import { from, Observable } from 'rxjs';
 import { concatMap, catchError } from 'rxjs/operators';
 import { FileStorageService } from '../../common/services/file-storage.service';
@@ -17,6 +18,25 @@ export class ProductFilesAndSearchSaga {
       ofType(ProductCreatedEvent),
       concatMap((event) => {
         return from(this.fileStorage.moveFromTemp(event.images)).pipe(
+          concatMap(() => {
+            console.log(2222222);
+            return of(void 0);
+          }),
+          catchError(async (error) => {
+            await this.fileStorage.cleanupTemp(event.images);
+            throw error;
+          }),
+        );
+      }),
+    );
+  }
+
+  @Saga()
+  productUpdated(events$: Observable<ProductUpdatedEvent>): Observable<void> {
+    return events$.pipe(
+      ofType(ProductUpdatedEvent),
+      concatMap((event) => {
+        return from(this.fileStorage.moveFromTemp(event.images, event.oldFileDir)).pipe(
           concatMap(() => {
             console.log(2222222);
             return of(void 0);

@@ -9,7 +9,7 @@ import { ProductImage } from '../entities/product-images.entity';
 import { HashPathService } from '../../common/services/hash-path.service';
 import { FileStorageService } from '../../common/services/file-storage.service';
 import * as path from 'path';
-import { UpdateFiles } from '../../../types/global.catalog';
+import { UpdateImage } from '../interfaces/product.interface';
 
 @Injectable()
 export class ProductService {
@@ -39,13 +39,22 @@ export class ProductService {
     product: Product,
     manager: EntityManager,
     files?: Express.Multer.File[],
-  ): Promise<UpdateFiles[] | null> {
+  ): Promise<UpdateImage | null> {
     try {
       if (!files) {
         return null;
       }
 
-      await manager.delete(ProductImage, { productId: product.id });
+      const oldProductFiles = await manager.find(ProductImage, {
+        where: { productId: product.id },
+      });
+
+      let oldFileDir: string | null = null;
+      if (oldProductFiles?.length) {
+        oldFileDir = path.dirname(oldProductFiles[0].path);
+        await manager.delete(ProductImage, { productId: product.id });
+      }
+
       const relativeTargetDir = this.getRelativeTargetDir(product.id);
       const images = files.map((file) => {
         const fullPath = path.join(relativeTargetDir, file.originalname);
@@ -66,11 +75,14 @@ export class ProductService {
         images.map((i) => i.entity),
       );
 
-      return images.map((i) => ({
-        destPath: i.destPath,
-        name: i.name,
-        tmpPath: i.tmpPath,
-      }));
+      return {
+        newImages: images.map((i) => ({
+          destPath: i.destPath,
+          name: i.name,
+          tmpPath: i.tmpPath,
+        })),
+        oldFileDir: oldFileDir,
+      };
     } catch (error) {
       throw new InternalServerErrorException({
         success: false,

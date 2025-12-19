@@ -1,4 +1,4 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateProductCommand } from '../../impl/product/update-product.command';
 import { Product } from '../../../entities/product.entity';
 import { DataSource } from 'typeorm';
@@ -7,12 +7,15 @@ import { ProductService } from '../../../services/product.service';
 import { transliterate } from '../../../../../common/utils/transliteration.util';
 import { assignIfDefined } from '../../../../../common/utils/assing-if-defined.util';
 import type { UpdatableProductFields } from '../../../../../types/global.catalog';
+import { UpdateImage } from '../../../interfaces/product.interface';
+import { ProductUpdatedEvent } from '../../../events/product-updated.event';
 
 @CommandHandler(UpdateProductCommand)
 export class UpdateProductHandler implements ICommandHandler<UpdateProductCommand> {
   constructor(
     private readonly dataSource: DataSource,
     private readonly productService: ProductService,
+    private readonly eventBus: EventBus,
   ) {}
 
   async execute(command: UpdateProductCommand): Promise<void> {
@@ -46,12 +49,26 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
 
         await manager.save(product);
 
+        let imagesData: UpdateImage | null = null;
         if (command.images?.length) {
-          await this.productService.updateProductImages(product, manager, command.images);
+          imagesData = await this.productService.updateProductImages(
+            product,
+            manager,
+            command.images,
+          );
         }
 
-        // TODO: сделать сагу на перенос файлов из папок
-        // TODO: добавить обновления эластика
+        this.eventBus.publish(
+          new ProductUpdatedEvent(
+            {
+              id: product.id,
+              title: product.title,
+              price: product.price,
+            },
+            imagesData?.newImages,
+            imagesData?.oldFileDir,
+          ),
+        );
       });
     } catch (error) {
       throw new InternalServerErrorException({

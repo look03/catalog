@@ -7,7 +7,7 @@ import { ProductService } from '../../../services/product.service';
 import { EventBus } from '@nestjs/cqrs';
 import { ProductCreatedEvent } from '../../../events/product-created.event';
 import { InternalServerErrorException } from '@nestjs/common';
-import { UpdateFiles } from '../../../../../types/global.catalog';
+import { UpdateImage } from '../../../interfaces/product.interface';
 
 @CommandHandler(CreateProductCommand)
 export class CreateProductHandler implements ICommandHandler<CreateProductCommand> {
@@ -34,12 +34,11 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
         const result: Product = await manager.save(product);
 
         await this.productService.updateProductSections(product, command.section_ids, manager);
-        const pathImages: UpdateFiles[] | null = await this.productService.updateProductImages(
+        const imagesData: UpdateImage | null = await this.productService.updateProductImages(
           product,
           manager,
           command.images,
         );
-        console.log(pathImages, '<<<<<<<<<<<<<< pathImages');
 
         this.eventBus.publish(
           new ProductCreatedEvent(
@@ -48,7 +47,7 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
               title: product.title,
               price: product.price,
             },
-            pathImages,
+            imagesData?.newImages,
           ),
         );
 
