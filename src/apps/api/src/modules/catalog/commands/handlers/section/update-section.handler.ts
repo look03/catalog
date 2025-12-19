@@ -22,14 +22,20 @@ export class UpdateSectionHandler implements ICommandHandler<UpdateSectionComman
         throw new NotFoundException(`Section with id ${command.id} not found`);
       }
 
-      if (command.title) {
-        section.title = command.title;
-        section.code = transliterate(command.title) as string;
+      if (section.id === command.parent_section_id) {
+        throw new InternalServerErrorException(
+          'The section ID and parent_section_id must not be equal.',
+        );
       }
 
-      section.parent_section = await this.sectionService.checkParentSection(
-        command.parent_section_id,
-      );
+      let code: string = '';
+      if (command.title) {
+        code = transliterate(command.title) as string;
+        section.title = command.title;
+        section.code = code;
+      }
+
+      await this.sectionService.designParentSection(command.parent_section_id, code, section);
 
       await this.repo.save(section);
     } catch (error) {

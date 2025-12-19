@@ -1,3 +1,3 @@
-import { ProductFilesAndSearchSaga } from './product-files-and-search.saga';
+import { ProductChangesSaga } from './product-changes.saga';
 
-export const sagas = [ProductFilesAndSearchSaga];
+export const sagas = [ProductChangesSaga];

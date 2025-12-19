@@ -8,7 +8,6 @@ import {
   ParseIntPipe,
   Delete,
   UploadedFiles,
-  UseInterceptors,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { BaseProductDto } from './dto/base-product.dto';
@@ -21,9 +20,8 @@ import { UpdateSectionCommand } from './commands/impl/section/update-section.com
 import { DeleteSectionCommand } from './commands/impl/section/delete-section.command';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
-import { FilesInterceptor } from '@nestjs/platform-express';
 import { UploadFiles } from '../../common/decorators/upload-files.decorator';
-const COUNT_FILES = 5;
+import { ReIndexSearchCommand } from './commands/impl/reindex-search.command';
 
 @ApiTags('catalog')
 @Controller('catalog/')
@@ -101,7 +99,13 @@ export class CatalogController {
   }
 
   @Get()
-  async findAll() {
+  findAll() {
     console.log(333333, '<<<<<<<3<<<<<<< 333333');
+  }
+
+  @Post('re-index/')
+  @ApiOperation({ summary: 'Переиндексировать эластик' })
+  reIndex() {
+    return this.commandBus.execute(new ReIndexSearchCommand());
   }
 }

@@ -17,17 +17,14 @@ export class CreateSectionHandler implements ICommandHandler<CreateSectionComman
 
   async execute(command: CreateSectionCommand) {
     try {
+      const code = transliterate(command.title) ?? undefined;
       const fields = {
         title: command.title,
-        code: transliterate(command.title) ?? undefined,
+        code,
       };
 
       const section = this.repo.create(fields);
-
-      section.parent_section = await this.sectionService.checkParentSection(
-        command.parent_section_id,
-      );
-
+      await this.sectionService.designParentSection(command.parent_section_id, code, section);
       const result = await this.repo.save(section);
 
       return {

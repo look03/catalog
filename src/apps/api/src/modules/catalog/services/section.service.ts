@@ -9,19 +9,24 @@ export class SectionService {
     @InjectRepository(Section)
     private readonly repo: Repository<Section>,
   ) {}
-
-  async checkParentSection(
-    parent_section_id: number | null | undefined,
-  ): Promise<Section | undefined> {
-    if (!parent_section_id) {
-      return undefined;
+  async designParentSection(
+    parentSectionId: number | undefined,
+    code: string | undefined,
+    section: Section,
+  ): Promise<void> {
+    if (!parentSectionId) {
+      section.path = `/catalog/${code}/`;
+      return;
     }
 
-    const parentSection = await this.repo.findOneBy({ id: parent_section_id });
+    const parentSection = await this.repo.findOneBy({ id: parentSectionId });
     if (!parentSection) {
-      throw new NotFoundException(`Parent section with id ${parent_section_id} not found`);
+      throw new NotFoundException(`Parent section with id ${parentSectionId} not found`);
     }
 
-    return parentSection;
+    section.parent_section = parentSection;
+    if (code) {
+      section.path = `${parentSection.path}${code}/`;
+    }
   }
 }

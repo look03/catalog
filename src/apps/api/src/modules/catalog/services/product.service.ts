@@ -32,7 +32,7 @@ export class ProductService {
   getRelativeTargetDir(productId: number): string {
     const hashedDir = this.hashPath.getHashedPath(productId, 1);
     const dir = this.fileStorageService.getUploadRoot();
-    return path.join(dir, 'products', hashedDir);
+    return path.join(dir, 'images', hashedDir);
   }
 
   async updateProductImages(

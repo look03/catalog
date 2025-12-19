@@ -64,10 +64,27 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./logs/nginx:/var/log/nginx
-      # - ./src/front:/var/www/html  # если есть фронт
+      # - ./src/front:/var/www/html  # если есть фронт 7.17.20
     depends_on:
       - api
     command: nginx -g "daemon off;"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.20
+    container_name: elasticsearch
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 2g
+    ports:
+      - "127.0.0.1:9200:9200"
+    volumes:
+      - ./elasticsearch/data:/usr/share/elasticsearch/data
 
 networks:
   docker_net:

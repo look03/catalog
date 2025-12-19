@@ -4,6 +4,7 @@ import { DeleteSectionHandler } from './section/delete-section.handler';
 import { CreateProductHandler } from './product/create-product.handler';
 import { UpdateProductHandler } from './product/update-product.handler';
 import { DeleteProductHandler } from './product/delete-product.handler';
+import { ReIndexSearchHandler } from './reindex-search.handler';
 export const handlers = [
   CreateSectionHandler,
   CreateProductHandler,
@@ -11,4 +12,5 @@ export const handlers = [
   DeleteSectionHandler,
   DeleteProductHandler,
   UpdateProductHandler,
+  ReIndexSearchHandler,
 ];

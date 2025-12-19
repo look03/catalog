@@ -21,6 +21,13 @@ export class Section {
   code: string;
 
   @Column({
+    type: 'text',
+    comment: 'Путь к разделу',
+    nullable: true,
+  })
+  path: string;
+
+  @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
     comment: 'Дата создания товара',
