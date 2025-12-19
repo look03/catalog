@@ -15,7 +15,7 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
     private readonly productService: ProductService,
   ) {}
 
-  async execute(command: UpdateProductCommand) {
+  async execute(command: UpdateProductCommand): Promise<void> {
     try {
       return await this.dataSource.transaction(async (manager) => {
         const product = await manager.findOne(Product, {

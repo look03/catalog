@@ -6,7 +6,10 @@ import { Brand } from '../entities/brand.entity';
 import { Section } from '../entities/section.entity';
 import { ProductSection } from '../entities/product-section.entity';
 import { ProductImage } from '../entities/product-images.entity';
-import { ConfigService } from '@nestjs/config';
+import { HashPathService } from '../../common/services/hash-path.service';
+import { FileStorageService } from '../../common/services/file-storage.service';
+import * as path from 'path';
+import { UpdateFiles } from '../../../types/global.catalog';
 
 @Injectable()
 export class ProductService {
@@ -22,33 +25,52 @@ export class ProductService {
 
     @InjectRepository(Brand)
     private readonly repoBrand: Repository<Brand>,
-
-    private configService: ConfigService,
+    private readonly hashPath: HashPathService,
+    private readonly fileStorageService: FileStorageService,
   ) {}
+
+  getRelativeTargetDir(productId: number): string {
+    const hashedDir = this.hashPath.getHashedPath(productId);
+    const dir = this.fileStorageService.getUploadRoot();
+    return path.join(dir, 'products', hashedDir);
+  }
 
   async updateProductImages(
     product: Product,
     manager: EntityManager,
     files?: Express.Multer.File[],
-  ): Promise<void> {
+  ): Promise<UpdateFiles[] | null> {
     try {
       if (!files) {
-        return;
+        return null;
       }
 
       await manager.delete(ProductImage, { productId: product.id });
+      const relativeTargetDir = this.getRelativeTargetDir(product.id);
+      const images = files.map((file) => {
+        const fullPath = path.join(relativeTargetDir, file.originalname);
+        return {
+          entity: manager.create(ProductImage, {
+            product,
+            filename: file.originalname,
+            path: fullPath,
+          }),
+          destPath: fullPath,
+          name: file.originalname,
+          tmpPath: file.path,
+        };
+      });
 
-      const dir = this.configService.get<string>('FILE_PATH_DIR') || '/uploads/';
-
-      const images = files.map((file) =>
-        manager.create(ProductImage, {
-          product,
-          filename: file.originalname,
-          path: `${dir}${file.originalname}`,
-        }),
+      await manager.save(
+        ProductImage,
+        images.map((i) => i.entity),
       );
 
-      await manager.save(ProductImage, images);
+      return images.map((i) => ({
+        destPath: i.destPath,
+        name: i.name,
+        tmpPath: i.tmpPath,
+      }));
     } catch (error) {
       throw new InternalServerErrorException({
         success: false,
