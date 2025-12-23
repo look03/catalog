@@ -7,3 +7,42 @@ export type UpdateFiles = {
   destPath: string;
   name: string;
 };
+
+export interface SearchSection {
+  id: number;
+  title: string;
+  code: string;
+  path: string;
+  parent_section_id: number | undefined;
+  type: string;
+}
+
+export interface Brand {
+  name: string;
+  code: string;
+}
+
+export interface BaseProduct {
+  id: number;
+  title: string;
+  code: string;
+  price: number;
+  color: string | undefined;
+  preview_text: string | undefined;
+  created_at: Date;
+  updated_at: Date;
+  images: string[];
+}
+
+export type SearchProduct = BaseProduct & {
+  section_ids: number[];
+  brand: Brand | undefined;
+  brand_code: string | undefined;
+  paths: string[];
+  type: string;
+};
+
+export interface SearchSectionsAndProducts {
+  sections: SearchSection[];
+  products: SearchProduct[];
+}

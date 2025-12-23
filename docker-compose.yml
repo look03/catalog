@@ -52,6 +52,8 @@ services:
     ports:
       - "127.0.0.1:3001:3000"
     depends_on:
+      elasticsearch:
+        condition: service_started
       postgres:
         condition: service_healthy
 
@@ -70,6 +72,7 @@ services:
     command: nginx -g "daemon off;"
 
   elasticsearch:
+    <<: *base
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.20
     container_name: elasticsearch
     environment:
@@ -82,7 +85,7 @@ services:
         hard: -1
     mem_limit: 2g
     ports:
-      - "127.0.0.1:9200:9200"
+      - "9200:9200"
     volumes:
       - ./elasticsearch/data:/usr/share/elasticsearch/data
 
