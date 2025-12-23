@@ -14,7 +14,7 @@ export interface SearchSection {
   code: string;
   path: string;
   parent_section_id: number | undefined;
-  type: string;
+  type: 'section';
 }
 
 export interface Brand {

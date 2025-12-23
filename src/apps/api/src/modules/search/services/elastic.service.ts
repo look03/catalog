@@ -13,8 +13,49 @@ export class ElasticService implements OnModuleInit {
     });
   }
 
-  getClient(): Client {
-    return this.client;
+  private async getIndex(): Promise<string | null> {
+    try {
+      const alias: string = process.env.ELASTIC_ALIAS || 'catalog_search';
+
+      const aliasExists = await this.client.indices.existsAlias({ name: alias });
+      if (!aliasExists) {
+        return null;
+      }
+
+      const aliasInfo = await this.client.indices.getAlias({ name: alias });
+      const indices = Object.keys(aliasInfo);
+
+      return indices.length > 0 ? indices[0] : null;
+    } catch (error) {
+      throw new InternalServerErrorException({
+        success: false,
+        message: 'Failed to get index for alias',
+        details: error,
+      });
+    }
+  }
+
+  async updateOrCreate(id: string, doc: Record<string, any>): Promise<void> {
+    try {
+      const index = await this.getIndex();
+      if (!index) {
+        throw new InternalServerErrorException('No such index');
+      }
+
+      await this.client.update({
+        index,
+        id,
+        doc,
+        doc_as_upsert: true,
+        refresh: true,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException({
+        success: false,
+        message: 'Failed to add index',
+        details: error,
+      });
+    }
   }
 
   async createIndex(index: string, mapping: object): Promise<void> {
@@ -30,7 +71,6 @@ export class ElasticService implements OnModuleInit {
         body: mapping,
       });
     } catch (error) {
-      console.log(error, '<<<<<<<<<<<<<< error');
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to create elastic index',
@@ -40,10 +80,20 @@ export class ElasticService implements OnModuleInit {
   }
 
   async deleteIndex(index: string): Promise<void> {
-    const exists = await this.client.indices.exists({ index });
-    if (!exists) return;
+    try {
+      const exists = await this.client.indices.exists({ index });
+      if (!exists) {
+        return;
+      }
 
-    await this.client.indices.delete({ index });
+      await this.client.indices.delete({ index });
+    } catch (error) {
+      throw new InternalServerErrorException({
+        success: false,
+        message: 'Failed to delete index',
+        details: error,
+      });
+    }
   }
 
   async bulk(index: string, documents: Array<Record<string, unknown>>): Promise<void> {
@@ -58,6 +108,28 @@ export class ElasticService implements OnModuleInit {
       throw new InternalServerErrorException({
         success: false,
         message: 'Write goods in elastic',
+        details: error,
+      });
+    }
+  }
+
+  async deleteDocument(id: string): Promise<void> {
+    try {
+      const index = await this.getIndex();
+
+      if (!index) {
+        throw new InternalServerErrorException('No such index');
+      }
+
+      await this.client.delete({
+        index,
+        id,
+        refresh: true,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException({
+        success: false,
+        message: 'Failed to delete index',
         details: error,
       });
     }
