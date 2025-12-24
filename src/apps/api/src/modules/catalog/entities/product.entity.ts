@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Brand } from './brand.entity';
 import { ProductSection } from './product-section.entity';
 import { ProductImage } from './product-images.entity';
@@ -56,10 +64,9 @@ export class Product {
   })
   created_at: Date;
 
-  @Column({
+  @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
     comment: 'Дата последнего изменения товара',
   })
   updated_at: Date;
