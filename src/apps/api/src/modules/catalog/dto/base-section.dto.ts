@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, Length, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, Length, IsOptional, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 export class BaseSectionDto {
   @IsString()
@@ -11,4 +11,9 @@ export class BaseSectionDto {
   @IsNumber()
   @ApiProperty({ example: '1', description: 'Id родительской секции' })
   parent_section_id?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ example: 'true', description: 'Активность' })
+  active?: boolean;
 }

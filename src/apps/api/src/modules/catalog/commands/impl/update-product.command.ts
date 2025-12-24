@@ -1,6 +1,7 @@
 export class UpdateProductCommand {
   constructor(
     public readonly id: number,
+    public readonly active?: boolean,
     public readonly title?: string,
     public readonly section_ids?: number[],
     public readonly price?: number,

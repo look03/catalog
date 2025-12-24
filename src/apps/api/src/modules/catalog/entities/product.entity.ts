@@ -9,6 +9,13 @@ export class Product {
   id: number;
 
   @Column({
+    type: 'boolean',
+    comment: 'Активность товара',
+    default: true,
+  })
+  active: boolean;
+
+  @Column({
     type: 'varchar',
     comment: 'Наименование товара',
     unique: true,

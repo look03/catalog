@@ -1,7 +1,5 @@
+import { SearchProduct, SearchSection } from '../../../../types/global.catalog';
+
 export class IndexDocumentCommand {
-  constructor(
-    public readonly id: number,
-    public readonly title: string,
-    public readonly price: number,
-  ) {}
+  constructor(public readonly document: SearchSection | SearchProduct) {}
 }

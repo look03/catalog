@@ -12,51 +12,54 @@ import {
 } from '../../../types/global.catalog';
 
 @Injectable()
-export class ReIndexSearchService {
+export class IndexSearchService {
   constructor(
     @InjectRepository(Product)
     private readonly repoProduct: Repository<Product>,
     @InjectRepository(Section)
     private readonly repoSection: Repository<Section>,
-
-    private readonly hashPath: HashPathService,
-    private readonly fileStorageService: FileStorageService,
   ) {}
 
-  async getReIndexData(): Promise<SearchSectionsAndProducts | null> {
-    const sections = await this.repoSection.createQueryBuilder('product').getMany();
+  async getIndexData(updatedSince?: Date): Promise<SearchSectionsAndProducts> {
+    const sectionQuery = this.repoSection.createQueryBuilder('section');
 
-    if (!sections.length) {
-      return null;
+    if (updatedSince) {
+      sectionQuery.andWhere('section.updated_at >= :updatedSince', { updatedSince });
     }
+
+    const sections = await sectionQuery.getMany();
 
     const formatSections: SearchSection[] = sections.map((p) => ({
       id: p.id,
+      active: p.active,
       title: p.title,
       code: p.code,
       parent_section_id: p.parent_section?.id,
       path: p.path,
       type: 'section',
+      created_at: p.created_at,
+      updated_at: p.updated_at,
     }));
 
-    const products = await this.repoProduct
+    const productQuery = this.repoProduct
       .createQueryBuilder('product')
       .leftJoin('product.images', 'images')
       .leftJoinAndSelect('product.productSections', 'productSections')
       .leftJoin('productSections.section', 'section')
       .leftJoin('product.brand', 'brand')
-      .addSelect(['brand.code', 'brand.name', 'images.path', 'section.id'])
-      .getMany();
+      .addSelect(['brand.code', 'brand.name', 'images.path', 'section.id']);
 
-    if (!products.length) {
-      return null;
+    if (updatedSince) {
+      productQuery.andWhere('product.updated_at >= :updatedSince', { updatedSince });
     }
 
-    const sectionMap = new Map<number, SearchSection>();
+    const products = await productQuery.getMany();
 
+    const sectionMap = new Map<number, SearchSection>();
     formatSections.forEach((section) => {
       sectionMap.set(section.id, section);
     });
+
     const formatProducts: SearchProduct[] = products.map((p) => {
       const paths = p.productSections
         .map((ps) => {
@@ -67,6 +70,7 @@ export class ReIndexSearchService {
 
       return {
         id: p.id,
+        active: p.active,
         title: p.title,
         code: p.code,
         price: p.price,
@@ -74,8 +78,8 @@ export class ReIndexSearchService {
         preview_text: p.preview_text,
         created_at: p.created_at,
         updated_at: p.updated_at,
-        section_ids: p.productSections.map((p) => p.section.id),
-        images: p.images.map((p) => p.path),
+        section_ids: p.productSections.map((ps) => ps.section.id),
+        images: p.images.map((img) => img.path),
         brand: p.brand || undefined,
         brand_code: p.brand?.code || undefined,
         paths,
@@ -84,8 +88,8 @@ export class ReIndexSearchService {
     });
 
     return {
-      sections: formatSections,
-      products: formatProducts,
+      sections: formatSections || [],
+      products: formatProducts || [],
     };
   }
 }

@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DeleteProductCommand } from '../../impl/product/delete-product.command';
-import { Product } from '../../../entities/product.entity';
+import { DeleteProductCommand } from '../impl/delete-product.command';
+import { Product } from '../../entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotFoundException, InternalServerErrorException } from '@nestjs/common';

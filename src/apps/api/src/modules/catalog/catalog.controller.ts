@@ -12,12 +12,12 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { BaseProductDto } from './dto/base-product.dto';
 import { BaseSectionDto } from './dto/base-section.dto';
-import { CreateProductCommand } from './commands/impl/product/create-product.command';
-import { UpdateProductCommand } from './commands/impl/product/update-product.command';
-import { DeleteProductCommand } from './commands/impl/product/delete-product.command';
-import { CreateSectionCommand } from './commands/impl/section/create-section.command';
-import { UpdateSectionCommand } from './commands/impl/section/update-section.command';
-import { DeleteSectionCommand } from './commands/impl/section/delete-section.command';
+import { CreateProductCommand } from './commands/impl/create-product.command';
+import { UpdateProductCommand } from './commands/impl/update-product.command';
+import { DeleteProductCommand } from './commands/impl/delete-product.command';
+import { CreateSectionCommand } from './commands/impl/create-section.command';
+import { UpdateSectionCommand } from './commands/impl/update-section.command';
+import { DeleteSectionCommand } from './commands/impl/delete-section.command';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { UploadFiles } from '../../common/decorators/upload-files.decorator';
@@ -41,7 +41,9 @@ export class CatalogController {
   @ApiOperation({ summary: 'Обновить секцию по id' })
   @ApiParam({ name: 'id', type: Number })
   updateSection(@Param('id', ParseIntPipe) id: number, @Body() dto: BaseSectionDto) {
-    return this.commandBus.execute(new UpdateSectionCommand(id, dto.title, dto.parent_section_id));
+    return this.commandBus.execute(
+      new UpdateSectionCommand(id, dto.active, dto.title, dto.parent_section_id),
+    );
   }
 
   @Delete('section/:id')
@@ -80,6 +82,7 @@ export class CatalogController {
     return this.commandBus.execute(
       new UpdateProductCommand(
         id,
+        dto.active,
         dto.title,
         dto.section_ids,
         dto.price,

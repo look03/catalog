@@ -1,14 +1,14 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
-import { UpdateProductCommand } from '../../impl/product/update-product.command';
-import { Product } from '../../../entities/product.entity';
+import { UpdateProductCommand } from '../impl/update-product.command';
+import { Product } from '../../entities/product.entity';
 import { DataSource } from 'typeorm';
 import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { ProductService } from '../../../services/product.service';
-import { transliterate } from '../../../../../common/utils/transliteration.util';
-import { assignIfDefined } from '../../../../../common/utils/assing-if-defined.util';
-import type { UpdatableProductFields } from '../../../../../types/global.catalog';
-import { UpdateImage } from '../../../interfaces/product.interface';
-import { ProductUpdatedEvent } from '../../../events/product-updated.event';
+import { ProductService } from '../../services/product.service';
+import { transliterate } from '../../../../common/utils/transliteration.util';
+import { assignIfDefined } from '../../../../common/utils/assing-if-defined.util';
+import type { UpdatableProductFields } from '../../../../types/global.catalog';
+import { UpdateImage } from '../../interfaces/product.interface';
+import { ProductUpdatedEvent } from '../../events/product-updated.event';
 
 @CommandHandler(UpdateProductCommand)
 export class UpdateProductHandler implements ICommandHandler<UpdateProductCommand> {
@@ -45,6 +45,10 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
 
         if (command.brand_id) {
           product.brand = await this.productService.getBrand(command.brand_id, manager);
+        }
+
+        if (command.active !== undefined) {
+          product.active = command.active;
         }
 
         await manager.save(product);

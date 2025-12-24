@@ -6,37 +6,14 @@ import { ProductUpdatedEvent } from '../events/product-updated.event';
 import { from, Observable } from 'rxjs';
 import { concatMap, catchError } from 'rxjs/operators';
 import { FileStorageService } from '../../common/services/file-storage.service';
-import { map } from 'rxjs';
 import { ProductIndexEvent } from '../interfaces/product.interface';
-import { IndexDocumentCommand } from '../../search/commands/impl/index-document.command';
 
 @Injectable()
 export class ProductChangesSaga {
-  constructor(
-    private readonly fileStorage: FileStorageService,
-    private readonly commandBus: CommandBus,
-  ) {}
+  constructor(private readonly fileStorage: FileStorageService) {}
 
   private handleFilesAndIndex(event: ProductIndexEvent): Observable<void> {
-    if (!event.images || !event.images.length) {
-      return from(
-        this.commandBus.execute(
-          new IndexDocumentCommand(event.product.id, event.product.title, event.product.price),
-        ),
-      )
-        .pipe()
-        .pipe(map(() => void 0));
-    }
-
     return from(this.fileStorage.moveFromTemp(event.images, event.oldFileDir)).pipe(
-      concatMap(() =>
-        from(
-          this.commandBus.execute(
-            new IndexDocumentCommand(event.product.id, event.product.title, event.product.price),
-          ),
-        ),
-      ),
-      map(() => void 0),
       catchError(async (error) => {
         await this.fileStorage.cleanupTemp(event.images);
         throw error;

@@ -113,6 +113,41 @@ export class ElasticService implements OnModuleInit {
     }
   }
 
+  async syncDocumentsBulk(documents: Array<Record<string, unknown>>): Promise<void> {
+    try {
+      const index = await this.getIndex();
+
+      const activeDocs = documents.filter((doc) => doc.active !== false);
+      const inactiveDocs = documents.filter((doc) => doc.active === false);
+
+      const updateBody = activeDocs.flatMap((doc) => [
+        { update: { _index: index, _id: doc.id } },
+        { doc, doc_as_upsert: true },
+      ]);
+
+      const deleteBody = inactiveDocs.map((doc) => ({
+        delete: { _index: index, _id: doc.id },
+      }));
+
+      const bulkBody = [...updateBody, ...deleteBody];
+
+      if (bulkBody.length === 0) {
+        return;
+      }
+
+      await this.client.bulk({
+        refresh: true,
+        body: bulkBody,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException({
+        success: false,
+        message: 'Failed to bulk insert/delete documents',
+        details: error,
+      });
+    }
+  }
+
   async deleteDocument(id: string): Promise<void> {
     try {
       const index = await this.getIndex();

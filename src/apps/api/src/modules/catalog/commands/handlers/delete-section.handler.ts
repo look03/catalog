@@ -1,10 +1,10 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DeleteSectionCommand } from '../../impl/section/delete-section.command';
+import { DeleteSectionCommand } from '../impl/delete-section.command';
 import { NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Section } from '../../../entities/section.entity';
+import { Section } from '../../entities/section.entity';
 import { Repository } from 'typeorm';
-import { DeleteDocumentCommand } from '../../../../search/commands/impl/delete-document.command';
+import { DeleteDocumentCommand } from '../../../search/commands/impl/delete-document.command';
 
 @CommandHandler(DeleteSectionCommand)
 export class DeleteSectionHandler implements ICommandHandler<DeleteSectionCommand> {

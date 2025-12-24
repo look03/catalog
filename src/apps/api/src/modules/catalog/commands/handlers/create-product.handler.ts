@@ -1,13 +1,13 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CreateProductCommand } from '../../impl/product/create-product.command';
-import { Product } from '../../../entities/product.entity';
+import { CreateProductCommand } from '../impl/create-product.command';
+import { Product } from '../../entities/product.entity';
 import { DataSource } from 'typeorm';
-import { transliterate } from '../../../../../common/utils/transliteration.util';
-import { ProductService } from '../../../services/product.service';
+import { transliterate } from '../../../../common/utils/transliteration.util';
+import { ProductService } from '../../services/product.service';
 import { EventBus } from '@nestjs/cqrs';
-import { ProductCreatedEvent } from '../../../events/product-created.event';
+import { ProductCreatedEvent } from '../../events/product-created.event';
 import { InternalServerErrorException } from '@nestjs/common';
-import { UpdateImage } from '../../../interfaces/product.interface';
+import { UpdateImage } from '../../interfaces/product.interface';
 
 @CommandHandler(CreateProductCommand)
 export class CreateProductHandler implements ICommandHandler<CreateProductCommand> {

@@ -3,21 +3,21 @@ import { DataSource } from 'typeorm';
 import { EventBus, CommandBus } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
 import { ReIndexSearchCommand } from '../impl/reindex-search.command';
-import { ReIndexSearchService } from '../../services/reindex-search.service';
+import { IndexSearchService } from '../../services/index-search.service';
 import { ReIndexCommand } from '../../../search/commands/impl/re-index.command';
 
 @CommandHandler(ReIndexSearchCommand)
 export class ReIndexSearchHandler implements ICommandHandler<ReIndexSearchCommand> {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly reIndexSearchService: ReIndexSearchService,
+    private readonly reIndexSearchService: IndexSearchService,
   ) {}
 
   async execute() {
     try {
-      const response = await this.reIndexSearchService.getReIndexData();
+      const response = await this.reIndexSearchService.getIndexData();
 
-      if (!response) {
+      if (!response.sections.length || !response.products.length) {
         return {
           message: 'There are no products in the catalog.',
         };

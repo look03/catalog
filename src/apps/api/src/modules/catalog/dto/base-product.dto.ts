@@ -7,6 +7,7 @@ import {
   IsArray,
   ArrayNotEmpty,
   IsInt,
+  IsBoolean,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
@@ -49,4 +50,9 @@ export class BaseProductDto {
   @ApiProperty({ example: '1', description: 'Id бренда' })
   @Transform(({ value }) => Number(value))
   brand_id: number;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiProperty({ example: 'true', description: 'Активность' })
+  active?: boolean;
 }

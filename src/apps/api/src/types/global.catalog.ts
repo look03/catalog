@@ -10,11 +10,14 @@ export type UpdateFiles = {
 
 export interface SearchSection {
   id: number;
+  active: boolean;
   title: string;
   code: string;
   path: string;
   parent_section_id: number | undefined;
   type: 'section';
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface Brand {
@@ -24,6 +27,7 @@ export interface Brand {
 
 export interface BaseProduct {
   id: number;
+  active: boolean;
   title: string;
   code: string;
   price: number;

@@ -1,10 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UpdateSectionCommand } from '../../impl/section/update-section.command';
+import { UpdateSectionCommand } from '../impl/update-section.command';
 import { NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import { transliterate } from '../../../../../common/utils/transliteration.util';
-import { SectionService } from '../../../services/section.service';
+import { transliterate } from '../../../../common/utils/transliteration.util';
+import { SectionService } from '../../services/section.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Section } from '../../../entities/section.entity';
+import { Section } from '../../entities/section.entity';
 import { Repository } from 'typeorm';
 
 @CommandHandler(UpdateSectionCommand)
@@ -33,6 +33,10 @@ export class UpdateSectionHandler implements ICommandHandler<UpdateSectionComman
         code = transliterate(command.title) as string;
         section.title = command.title;
         section.code = code;
+      }
+
+      if (command.active !== undefined) {
+        section.active = command.active;
       }
 
       await this.sectionService.designParentSection(command.parent_section_id, code, section);

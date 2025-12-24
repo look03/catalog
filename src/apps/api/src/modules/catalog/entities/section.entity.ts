@@ -1,10 +1,25 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { ProductSection } from './product-section.entity';
 
 @Entity('sections')
 export class Section {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({
+    type: 'boolean',
+    comment: 'Активность раздела',
+    default: true,
+  })
+  active: boolean;
 
   @Column({
     type: 'varchar',
@@ -34,10 +49,9 @@ export class Section {
   })
   created_at: Date;
 
-  @Column({
+  @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
     comment: 'Дата последнего изменения товара',
   })
   updated_at: Date;
