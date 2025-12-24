@@ -7,7 +7,6 @@ export interface Product {
 }
 
 export interface ProductIndexEvent {
-  product: Product;
   images?: UpdateFiles[] | null | undefined;
   oldFileDir?: string | null | undefined;
 }

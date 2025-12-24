@@ -40,16 +40,7 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
           command.images,
         );
 
-        this.eventBus.publish(
-          new ProductCreatedEvent(
-            {
-              id: product.id,
-              title: product.title,
-              price: product.price,
-            },
-            imagesData?.newImages,
-          ),
-        );
+        this.eventBus.publish(new ProductCreatedEvent(imagesData?.newImages));
 
         return result.id;
       });

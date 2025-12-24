@@ -32,6 +32,8 @@ export class FileStorageService {
         }
       }),
     );
+
+    await this.clearDirWithFiles(path.dirname(dirPath));
   }
 
   async clearDirWithFiles(dirPath: string): Promise<void> {

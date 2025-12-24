@@ -63,15 +63,7 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
         }
 
         this.eventBus.publish(
-          new ProductUpdatedEvent(
-            {
-              id: product.id,
-              title: product.title,
-              price: product.price,
-            },
-            imagesData?.newImages,
-            imagesData?.oldFileDir,
-          ),
+          new ProductUpdatedEvent(imagesData?.newImages, imagesData?.oldFileDir),
         );
       });
     } catch (error) {

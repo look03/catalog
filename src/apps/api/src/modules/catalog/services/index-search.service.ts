@@ -47,7 +47,7 @@ export class IndexSearchService {
       .leftJoinAndSelect('product.productSections', 'productSections')
       .leftJoin('productSections.section', 'section')
       .leftJoin('product.brand', 'brand')
-      .addSelect(['brand.code', 'brand.name', 'images.path', 'section.id']);
+      .addSelect(['brand.code', 'brand.name', 'images.path', 'section.id', 'section.path']);
 
     if (updatedSince) {
       productQuery.andWhere('product.updated_at >= :updatedSince', { updatedSince });
@@ -55,16 +55,10 @@ export class IndexSearchService {
 
     const products = await productQuery.getMany();
 
-    const sectionMap = new Map<number, SearchSection>();
-    formatSections.forEach((section) => {
-      sectionMap.set(section.id, section);
-    });
-
     const formatProducts: SearchProduct[] = products.map((p) => {
       const paths = p.productSections
         .map((ps) => {
-          const sectionPath = sectionMap.get(ps.section.id)?.path;
-          return sectionPath ? `${sectionPath}${p.code}/` : null;
+          return `${ps.section.path}${p.code}/`;
         })
         .filter((path): path is string => Boolean(path));
 
