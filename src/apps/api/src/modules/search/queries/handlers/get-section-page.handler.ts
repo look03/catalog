@@ -1,16 +1,34 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetSectionPageQuery } from '../impl/get-section-page.query';
 import { ElasticService } from '../../services/elastic.service';
-import { SearchDocument } from '../../types/document.types';
+import { SearchDocument, SearchSections, SectionDocument } from '../../types/document.types';
 import { NotFoundException } from '@nestjs/common';
+import { SearchFilters, SearchSortType, Aggregations, Facet } from '../../types/document.types';
+import {
+  ElasticsearchRangeFilter,
+  ElasticsearchTermsFilter,
+  ElasticsearchFilter,
+  ElasticsearchRange,
+  ElasticSearchResult,
+  ElasticSearchHitsResult,
+} from '../../types/elastic-search.types';
 
 @QueryHandler(GetSectionPageQuery)
 export class GetSectionPageHandler implements IQueryHandler<GetSectionPageQuery> {
   constructor(private readonly elasticService: ElasticService) {}
+  private MAX_ELASTIC_SIZE = 10000;
+
+  private pushIfNotEmpty<T>(target: T[], items: T[] | null | undefined): void {
+    if (Array.isArray(items) && items.length > 0) {
+      for (const item of items) {
+        target.push(item);
+      }
+    }
+  }
 
   private async getChildSectionsIds(url: string): Promise<string[]> {
     const result = await this.elasticService.search<SearchDocument>({
-      size: 10000,
+      size: this.MAX_ELASTIC_SIZE,
       query: {
         prefix: {
           'path.keyword': url,
@@ -22,64 +40,216 @@ export class GetSectionPageHandler implements IQueryHandler<GetSectionPageQuery>
       throw new NotFoundException('No Hits Found');
     }
 
-    // Все разделы — текущий + потомки
     return result.hits.hits.map((hit) => hit._source.id);
   }
 
-  async execute(query: GetSectionPageQuery) {
-    const filters: any[] = [{ term: { type: 'element' } }];
+  private async buildSectionFilters(url: string): Promise<ElasticsearchTermsFilter[]> {
+    const sectionIds = await this.getChildSectionsIds(url);
+
+    if (!sectionIds || sectionIds.length === 0) {
+      return [];
+    }
+
+    return [
+      {
+        terms: {
+          section_ids: sectionIds,
+        },
+      },
+    ];
+  }
+
+  private buildPriceFilters(filters?: SearchFilters): ElasticsearchRangeFilter[] {
+    if (!filters) {
+      return [];
+    }
+
+    const priceRange: ElasticsearchRange = {};
+
+    if (filters.priceFrom !== undefined) {
+      priceRange.gte = filters.priceFrom;
+    }
+
+    if (filters.priceTo !== undefined) {
+      priceRange.lte = filters.priceTo;
+    }
+
+    if (Object.keys(priceRange).length === 0) {
+      return [];
+    }
+
+    return [
+      {
+        range: {
+          price: priceRange,
+        },
+      },
+    ];
+  }
+
+  private buildBrandFilters(filters?: SearchFilters): ElasticsearchTermsFilter[] {
+    if (!filters?.brands?.length) {
+      return [];
+    }
+
+    return [
+      {
+        terms: {
+          'brand.code': filters.brands,
+        },
+      },
+    ];
+  }
+
+  private async buildFilters(query: GetSectionPageQuery): Promise<ElasticsearchFilter[]> {
+    const filters: ElasticsearchFilter[] = [{ term: { type: 'element' } }];
 
     if (query.url !== '/catalog/') {
-      const sectionIds = await this.getChildSectionsIds(query.url);
-      filters.push({ terms: { section_ids: sectionIds } });
+      const sectionFilters = await this.buildSectionFilters(query.url);
+      this.pushIfNotEmpty(filters, sectionFilters);
     }
 
-    if (query.filters?.priceFrom || query.filters?.priceTo) {
-      filters.push({
-        range: {
-          price: {
-            gte: query.filters.priceFrom,
-            lte: query.filters.priceTo,
-          },
-        },
-      });
-    }
+    this.pushIfNotEmpty(filters, this.buildPriceFilters(query.filters));
+    this.pushIfNotEmpty(filters, this.buildBrandFilters(query.filters));
 
-    if (query.filters?.brands?.length) {
-      filters.push({
-        terms: { brand: query.filters.brands },
-      });
-    }
+    return filters;
+  }
 
-    const sortMap = {
-      price_asc: [{ price: 'asc' as const }],
-      price_desc: [{ price: 'desc' as const }],
-      newest: [{ created_at: 'desc' as const }],
+  private buildSort(sort?: SearchSortType) {
+    const sortMap: Record<SearchSortType, Array<Record<string, 'asc' | 'desc'>>> = {
+      price_asc: [{ price: 'asc' }],
+      price_desc: [{ price: 'desc' }],
+      newest: [{ created_at: 'desc' }],
     };
 
-    const result = await this.elasticService.search<SearchDocument>({
-      from: (query.page - 1) * query.limit,
-      size: query.limit,
-      query: { bool: { filter: filters } },
-      sort: sortMap[query.sort ?? 'newest'],
-      aggs: {
-        // brands: { terms: { field: 'brand', size: 50 } },
-        price: { stats: { field: 'price' } },
-      },
-    });
+    return sortMap[sort ?? 'newest'];
+  }
 
+  private buildAggregations() {
     return {
+      brands: {
+        terms: {
+          field: 'brand.code.keyword',
+          size: 100,
+        },
+        aggs: {
+          brand_sample: {
+            top_hits: {
+              size: 1,
+              _source: ['brand'],
+            },
+          },
+        },
+      },
+      price: {
+        stats: {
+          field: 'price',
+        },
+      },
+    };
+  }
+
+  private formatFacets(aggregations: Aggregations | undefined): Facet[] | null {
+    if (!aggregations) {
+      return null;
+    }
+
+    const facets: Facet[] = [];
+    if (aggregations.price) {
+      facets.push({
+        values: [aggregations.price.min ?? 0, aggregations.price.max ?? 0],
+        title: 'Цена',
+        key: 'price',
+        sort: '1',
+      });
+    }
+
+    if (aggregations.brands) {
+      facets.push({
+        key: 'brands',
+        sort: '2',
+        values: aggregations.brands.buckets.map((bucket) => {
+          const brandSource = bucket.brand_sample?.hits.hits[0]?._source?.brand || {};
+          return {
+            name: brandSource.name ?? bucket.key,
+            code: brandSource.code ?? bucket.key,
+            count: bucket.doc_count,
+            searchCode: brandSource.code ?? bucket.key,
+          };
+        }),
+      });
+    }
+
+    return facets;
+  }
+
+  private pickBestPath(paths: string[] | undefined, url: string): string {
+    if (!paths || !paths.length) {
+      return '';
+    }
+
+    const normalizedUrl = url.endsWith('/') ? url : `${url}/`;
+
+    const matched = paths
+      .filter((path) => normalizedUrl.startsWith(path))
+      .sort((a, b) => b.length - a.length);
+
+    return matched[0] ?? paths[0];
+  }
+
+  private formatProducts(
+    products: ElasticSearchHitsResult<SearchDocument>,
+    url: string,
+  ): SectionDocument[] | null {
+    if (!products) {
+      return null;
+    }
+
+    return products.map((hit) => ({
+      id: hit._source.id,
+      title: hit._source.title,
+      path: this.pickBestPath(hit._source.paths, url),
+      price: hit._source.price,
+      images: hit._source.images,
+    }));
+  }
+
+  private formatResponse(result: ElasticSearchResult, query: GetSectionPageQuery): SearchSections {
+    const response = {
       type: 'section',
-      products: result.hits.hits.map((h) => h._source),
+      products: this.formatProducts(result.hits.hits, query.url),
       pagination: {
         page: query.page,
         limit: query.limit,
         total: result.hits.total.value,
       },
-      facets: {
-        brands: result.aggregations?.brands?.buckets ?? [],
-        price: result.aggregations?.price ?? {},
-      },
+      facets: this.formatFacets(result.aggregations),
     };
+
+    if (query.onlyFilter) {
+      response.products = null;
+    }
+
+    return response;
+  }
+
+  async execute(query: GetSectionPageQuery) {
+    const filters = await this.buildFilters(query);
+    const sort = this.buildSort(query.sort);
+    const aggs = this.buildAggregations();
+
+    const result = await this.elasticService.search<SearchDocument>({
+      from: (query.page - 1) * query.limit,
+      size: query.limit,
+      query: {
+        bool: {
+          filter: filters,
+        },
+      },
+      sort,
+      aggs,
+    });
+
+    return this.formatResponse(result, query);
   }
 }

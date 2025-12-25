@@ -10,10 +10,40 @@ export interface ElasticSearchOptions {
   aggs?: Record<string, any>;
 }
 
-export interface ElasticSearchResult<T = any> {
+export type ElasticSearchHitsResult<T = any> = Array<{ _source: T }>;
+
+export type ElasticSearchResult<T = any> = {
   hits: {
     total: { value: number };
-    hits: Array<{ _source: T }>;
+    hits: ElasticSearchHitsResult<T>;
   };
   aggregations?: Record<string, any>;
+};
+
+export interface ElasticsearchRange {
+  gte?: number;
+  lte?: number;
 }
+
+export interface ElasticsearchRangeFilter {
+  range: {
+    [field: string]: ElasticsearchRange;
+  };
+}
+
+export interface ElasticsearchTermsFilter {
+  terms: {
+    [field: string]: string[];
+  };
+}
+
+export interface ElasticsearchTermFilter {
+  term: {
+    [field: string]: string;
+  };
+}
+
+export type ElasticsearchFilter =
+  | ElasticsearchRangeFilter
+  | ElasticsearchTermsFilter
+  | ElasticsearchTermFilter;

@@ -7,5 +7,6 @@ export class GetSectionPageQuery {
     public readonly limit: number = 24,
     public readonly filters?: CatalogFiltersDto,
     public readonly sort?: 'price_asc' | 'price_desc' | 'newest',
+    public readonly onlyFilter?: boolean,
   ) {}
 }

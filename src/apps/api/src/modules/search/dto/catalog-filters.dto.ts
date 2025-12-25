@@ -1,15 +1,15 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString, IsNumber } from 'class-validator';
 
 export class CatalogFiltersDto {
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
+  @IsNumber()
   priceFrom?: number;
 
   @IsOptional()
   @Type(() => Number)
-  @IsInt()
+  @IsNumber()
   priceTo?: number;
 
   @IsOptional()

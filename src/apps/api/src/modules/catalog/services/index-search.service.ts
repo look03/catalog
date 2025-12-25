@@ -2,8 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../entities/product.entity';
 import { Section } from '../entities/section.entity';
-import { HashPathService } from '../../common/services/hash-path.service';
-import { FileStorageService } from '../../common/services/file-storage.service';
 import { Repository } from 'typeorm';
 import {
   SearchSection,
@@ -24,7 +22,7 @@ export class IndexSearchService {
     const sectionQuery = this.repoSection.createQueryBuilder('section');
 
     if (updatedSince) {
-      sectionQuery.andWhere('section.updated_at >= :updatedSince', { updatedSince });
+      sectionQuery.andWhere('section.updated_at > :updatedSince', { updatedSince });
     }
 
     const sections = await sectionQuery.getMany();
@@ -51,7 +49,7 @@ export class IndexSearchService {
       .addSelect(['brand.code', 'brand.name', 'images.path', 'section.id', 'section.path']);
 
     if (updatedSince) {
-      productQuery.andWhere('product.updated_at >= :updatedSince', { updatedSince });
+      productQuery.andWhere('product.updated_at > :updatedSince', { updatedSince });
     }
 
     const products = await productQuery.getMany();
@@ -76,7 +74,6 @@ export class IndexSearchService {
         section_ids: p.productSections.map((ps) => ps.section.id),
         images: p.images.map((img) => img.path),
         brand: p.brand || undefined,
-        brand_code: p.brand?.code || undefined,
         paths,
         type: 'element',
       };

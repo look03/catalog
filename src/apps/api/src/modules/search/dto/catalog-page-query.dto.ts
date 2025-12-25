@@ -1,14 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-  IsEnum,
-  IsInt,
-  IsOptional,
-  IsString,
-  Min,
-  ValidateNested,
-  IsNotEmpty,
-} from 'class-validator';
-import { CatalogFiltersDto } from './catalog-filters.dto';
+import { IsEnum, IsInt, IsOptional, IsString, Min, IsNotEmpty, IsBoolean } from 'class-validator';
 
 export class CatalogPageQueryDto {
   @IsString()
@@ -28,11 +19,10 @@ export class CatalogPageQueryDto {
   limit?: number = 24;
 
   @IsOptional()
-  @ValidateNested()
-  @Type(() => CatalogFiltersDto)
-  filter?: CatalogFiltersDto;
-
-  @IsOptional()
   @IsEnum(['price_asc', 'price_desc', 'newest'])
   sort?: 'price_asc' | 'price_desc' | 'newest';
+
+  @IsOptional()
+  @IsBoolean()
+  onlyFilter?: boolean;
 }

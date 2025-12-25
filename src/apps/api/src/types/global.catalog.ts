@@ -42,7 +42,6 @@ export interface BaseProduct {
 export type SearchProduct = BaseProduct & {
   section_ids: number[];
   brand: Brand | undefined;
-  brand_code: string | undefined;
   paths: string[];
   type: string;
 };
