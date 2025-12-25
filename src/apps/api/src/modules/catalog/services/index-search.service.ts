@@ -46,7 +46,14 @@ export class IndexSearchService {
       .leftJoinAndSelect('product.productSections', 'productSections')
       .leftJoin('productSections.section', 'section')
       .leftJoin('product.brand', 'brand')
-      .addSelect(['brand.code', 'brand.name', 'images.path', 'section.id', 'section.path']);
+      .addSelect([
+        'brand.code',
+        'brand.name',
+        'images.path',
+        'section.id',
+        'section.path',
+        'section.title',
+      ]);
 
     if (updatedSince) {
       productQuery.andWhere('product.updated_at > :updatedSince', { updatedSince });
@@ -60,6 +67,11 @@ export class IndexSearchService {
           return `${ps.section.path}${p.code}/`;
         })
         .filter((path): path is string => Boolean(path));
+
+      const parentSectionsFormat = p.productSections.map((ps) => ({
+        path: ps.section.path,
+        name: ps.section.title,
+      }));
 
       return {
         id: p.id,
@@ -76,6 +88,7 @@ export class IndexSearchService {
         brand: p.brand || undefined,
         paths,
         type: 'element',
+        parent_sections_format: parentSectionsFormat,
       };
     });
 

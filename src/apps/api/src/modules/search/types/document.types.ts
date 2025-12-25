@@ -1,3 +1,5 @@
+import { ParentSectionFormat } from '../../../types/global.catalog';
+
 export interface BaseSearchDocument {
   id: string;
   title: string;
@@ -14,11 +16,18 @@ export type SearchDocument = BaseSearchDocument & {
   images?: string[];
   color?: string;
   preview_text?: string;
-  brand_code?: string;
   paths?: string[];
+  parent_sections_format: ParentSectionFormat[];
 };
 
 export type SectionDocument = BaseSearchDocument;
+
+export type ProductDocument = Omit<
+  SearchDocument,
+  'paths' | 'type' | 'active' | 'parent_sections_format'
+> & {
+  parent_section_format: ParentSectionFormat | null;
+};
 
 export type SearchFilters = {
   priceFrom?: number;

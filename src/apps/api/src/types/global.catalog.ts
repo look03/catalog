@@ -39,11 +39,17 @@ export interface BaseProduct {
   images: string[];
 }
 
+export interface ParentSectionFormat {
+  name: string;
+  path: string;
+}
+
 export type SearchProduct = BaseProduct & {
   section_ids: number[];
   brand: Brand | undefined;
   paths: string[];
   type: string;
+  parent_sections_format: ParentSectionFormat[];
 };
 
 export interface SearchSectionsAndProducts {

@@ -1,4 +1,7 @@
-export function formatDate(date: Date): string {
+export function formatDate(date: Date | string): string {
+  if (typeof date === 'string') {
+    date = new Date(date);
+  }
   const pad = (n: number) => n.toString().padStart(2, '0');
 
   const day = pad(date.getDate());
