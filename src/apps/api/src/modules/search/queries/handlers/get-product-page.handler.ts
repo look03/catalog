@@ -22,14 +22,11 @@ export class GetProductPageHandler implements IQueryHandler<GetProductPageQuery>
     parentSections: ParentSectionFormat[] | undefined,
     url: string,
   ): ParentSectionFormat | null {
-    console.log(parentSections, '<<<<<<<<<<<<<< parentSections');
     if (!parentSections?.length) {
       return null;
     }
 
     const normalizedUrl = url.endsWith('/') ? url : `${url}/`;
-
-    // Фильтруем те, у которых path — префикс url
     const candidates = parentSections
       .filter((ps) => normalizedUrl.startsWith(ps.path))
       .sort((a, b) => b.path.length - a.path.length); // сортируем по длине path (убывание)
