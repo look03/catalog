@@ -19,8 +19,12 @@ export class CatalogPageQueryDto {
   limit?: number = 24;
 
   @IsOptional()
-  @IsEnum(['price_asc', 'price_desc', 'newest'])
-  sort?: 'price_asc' | 'price_desc' | 'newest';
+  @IsEnum(['price', 'newest'])
+  sort?: 'price' | 'newest';
+
+  @IsOptional()
+  @IsEnum(['asc', 'desc'])
+  order?: 'asc' | 'desc';
 
   @IsOptional()
   @IsBoolean()

@@ -35,7 +35,9 @@ export type SearchFilters = {
   brands?: string[];
 };
 
-export type SearchSortType = 'price_asc' | 'price_desc' | 'newest';
+export type SearchSortOrder = 'asc' | 'desc';
+
+export type SearchSort = 'price' | 'newest';
 
 export interface SearchBrand {
   name?: string;
@@ -83,11 +85,7 @@ export interface FacetValue {
 
 export interface Facet {
   key: string;
-  sort: string;
+  sort: number;
   title?: string;
   values: number[] | FacetValue[];
-}
-
-export interface DocumentResponse {
-  __s;
 }

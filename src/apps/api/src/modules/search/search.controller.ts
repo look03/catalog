@@ -41,6 +41,7 @@ export class SearchController {
           query.limit,
           filter,
           query.sort,
+          query.order,
           query.onlyFilter,
         ),
       );

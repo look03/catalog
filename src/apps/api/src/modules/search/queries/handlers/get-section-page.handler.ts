@@ -1,9 +1,14 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetSectionPageQuery } from '../impl/get-section-page.query';
 import { ElasticService } from '../../services/elastic.service';
-import { SearchDocument, SearchSections, SectionDocument } from '../../types/document.types';
+import {
+  SearchDocument,
+  SearchSections,
+  SearchSort,
+  SectionDocument,
+} from '../../types/document.types';
 import { NotFoundException } from '@nestjs/common';
-import { SearchFilters, SearchSortType, Aggregations, Facet } from '../../types/document.types';
+import { SearchFilters, SearchSortOrder, Aggregations, Facet } from '../../types/document.types';
 import {
   ElasticsearchRangeFilter,
   ElasticsearchTermsFilter,
@@ -115,14 +120,18 @@ export class GetSectionPageHandler implements IQueryHandler<GetSectionPageQuery>
     return filters;
   }
 
-  private buildSort(sort?: SearchSortType) {
-    const sortMap: Record<SearchSortType, Array<Record<string, 'asc' | 'desc'>>> = {
-      price_asc: [{ price: 'asc' }],
-      price_desc: [{ price: 'desc' }],
-      newest: [{ created_at: 'desc' }],
+  private buildSort(
+    sort: SearchSort = 'newest',
+    order: SearchSortOrder = 'desc',
+  ): Array<Record<string, 'asc' | 'desc'>> {
+    const fieldMap: Record<SearchSort, string> = {
+      price: 'price',
+      newest: 'created_at',
     };
 
-    return sortMap[sort ?? 'newest'];
+    const field = fieldMap[sort];
+
+    return [{ [field]: order }];
   }
 
   private buildAggregations() {
@@ -160,14 +169,15 @@ export class GetSectionPageHandler implements IQueryHandler<GetSectionPageQuery>
         values: [aggregations.price.min ?? 0, aggregations.price.max ?? 0],
         title: 'Цена',
         key: 'price',
-        sort: '1',
+        sort: 1,
       });
     }
 
     if (aggregations.brands) {
       facets.push({
         key: 'brands',
-        sort: '2',
+        title: 'Бренд',
+        sort: 2,
         values: aggregations.brands.buckets.map((bucket) => {
           const brandSource = bucket.brand_sample?.hits.hits[0]?._source?.brand || {};
           return {
@@ -235,7 +245,7 @@ export class GetSectionPageHandler implements IQueryHandler<GetSectionPageQuery>
 
   async execute(query: GetSectionPageQuery) {
     const filters = await this.buildFilters(query);
-    const sort = this.buildSort(query.sort);
+    const sort = this.buildSort(query.sort, query.order);
     const aggs = this.buildAggregations();
 
     const result = await this.elasticService.search<SearchDocument>({
