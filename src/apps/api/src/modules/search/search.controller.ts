@@ -1,17 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  ParseIntPipe,
-  Delete,
-  UploadedFiles,
-  Query,
-  ValidationPipe,
-  NotFoundException,
-} from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { CatalogPageQueryDto } from './dto/catalog-page-query.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { QueryBus } from '@nestjs/cqrs';
