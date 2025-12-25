@@ -20,6 +20,7 @@ import { GetSectionPageQuery } from './queries/impl/get-section-page.query';
 import { GetProductPageQuery } from './queries/impl/get-product-page.query';
 import { ParseJsonPipe } from '../../common/pipes/parse-json.pipe';
 import { CatalogFiltersDto } from './dto/catalog-filters.dto';
+import { SearchProducts, SearchSections } from './types/document.types';
 
 @ApiTags('search')
 @Controller('search/')
@@ -30,7 +31,7 @@ export class SearchController {
   async getCatalogPage(
     @Query('filter', ParseJsonPipe) filter: CatalogFiltersDto,
     @Query() query: Omit<CatalogPageQueryDto, 'filter'>,
-  ): Promise<any> {
+  ): Promise<SearchProducts | SearchSections> {
     const type: string = await this.queryBus.execute(new GetPageByUrlQuery(query.url));
 
     if (type === 'section') {

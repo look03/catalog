@@ -243,7 +243,7 @@ export class GetSectionPageHandler implements IQueryHandler<GetSectionPageQuery>
     return response;
   }
 
-  async execute(query: GetSectionPageQuery) {
+  async execute(query: GetSectionPageQuery): Promise<SearchSections> {
     const filters = await this.buildFilters(query);
     const sort = this.buildSort(query.sort, query.order);
     const aggs = this.buildAggregations();

@@ -1,8 +1,12 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetProductPageQuery } from '../impl/get-product-page.query';
 import { ElasticService } from '../../services/elastic.service';
-import { ProductDocument, SearchDocument } from '../../types/document.types';
-import { ElasticsearchFilter, ElasticSearchHitsResult } from '../../types/elastic-search.types';
+import { ProductDocument, SearchDocument, SearchProducts } from '../../types/document.types';
+import {
+  ElasticsearchFilter,
+  ElasticSearchHitsResult,
+  ElasticSearchResult,
+} from '../../types/elastic-search.types';
 import { formatDate } from '../../../../common/utils/date-format.util';
 import { ParentSectionFormat } from '../../../../types/global.catalog';
 
@@ -60,7 +64,14 @@ export class GetProductPageHandler implements IQueryHandler<GetProductPageQuery>
     return [{ term: { type: 'element' } }, { term: { paths: url } }];
   }
 
-  async execute({ url }: GetProductPageQuery) {
+  private formatResponse(result: ElasticSearchResult, url: string): SearchProducts {
+    return {
+      type: 'element',
+      products: this.formatProduct(result.hits.hits, url),
+    };
+  }
+
+  async execute({ url }: GetProductPageQuery): Promise<SearchProducts> {
     const result = await this.elasticService.search<SearchDocument>({
       size: 1,
       query: {
@@ -70,9 +81,6 @@ export class GetProductPageHandler implements IQueryHandler<GetProductPageQuery>
       },
     });
 
-    return {
-      type: 'element',
-      products: this.formatProduct(result.hits.hits, url),
-    };
+    return this.formatResponse(result, url);
   }
 }

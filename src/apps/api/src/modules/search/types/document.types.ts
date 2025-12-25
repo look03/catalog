@@ -51,6 +51,11 @@ export interface SearchSections {
   facets: Facet[] | null;
 }
 
+export interface SearchProducts {
+  type: string;
+  products: ProductDocument[] | null;
+}
+
 export interface AggregationBucket {
   key: string;
   doc_count: number;
