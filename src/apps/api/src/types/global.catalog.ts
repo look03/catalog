@@ -14,6 +14,7 @@ export interface SearchSection {
   title: string;
   code: string;
   path: string;
+  paths: string[];
   parent_section_id: number | undefined;
   type: 'section';
   created_at: Date;

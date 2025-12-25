@@ -36,6 +36,7 @@ export class IndexSearchService {
       code: p.code,
       parent_section_id: p.parent_section?.id,
       path: p.path,
+      paths: [p.path],
       type: 'section',
       created_at: p.created_at,
       updated_at: p.updated_at,

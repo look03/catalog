@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException, OnModuleInit } from '@nestjs/common';
 import { Client } from '@elastic/elasticsearch';
 import { getElasticAuth } from './elastic.config';
+import { ElasticSearchOptions, ElasticSearchResult } from '../types/elastic-search.types';
 
 @Injectable()
 export class ElasticService implements OnModuleInit {
@@ -217,6 +218,31 @@ export class ElasticService implements OnModuleInit {
           }
         }
       }
+    }
+  }
+  async search<T = any>(options: ElasticSearchOptions): Promise<ElasticSearchResult<T>> {
+    try {
+      const index = await this.getIndex();
+      if (!index) {
+        throw new InternalServerErrorException('No such index');
+      }
+
+      const result = await this.client.search({
+        index,
+        from: options.from,
+        size: options.size,
+        query: options.query,
+        sort: options.sort,
+        aggs: options.aggs,
+      });
+
+      return result as ElasticSearchResult<T>;
+    } catch (error) {
+      throw new InternalServerErrorException({
+        success: false,
+        message: 'Elastic search failed',
+        details: error,
+      });
     }
   }
 }
