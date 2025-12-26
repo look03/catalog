@@ -9,8 +9,10 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import type { RequestWithUser, ResponseCreateUser, Tokens } from './types/auth.types';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('auth/')
+@ApiTags('auth')
 export class AuthController {
   constructor(private readonly commandBus: CommandBus) {}
 
@@ -33,6 +35,9 @@ export class AuthController {
 
   @UseGuards(JwtGuard)
   @Post('logout/')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Выход пользователя (logout)' })
+  @ApiResponse({ status: 200, description: 'Успешный выход, токены удалены' })
   async logout(@Req() req: RequestWithUser): Promise<void> {
     return this.commandBus.execute(new LogoutCommand(req.user.userId));
   }

@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { CatalogPageQueryDto } from './dto/catalog-page-query.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { QueryBus } from '@nestjs/cqrs';
 import { GetPageByUrlQuery } from './queries/impl/get-page-by-url.query';
 import { GetSectionPageQuery } from './queries/impl/get-section-page.query';
@@ -15,9 +15,10 @@ export class SearchController {
   constructor(private readonly queryBus: QueryBus) {}
 
   @Get('/')
+  @ApiOperation({ summary: 'Получить товары или секции' })
   async getCatalogPage(
-    @Query('filter', ParseJsonPipe) filter: CatalogFiltersDto,
     @Query() query: Omit<CatalogPageQueryDto, 'filter'>,
+    @Query('filter', ParseJsonPipe) filter: CatalogFiltersDto,
   ): Promise<SearchProducts | SearchSections> {
     const type: string = await this.queryBus.execute(new GetPageByUrlQuery(query.url));
 
