@@ -56,6 +56,8 @@ services:
         condition: service_started
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
 
   nginx:
     <<: *base
@@ -88,6 +90,21 @@ services:
       - "9200:9200"
     volumes:
       - ./elasticsearch/data:/usr/share/elasticsearch/data
+
+  redis:
+    <<: *base
+    image: redis:7-alpine
+    container_name: redis
+    command: redis-server --appendonly yes
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - ./redis/data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
 networks:
   docker_net:
