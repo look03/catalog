@@ -10,6 +10,7 @@ import {
   UploadedFiles,
   Query,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { BaseProductDto } from './dto/base-product.dto';
@@ -29,7 +30,12 @@ import { GetSectionsQuery } from './queries/impl/get-sections.query';
 import { BasePaginationFilterDto } from './dto/base-pagination-filter.query.dto';
 import { Products } from './interfaces/product.interface';
 import { Sections } from './interfaces/section.interface';
+import { JwtGuard } from '../auth/infrastructure/jwt.guard';
+import { RolesGuard } from '../auth/infrastructure/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 
+@Roles('admin')
+@UseGuards(JwtGuard, RolesGuard)
 @ApiTags('catalog')
 @Controller('catalog/')
 export class CatalogController {
