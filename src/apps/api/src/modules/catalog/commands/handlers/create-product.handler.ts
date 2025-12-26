@@ -8,6 +8,7 @@ import { EventBus } from '@nestjs/cqrs';
 import { ProductCreatedEvent } from '../../events/product-created.event';
 import { InternalServerErrorException } from '@nestjs/common';
 import { UpdateImage } from '../../interfaces/product.interface';
+import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 
 @CommandHandler(CreateProductCommand)
 export class CreateProductHandler implements ICommandHandler<CreateProductCommand> {
@@ -47,8 +48,8 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
     } catch (error) {
       throw new InternalServerErrorException({
         success: false,
-        message: error.message ?? 'Failed to update product',
-        details: error.details ?? error.message ?? error,
+        message: 'Failed to update product',
+        details: getDetailsErrorUtil(error),
       });
     }
   }

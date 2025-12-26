@@ -5,6 +5,7 @@ import { ReIndexCommand } from '../impl/re-index.command';
 import { ElasticService } from '../../services/elastic.service';
 import { InternalServerErrorException } from '@nestjs/common';
 import * as process from 'node:process';
+import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 
 @CommandHandler(ReIndexCommand)
 export class ReIndexHandler implements ICommandHandler<ReIndexCommand> {
@@ -61,8 +62,8 @@ export class ReIndexHandler implements ICommandHandler<ReIndexCommand> {
     } catch (error) {
       throw new InternalServerErrorException({
         success: false,
-        message: error.message ?? 'Failed to create index elastic',
-        details: error.details || error.response?.details || error.message || error,
+        message: 'Failed to create index elastic',
+        details: getDetailsErrorUtil(error),
       });
     }
   }

@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException, OnModuleInit } from '@nestjs/
 import { Client } from '@elastic/elasticsearch';
 import { getElasticAuth } from './elastic.config';
 import { ElasticSearchOptions, ElasticSearchResult } from '../types/elastic-search.types';
+import { getDetailsErrorUtil } from '../../../common/utils/error.utils';
 
 @Injectable()
 export class ElasticService implements OnModuleInit {
@@ -31,7 +32,7 @@ export class ElasticService implements OnModuleInit {
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to get index for alias',
-        details: error,
+        details: error instanceof Error ? error.message : String(error),
       });
     }
   }
@@ -54,7 +55,7 @@ export class ElasticService implements OnModuleInit {
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to add index',
-        details: error,
+        details: getDetailsErrorUtil(error),
       });
     }
   }
@@ -75,7 +76,7 @@ export class ElasticService implements OnModuleInit {
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to create elastic index',
-        details: error,
+        details: getDetailsErrorUtil(error),
       });
     }
   }
@@ -92,7 +93,7 @@ export class ElasticService implements OnModuleInit {
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to delete index',
-        details: error,
+        details: getDetailsErrorUtil(error),
       });
     }
   }
@@ -109,7 +110,7 @@ export class ElasticService implements OnModuleInit {
       throw new InternalServerErrorException({
         success: false,
         message: 'Write goods in elastic',
-        details: error,
+        details: getDetailsErrorUtil(error),
       });
     }
   }
@@ -144,7 +145,7 @@ export class ElasticService implements OnModuleInit {
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to bulk insert/delete documents',
-        details: error,
+        details: getDetailsErrorUtil(error),
       });
     }
   }
@@ -166,7 +167,7 @@ export class ElasticService implements OnModuleInit {
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to delete index',
-        details: error,
+        details: getDetailsErrorUtil(error),
       });
     }
   }
@@ -213,7 +214,7 @@ export class ElasticService implements OnModuleInit {
             throw new InternalServerErrorException({
               success: false,
               message: `Delete elastic index ${oldIndex}`,
-              details: error,
+              details: getDetailsErrorUtil(error),
             });
           }
         }
@@ -241,7 +242,7 @@ export class ElasticService implements OnModuleInit {
       throw new InternalServerErrorException({
         success: false,
         message: 'Elastic search failed',
-        details: error,
+        details: getDetailsErrorUtil(error),
       });
     }
   }

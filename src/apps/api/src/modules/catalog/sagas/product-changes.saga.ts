@@ -1,6 +1,5 @@
-// catalog/sagas/product-files-and-search.saga.ts
 import { Injectable } from '@nestjs/common';
-import { Saga, ofType, CommandBus } from '@nestjs/cqrs';
+import { Saga, ofType } from '@nestjs/cqrs';
 import { ProductCreatedEvent } from '../events/product-created.event';
 import { ProductUpdatedEvent } from '../events/product-updated.event';
 import { from, Observable } from 'rxjs';

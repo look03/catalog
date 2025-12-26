@@ -5,12 +5,12 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './infrastructure/jwt.strategy';
 import { JwtGuard } from './infrastructure/jwt.guard';
 import { JwtModule } from '@nestjs/jwt';
-import { User } from './entities/user.entity';
 import { commandHandlers } from './commands/handlers';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from './services/user.service';
 import { RefreshTokenService } from './services/refresh-token.service';
 import * as process from 'node:process';
+import { entities } from './entities';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import * as process from 'node:process';
       secret: process.env.JWT_SECRET_KEY,
       signOptions: { expiresIn: '15m' },
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature(entities),
   ],
   providers: [
     ...commandHandlers,

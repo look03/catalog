@@ -10,6 +10,7 @@ import { HashPathService } from '../../common/services/hash-path.service';
 import { FileStorageService } from '../../common/services/file-storage.service';
 import * as path from 'path';
 import { UpdateImage } from '../interfaces/product.interface';
+import { getDetailsErrorUtil } from '../../../common/utils/error.utils';
 
 @Injectable()
 export class ProductService {
@@ -87,7 +88,7 @@ export class ProductService {
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to create images',
-        details: error.message ?? error,
+        details: getDetailsErrorUtil(error),
       });
     }
   }
@@ -130,7 +131,7 @@ export class ProductService {
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to update product sections',
-        details: error.message ?? error,
+        details: getDetailsErrorUtil(error),
       });
     }
   }

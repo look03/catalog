@@ -7,6 +7,7 @@ import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { formatDate } from '../../../../common/utils/date-format.util';
 import { BasePaginationFilterHandler } from './base-pagination-filter.handler';
 import { CatalogSection, Sections } from '../../interfaces/section.interface';
+import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 
 @QueryHandler(GetSectionsQuery)
 export class GetSectionsHandler
@@ -90,7 +91,7 @@ export class GetSectionsHandler
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to get sections',
-        details: error.toString(),
+        details: getDetailsErrorUtil(error),
       });
     }
   }

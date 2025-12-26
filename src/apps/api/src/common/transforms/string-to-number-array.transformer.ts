@@ -1,13 +1,11 @@
-import { TransformFnParams } from 'class-transformer';
+import type { TransformFnParams } from 'class-transformer';
 
 export function TransformStringToNumberArray() {
-  return (params: TransformFnParams): number[] | any => {
-    const value = params.value;
-
+  return (params: TransformFnParams): number[] => {
+    const value = params.value as unknown;
     if (typeof value === 'string') {
       try {
-        const parsed = JSON.parse(value);
-
+        const parsed = JSON.parse(value) as unknown;
         if (
           Array.isArray(parsed) &&
           parsed.every((el) => typeof el === 'number' || typeof el === 'string')
@@ -15,15 +13,13 @@ export function TransformStringToNumberArray() {
           return parsed.map((v) => Number(v));
         }
       } catch {
-        // Если не JSON, пробуем разделить по запятой
         return value
           .split(',')
           .map((v) => Number(v.trim()))
-          .filter((v) => !isNaN(v)); // отфильтровать нечисла
+          .filter((v) => !isNaN(v));
       }
     }
 
-    // Если это уже массив, проверить и преобразовать
     if (
       Array.isArray(value) &&
       value.every((el) => typeof el === 'number' || typeof el === 'string')
@@ -31,7 +27,6 @@ export function TransformStringToNumberArray() {
       return value.map((v) => Number(v));
     }
 
-    // Если не получилось привести к массиву чисел — возвращаем пустой массив или null
     return [];
   };
 }

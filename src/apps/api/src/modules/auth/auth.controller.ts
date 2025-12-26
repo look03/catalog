@@ -5,32 +5,35 @@ import { LoginCommand } from './commands/impl/login.command';
 import { RefreshCommand } from './commands/impl/refresh.command';
 import { LogoutCommand } from './commands/impl/logout.command';
 import { JwtGuard } from './infrastructure/jwt.guard';
-import { UserRole } from './entities/user.entity';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { RefreshDto } from './dto/refresh.dto';
+import type { RequestWithUser, ResponseCreateUser, Tokens } from './types/auth.types';
 
 @Controller('auth/')
 export class AuthController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Post('register/')
-  async register(@Body() body: { email: string; password: string; roles?: UserRole[] }) {
+  async register(@Body() body: RegisterDto): Promise<ResponseCreateUser> {
     return this.commandBus.execute(
-      new RegisterCommand(body.email, body.password, body.roles || [UserRole.USER]),
+      new RegisterCommand(body.email, body.password, body.roles || [2]),
     );
   }
 
   @Post('login/')
-  async login(@Body() body: { email: string; password: string }) {
+  async login(@Body() body: LoginDto): Promise<Tokens> {
     return this.commandBus.execute(new LoginCommand(body.email, body.password));
   }
 
   @Post('refresh/')
-  async refresh(@Body() body: { userId: string; refreshToken: string }) {
+  async refresh(@Body() body: RefreshDto): Promise<Tokens> {
     return this.commandBus.execute(new RefreshCommand(body.userId, body.refreshToken));
   }
 
   @UseGuards(JwtGuard)
   @Post('logout/')
-  async logout(@Req() req: any) {
+  async logout(@Req() req: RequestWithUser): Promise<void> {
     return this.commandBus.execute(new LogoutCommand(req.user.userId));
   }
 }

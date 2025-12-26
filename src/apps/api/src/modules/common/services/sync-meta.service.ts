@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SyncMeta } from '../entities/sync-meta.entity';
+import { getDetailsErrorUtil } from '../../../common/utils/error.utils';
 @Injectable()
 export class SyncMetaService {
   constructor(
@@ -21,7 +22,7 @@ export class SyncMetaService {
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to update sync meta',
-        details: error,
+        details: getDetailsErrorUtil(error),
       });
     }
   }

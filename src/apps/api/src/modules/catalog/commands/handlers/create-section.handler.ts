@@ -6,6 +6,7 @@ import { SectionService } from '../../services/section.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Section } from '../../entities/section.entity';
 import { Repository } from 'typeorm';
+import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 
 @CommandHandler(CreateSectionCommand)
 export class CreateSectionHandler implements ICommandHandler<CreateSectionCommand> {
@@ -34,7 +35,7 @@ export class CreateSectionHandler implements ICommandHandler<CreateSectionComman
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to create section',
-        details: error.message ?? error,
+        details: getDetailsErrorUtil(error),
       });
     }
   }

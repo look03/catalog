@@ -9,6 +9,7 @@ import { assignIfDefined } from '../../../../common/utils/assing-if-defined.util
 import type { UpdatableProductFields } from '../../../../types/global.catalog';
 import { UpdateImage } from '../../interfaces/product.interface';
 import { ProductUpdatedEvent } from '../../events/product-updated.event';
+import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 
 @CommandHandler(UpdateProductCommand)
 export class UpdateProductHandler implements ICommandHandler<UpdateProductCommand> {
@@ -69,8 +70,8 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
     } catch (error) {
       throw new InternalServerErrorException({
         success: false,
-        message: error.message ?? 'Failed to update product',
-        details: error.details ?? error.message ?? error,
+        message: 'Failed to update product',
+        details: getDetailsErrorUtil(error),
       });
     }
   }

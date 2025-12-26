@@ -1,5 +1,3 @@
-import { CatalogProduct } from './product.interface';
-
 export interface SectionForProduct {
   name: string;
   path: string;

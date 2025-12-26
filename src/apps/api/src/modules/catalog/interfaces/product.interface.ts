@@ -26,3 +26,7 @@ export interface Products {
   items: CatalogProduct[] | null;
   total: number;
 }
+
+export interface IdResultItem {
+  p2_id: string;
+}

@@ -3,6 +3,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { UpdateFiles } from '../../../types/global.catalog';
+import { getDetailsErrorUtil } from '../../../common/utils/error.utils';
 
 @Injectable()
 export class FileStorageService {
@@ -64,11 +65,11 @@ export class FileStorageService {
       }
 
       await this.clearDirWithFiles(tmpDir);
-    } catch (e) {
+    } catch (error) {
       throw new InternalServerErrorException({
         success: false,
-        message: e.message ?? 'Failed to moveFromTemp files',
-        details: e.details ?? e.message ?? e,
+        message: 'Failed to moveFromTemp files',
+        details: getDetailsErrorUtil(error),
       });
     }
   }
@@ -83,11 +84,11 @@ export class FileStorageService {
         await fs.unlink(file.tmpPath);
       }
       await this.clearDirWithFiles(tmpDir);
-    } catch (e) {
+    } catch (error) {
       throw new InternalServerErrorException({
         success: false,
-        message: e.message ?? 'Failed to delete files',
-        details: e.details ?? e.message ?? e,
+        message: 'Failed to delete files',
+        details: getDetailsErrorUtil(error),
       });
     }
   }

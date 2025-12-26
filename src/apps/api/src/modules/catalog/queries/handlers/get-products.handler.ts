@@ -1,12 +1,13 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetProductsQuery } from '../impl/get-products.query';
-import { CatalogProduct, Products } from '../../interfaces/product.interface';
+import { CatalogProduct, IdResultItem, Products } from '../../interfaces/product.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../../entities/product.entity';
 import { Repository } from 'typeorm';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { formatDate } from '../../../../common/utils/date-format.util';
 import { BasePaginationFilterHandler } from './base-pagination-filter.handler';
+import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 
 @QueryHandler(GetProductsQuery)
 export class GetProductsHandler
@@ -28,7 +29,7 @@ export class GetProductsHandler
     nameFilter: string | undefined,
     sortColumn: string,
     sortDirection: 'ASC' | 'DESC',
-  ): Promise<number[]> {
+  ): Promise<string[]> {
     const alias = 'p2';
     const adjustedSortColumn = sortColumn.replace('p', alias);
 
@@ -40,12 +41,12 @@ export class GetProductsHandler
       .skip((page - 1) * limit)
       .take(limit);
 
-    const idsResult = await idsSubQuery.getRawMany();
+    const idsResult: IdResultItem[] = await idsSubQuery.getRawMany();
 
     return idsResult.map((r) => r.p2_id);
   }
 
-  private async getProductsByIds(ids: number[], sortColumn: string, sortDirection: 'ASC' | 'DESC') {
+  private async getProductsByIds(ids: string[], sortColumn: string, sortDirection: 'ASC' | 'DESC') {
     return this.repo
       .createQueryBuilder('p')
       .select(['p.id', 'p.title', 'p.price', 'p.code', 'p.created_at', 'p.updated_at'])
@@ -122,7 +123,7 @@ export class GetProductsHandler
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to get products',
-        details: error.toString(),
+        details: getDetailsErrorUtil(error),
       });
     }
   }

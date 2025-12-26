@@ -1,10 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { DataSource } from 'typeorm';
-import { EventBus, CommandBus } from '@nestjs/cqrs';
+import { CommandBus } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
 import { ReIndexSearchCommand } from '../impl/reindex-search.command';
 import { IndexSearchService } from '../../services/index-search.service';
 import { ReIndexCommand } from '../../../search/commands/impl/re-index.command';
+import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 
 @CommandHandler(ReIndexSearchCommand)
 export class ReIndexSearchHandler implements ICommandHandler<ReIndexSearchCommand> {
@@ -27,8 +27,8 @@ export class ReIndexSearchHandler implements ICommandHandler<ReIndexSearchComman
     } catch (error) {
       throw new InternalServerErrorException({
         success: false,
-        message: error.message ?? 'Failed to update product',
-        details: error.details ?? error.message ?? error,
+        message: 'Failed to update product',
+        details: getDetailsErrorUtil(error),
       });
     }
   }

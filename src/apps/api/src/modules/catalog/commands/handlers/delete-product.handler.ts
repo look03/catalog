@@ -8,6 +8,7 @@ import { DeleteDocumentCommand } from '../../../search/commands/impl/delete-docu
 import { ProductImage } from '../../entities/product-images.entity';
 import path from 'path';
 import { FileStorageService } from '../../../common/services/file-storage.service';
+import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 
 @CommandHandler(DeleteProductCommand)
 export class DeleteProductHandler implements ICommandHandler<DeleteProductCommand> {
@@ -47,7 +48,7 @@ export class DeleteProductHandler implements ICommandHandler<DeleteProductComman
       throw new InternalServerErrorException({
         success: false,
         message: 'Failed to delete section',
-        details: error.message ?? error,
+        details: getDetailsErrorUtil(error),
       });
     }
   }

@@ -6,7 +6,7 @@ import { RefreshTokenService } from '../../services/refresh-token.service';
 export class LogoutHandler implements ICommandHandler<LogoutCommand> {
   constructor(private readonly refreshTokenService: RefreshTokenService) {}
 
-  async execute(command: LogoutCommand) {
+  async execute(command: LogoutCommand): Promise<void> {
     await this.refreshTokenService.deleteRefreshToken(command.userId);
   }
 }
