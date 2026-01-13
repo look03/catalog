@@ -7,7 +7,7 @@ import { ProductService } from '../../services/product.service';
 import { EventBus } from '@nestjs/cqrs';
 import { ProductCreatedEvent } from '../../events/product-created.event';
 import { InternalServerErrorException } from '@nestjs/common';
-import { UpdateImage } from '../../interfaces/product.interface';
+import { UpdateImage } from '../../interfaces/product.interfaces';
 import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 
 @CommandHandler(CreateProductCommand)

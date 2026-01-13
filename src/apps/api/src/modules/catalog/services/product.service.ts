@@ -9,7 +9,7 @@ import { ProductImage } from '../entities/product-images.entity';
 import { HashPathService } from '../../common/services/hash-path.service';
 import { FileStorageService } from '../../common/services/file-storage.service';
 import * as path from 'path';
-import { UpdateImage } from '../interfaces/product.interface';
+import { UpdateImage } from '../interfaces/product.interfaces';
 import { getDetailsErrorUtil } from '../../../common/utils/error.utils';
 
 @Injectable()

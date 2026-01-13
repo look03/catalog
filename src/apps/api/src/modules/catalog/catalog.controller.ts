@@ -27,12 +27,14 @@ import { UploadFiles } from '../../common/decorators/upload-files.decorator';
 import { ReIndexSearchCommand } from './commands/impl/reindex-search.command';
 import { GetProductsQuery } from './queries/impl/get-products.query';
 import { GetSectionsQuery } from './queries/impl/get-sections.query';
+import { GetBrandsQuery } from './queries/impl/get-brands.query';
 import { BasePaginationFilterDto } from './dto/base-pagination-filter.query.dto';
-import { Products } from './interfaces/product.interface';
-import { Sections } from './interfaces/section.interface';
+import { Products } from './interfaces/product.interfaces';
+import { Sections } from './interfaces/section.interfaces';
 import { JwtGuard } from '../auth/infrastructure/jwt.guard';
 import { RolesGuard } from '../auth/infrastructure/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { BrandProduct } from './interfaces/brand.interface';
 
 @Roles('admin')
 @UseGuards(JwtGuard, RolesGuard)
@@ -146,6 +148,11 @@ export class CatalogController {
   ): Promise<Products> {
     const { page, limit, name, sort, order } = query;
     return this.queryBus.execute(new GetProductsQuery(page, limit, name, sort, order));
+  }
+
+  @Get('brands/')
+  async getBrands(): Promise<BrandProduct[] | null> {
+    return this.queryBus.execute(new GetBrandsQuery());
   }
 
   @Post('re-index/')

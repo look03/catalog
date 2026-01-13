@@ -5,7 +5,7 @@ import { ProductUpdatedEvent } from '../events/product-updated.event';
 import { from, Observable } from 'rxjs';
 import { concatMap, catchError } from 'rxjs/operators';
 import { FileStorageService } from '../../common/services/file-storage.service';
-import { ProductIndexEvent } from '../interfaces/product.interface';
+import { ProductIndexEvent } from '../interfaces/product.interfaces';
 
 @Injectable()
 export class ProductChangesSaga {

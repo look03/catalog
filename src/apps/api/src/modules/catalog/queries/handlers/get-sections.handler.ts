@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { formatDate } from '../../../../common/utils/date-format.util';
 import { BasePaginationFilterHandler } from './base-pagination-filter.handler';
-import { CatalogSection, Sections } from '../../interfaces/section.interface';
+import { CatalogSection, Sections } from '../../interfaces/section.interfaces';
 import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 
 @QueryHandler(GetSectionsQuery)

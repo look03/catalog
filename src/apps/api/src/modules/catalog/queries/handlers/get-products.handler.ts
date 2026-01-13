@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetProductsQuery } from '../impl/get-products.query';
-import { CatalogProduct, IdResultItem, Products } from '../../interfaces/product.interface';
+import { CatalogProduct, IdResultItem, Products } from '../../interfaces/product.interfaces';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../../entities/product.entity';
 import { Repository } from 'typeorm';

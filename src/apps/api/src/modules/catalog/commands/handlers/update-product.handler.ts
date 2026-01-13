@@ -7,7 +7,7 @@ import { ProductService } from '../../services/product.service';
 import { transliterate } from '../../../../common/utils/transliteration.util';
 import { assignIfDefined } from '../../../../common/utils/assing-if-defined.util';
 import type { UpdatableProductFields } from '../../../../types/global.catalog';
-import { UpdateImage } from '../../interfaces/product.interface';
+import { UpdateImage } from '../../interfaces/product.interfaces';
 import { ProductUpdatedEvent } from '../../events/product-updated.event';
 import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 

@@ -1,4 +1,4 @@
-import { ProductIndexEvent } from '../interfaces/product.interface';
+import { ProductIndexEvent } from '../interfaces/product.interfaces';
 import { UpdateFiles } from '../../../types/global.catalog';
 
 export class ProductUpdatedEvent implements ProductIndexEvent {

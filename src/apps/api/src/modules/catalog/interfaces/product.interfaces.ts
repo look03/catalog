@@ -1,5 +1,5 @@
 import { UpdateFiles } from '../../../types/global.catalog';
-import { SectionForProduct } from './section.interface';
+import { SectionForProduct } from './section.interfaces';
 
 export interface ProductIndexEvent {
   images?: UpdateFiles[] | null | undefined;
