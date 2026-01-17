@@ -28,6 +28,7 @@ import { ReIndexSearchCommand } from './commands/impl/reindex-search.command';
 import { GetProductsQuery } from './queries/impl/get-products.query';
 import { GetSectionsQuery } from './queries/impl/get-sections.query';
 import { GetBrandsQuery } from './queries/impl/get-brands.query';
+import { GetModalSectionQuery } from './queries/impl/get-modal-sections.query';
 import { BasePaginationFilterDto } from './dto/base-pagination-filter.query.dto';
 import { Products } from './interfaces/product.interfaces';
 import { Sections } from './interfaces/section.interfaces';
@@ -153,6 +154,11 @@ export class CatalogController {
   @Get('brands/')
   async getBrands(): Promise<BrandProduct[] | null> {
     return this.queryBus.execute(new GetBrandsQuery());
+  }
+
+  @Get('modal-sections/')
+  async getModalSection(): Promise<BrandProduct[] | null> {
+    return this.queryBus.execute(new GetModalSectionQuery());
   }
 
   @Post('re-index/')
