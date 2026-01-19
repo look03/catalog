@@ -1,9 +1,4 @@
-import {
-  defineNuxtModule,
-  createResolver,
-  addComponentsDir,
-  addImportsDir,
-} from '@nuxt/kit';
+import { defineNuxtModule, createResolver, addComponentsDir } from '@nuxt/kit';
 
 export default defineNuxtModule({
   meta: {
@@ -14,16 +9,17 @@ export default defineNuxtModule({
     },
   },
   async setup() {
+    console.log('auth-module setup started');
+
     const { resolve } = createResolver(import.meta.url);
     const widgetsPath = resolve('./widgets');
-    // const globalPath = resolve('./global');
-    // addImportsDir(globalPath);
-    await addComponentsDir({
+
+    addComponentsDir({
       path: widgetsPath,
       global: true,
       pathPrefix: false,
     });
 
-    console.log('Successfully added module Auth');
+    console.log('auth-module setup finished');
   },
 });

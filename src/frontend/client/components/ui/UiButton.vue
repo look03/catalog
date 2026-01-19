@@ -24,7 +24,6 @@ const props = withDefaults(defineProps<{
 
 <style scoped lang="scss">
   .ui-button {
-    flex: 1;
     padding: 0.5rem 1rem;
     cursor: pointer;
     border: none;
