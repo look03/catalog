@@ -1,12 +1,11 @@
 <template>
   <div class="auth-container">
     <div class="tabs">
-      <button
+      <ui-button
         :class="{ active: tab === 'login' }"
+        :name="`Вход`"
         @click="tab = 'login'"
-      >
-        Вход
-      </button>
+      />
       <button
         :class="{ active: tab === 'register' }"
         @click="tab = 'register'"
@@ -53,6 +52,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import UiButton from '~/components/ui/UiButton.vue';
 
 const tab = ref('login');
 

@@ -1,0 +1,13 @@
+@import 'variables';
+
+p,
+ol,
+ul {
+  margin: 0;
+}
+ul {
+  list-style: none;
+}
+* {
+  box-sizing: border-box;
+}
