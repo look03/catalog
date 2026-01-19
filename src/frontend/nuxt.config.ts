@@ -1,12 +1,17 @@
 export default defineNuxtConfig({
   compatibilityDate: '2026-01-17',
-  devtools: { enabled: true },
-  srcDir: 'app',
+  devtools: { enabled: false },
+  srcDir: 'client',
   css: ['~/assets/styles/main.scss'],
+  ssr: false,
+  typescript: {
+    typeCheck: true,
+  },
   imports: {
+    autoImport: true,
     dirs: [
-      'client/composables',
-      'client/modules/**/composables',
+      // 'client/composables',
+      // 'client/modules/**/composables',
     ],
   },
   components: [
@@ -16,13 +21,22 @@ export default defineNuxtConfig({
       extensions: ['vue'],
     },
   ],
-  modules: ['@pinia/nuxt', '@nuxtjs/i18n'],
+  modules: [
+    '@vueuse/nuxt',
+    '@pinia/nuxt',
+    '@nuxtjs/i18n',
+    '~/modules/auth',
+  ],
+  i18n: {
+    defaultLocale: 'ru',
+    locales: ['ru'],
+  },
   vite: {
     css: {
       preprocessorOptions: {
         scss: {
           additionalData: `
-          @import '@/assets/styles/variables/index.scss';
+          @use '@/assets/styles/variables/index.scss' as *;
         `,
           quietDeps: true,
         },

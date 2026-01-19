@@ -1,25 +1,36 @@
-import { defineNuxtModule, createResolver, addComponentsDir } from '@nuxt/kit';
+import {
+  defineNuxtModule,
+  createResolver,
+  addComponentsDir,
+} from '@nuxt/kit';
 
 export default defineNuxtModule({
   meta: {
     name: 'auth-module',
-    configKey: 'auth-module',
-    compatibility: {
-      nuxt: '^4.2.2',
-    },
+    configKey: 'authModule',
   },
-  async setup() {
-    console.log('auth-module setup started');
 
+  setup(_, nuxt) {
     const { resolve } = createResolver(import.meta.url);
-    const widgetsPath = resolve('./widgets');
 
+    // components
     addComponentsDir({
-      path: widgetsPath,
+      path: resolve('./widgets'),
       global: true,
       pathPrefix: false,
     });
 
-    console.log('auth-module setup finished');
+    nuxt.hook('i18n:registerModule', register => {
+      register({
+        langDir: resolve('./lang'),
+        locales: [
+          {
+            code: 'ru',
+            file: 'ru.ts',
+          },
+        ]
+      })
+    })
+    console.log('Finished registering authModule');
   },
 });

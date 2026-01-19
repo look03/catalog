@@ -10,7 +10,7 @@
         Пароль:
         <input type="password" v-model="loginPassword" required />
       </label>
-      <button type="submit">Войти</button>
+      <button type="submit">{{$t('auth.login')}}</button>
     </form>
   </div>
 </template>
