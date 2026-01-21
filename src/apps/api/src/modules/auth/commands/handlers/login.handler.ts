@@ -35,6 +35,6 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
     await this.refreshTokenService.saveRefreshToken(user.userId, refreshToken, 7 * 24 * 3600);
 
-    return { userId: user.userId, accessToken, refreshToken };
+    return { accessToken, refreshToken };
   }
 }

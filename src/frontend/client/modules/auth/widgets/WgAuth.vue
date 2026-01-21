@@ -1,6 +1,6 @@
 <template>
   <div class="form-wrapper">
-    <h2>Вход</h2>
+    <h2>{{$t('auth.signIn')}}</h2>
     <form @submit.prevent="handleLogin">
       <label>
         Email:
@@ -21,7 +21,7 @@ import { ref } from 'vue';
 const loginEmail = ref('');
 const loginPassword = ref('');
 
-function handleLogin() {
+const handleLogin = async () => {
   // Здесь можно сделать вызов API для входа
   alert(`Вход: ${loginEmail.value}, пароль: ${loginPassword.value}`);
 }

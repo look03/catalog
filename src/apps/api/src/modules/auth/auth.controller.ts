@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterCommand } from './commands/impl/register.command';
 import { LoginCommand } from './commands/impl/login.command';
@@ -7,10 +7,9 @@ import { LogoutCommand } from './commands/impl/logout.command';
 import { JwtGuard } from './infrastructure/jwt.guard';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { RefreshDto } from './dto/refresh.dto';
 import type { RequestWithUser, ResponseCreateUser, Tokens } from './types/auth.types';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-
+import type { Request } from 'express';
 @Controller('auth/')
 @ApiTags('auth')
 export class AuthController {
@@ -29,8 +28,14 @@ export class AuthController {
   }
 
   @Post('refresh/')
-  async refresh(@Body() body: RefreshDto): Promise<Tokens> {
-    return this.commandBus.execute(new RefreshCommand(body.userId, body.refreshToken));
+  async refresh(@Req() req: Request): Promise<Tokens> {
+    const refreshToken = req.cookies['token'] as string;
+
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token missing or invalid');
+    }
+
+    return this.commandBus.execute(new RefreshCommand(refreshToken));
   }
 
   @UseGuards(JwtGuard)

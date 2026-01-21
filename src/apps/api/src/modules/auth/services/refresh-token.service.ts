@@ -10,7 +10,6 @@ export class RefreshTokenService {
   }
 
   async getRefreshToken(userId: string): Promise<string | null> {
-    console.log(`refresh_token:${userId}`, '<<<<<<<<<<<<<< `refresh_token:${userId}`');
     return this.redisClient.get(`refresh_token:${userId}`);
   }
 
