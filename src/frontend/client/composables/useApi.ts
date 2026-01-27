@@ -1,46 +1,81 @@
-type ApiOptions = {
-  auth?: boolean
-}
+import type { ApiOptions, ApiResponse, Tokens } from '~/types';
+import { useAuthModule } from '~/modules/auth/global';
+import type { RuntimeConfig } from 'nuxt/schema';
 
-export const useApi = () => {
-  const config = useRuntimeConfig()
-  const { token, clearToken } = useAuth()
+const refreshToken = async (
+  config: RuntimeConfig,
+  setToken: (token: string) => void
+): Promise<void> => {
+  const response = await $fetch<ApiResponse<Tokens>>('/auth/refresh', {
+    method: 'POST',
+    baseURL: config.public.apiBase,
+    credentials: 'include'
+  });
 
-  const request = async <T>(
-    url: string,
-    options: any = {},
-    apiOptions: ApiOptions = { auth: true }
-  ): Promise<T> => {
-    return $fetch<T>(url, {
+  if (response.data?.accessToken) {
+    setToken(response.data.accessToken);
+  } else {
+    logError('USE_API', 'Failed to refresh token');
+  }
+};
+
+const fetch = async <T>(
+  url: string,
+  options: any = {},
+  apiOptions: ApiOptions = { auth: true }
+): Promise<T> => {
+  const config = useRuntimeConfig();
+  const { accessToken, setToken, clearToken } = useAuthModule();
+
+  const makeRequest = async () => {
+    return await $fetch<ApiResponse<T>>(url, {
       baseURL: config.public.apiBase,
       ...options,
       headers: {
-        ...(apiOptions.auth && token.value
-          ? { Authorization: `Bearer ${token.value}` }
+        ...(apiOptions.auth && accessToken?.value
+          ? { Authorization: `Bearer ${accessToken.value}` }
           : {}),
-        ...options.headers,
-      },
+        ...options.headers
+      }
+    });
+  };
 
-      onResponseError({ response }) {
-        if (response.status === 401) {
-          clearToken()
-          navigateTo('/login')
-        }
-      },
-    })
+  try {
+    const response = await makeRequest();
+
+    if (!response.success) {
+      throw new Error();
+    }
+
+    return response.data;
+  } catch (error: any) {
+    if (error?.response?.status === 401) {
+      try {
+        await refreshToken(config, setToken);
+        const response = await makeRequest();
+        return response.data;
+      } catch {
+        clearToken();
+        navigateTo('/auth');
+        logError('USE_API', error);
+        throw error;
+      }
+    }
+    logError('USE_API', error);
+    throw error;
   }
+};
 
-  return {
-    get: <T>(url: string, opts = {}, apiOpts?: ApiOptions) =>
-      request<T>(url, { method: 'GET', ...opts }, apiOpts),
+export const useApi = {
+  get: <T>(url: string, opts = {}, apiOpts?: ApiOptions) =>
+    fetch<T>(url, { method: 'GET', ...opts }, apiOpts),
 
-    post: <T>(url: string, body?: any, opts = {}, apiOpts?: ApiOptions) =>
-      request<T>(url, { method: 'POST', body, ...opts }, apiOpts),
+  post: <T>(url: string, body?: any, opts = {}, apiOpts?: ApiOptions) =>
+    fetch<T>(url, { method: 'POST', body, ...opts }, apiOpts),
 
-    patch: <T>(url: string, body?: any, opts = {}, apiOpts?: ApiOptions) =>
-      request<T>(url, { method: 'PATCH', body, ...opts }, apiOpts),
+  patch: <T>(url: string, body?: any, opts = {}, apiOpts?: ApiOptions) =>
+    fetch<T>(url, { method: 'PATCH', body, ...opts }, apiOpts),
 
-    delete: <T>(url: string, opts = {}, apiOpts?: ApiOptions) =>
-      request<T>(url, { method: 'DELETE', ...opts }, apiOpts),
-  }
-}
+  delete: <T>(url: string, opts = {}, apiOpts?: ApiOptions) =>
+    fetch<T>(url, { method: 'DELETE', ...opts }, apiOpts)
+};

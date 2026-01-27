@@ -5,32 +5,31 @@ export default defineNuxtConfig({
   css: ['~/assets/styles/main.scss'],
   ssr: false,
   typescript: {
-    typeCheck: true,
+    typeCheck: true
+  },
+  runtimeConfig: {
+    public: {
+      apiBase: ''
+    }
   },
   imports: {
     autoImport: true,
     dirs: [
       // 'client/composables',
       // 'client/modules/**/composables',
-    ],
+    ]
   },
   components: [
     {
       path: '~/components',
       pathPrefix: false,
-      extensions: ['vue'],
-    },
+      extensions: ['vue']
+    }
   ],
-  modules: [
-    '@nuxt/eslint',
-    '@vueuse/nuxt',
-    '@pinia/nuxt',
-    '@nuxtjs/i18n',
-    '~/modules/auth',
-  ],
+  modules: ['@vueuse/nuxt', '@pinia/nuxt', '@nuxtjs/i18n', '~/modules/auth', '~/modules/admin'],
   i18n: {
     defaultLocale: 'ru',
-    locales: ['ru'],
+    locales: ['ru']
   },
   vite: {
     css: {
@@ -39,9 +38,9 @@ export default defineNuxtConfig({
           additionalData: `
           @use '@/assets/styles/variables/index.scss' as *;
         `,
-          quietDeps: true,
-        },
-      },
-    },
-  },
-})
+          quietDeps: true
+        }
+      }
+    }
+  }
+});

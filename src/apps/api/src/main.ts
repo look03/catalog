@@ -28,6 +28,14 @@ async function bootstrap() {
   app.use(new LoggingMiddleware().use);
   app.use(cookieParser());
 
+  if (process.env.NODE_ENV === 'development') {
+    app.enableCors({
+      origin: 'http://localhost:3000', // фронтенд адрес
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+      credentials: true, // если используешь куки
+    });
+  }
+
   await app.listen(process.env.PORT ?? 3000);
 }
 

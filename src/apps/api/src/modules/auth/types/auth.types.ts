@@ -17,12 +17,26 @@ export type UserByEmail = ResponseCreateUser & {
 export interface Tokens {
   accessToken: string;
   refreshToken: string;
+  sessionId?: string;
 }
+
+export interface JwtSessions {
+  jti: string;
+  sid: string;
+}
+
+export type RefreshSession = JwtSessions & {
+  userId: string;
+  refreshToken: string;
+  createdAt: number;
+};
 
 export interface JwtPayload {
   sub: string;
   email: string;
   roles: string[];
+  jti?: string;
+  sid?: string;
   iat?: number;
   exp?: number;
 }

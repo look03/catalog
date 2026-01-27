@@ -2,8 +2,8 @@ import { defineNuxtModule, createResolver, addComponentsDir, addImportsDir } fro
 
 export default defineNuxtModule({
   meta: {
-    name: 'auth-module',
-    configKey: 'authModule'
+    name: 'admin-module',
+    configKey: 'adminModule'
   },
 
   setup(_, nuxt) {
@@ -28,6 +28,6 @@ export default defineNuxtModule({
         ]
       });
     });
-    console.log('Finished registering authModule');
+    console.log('Finished registering adminModule');
   }
 });

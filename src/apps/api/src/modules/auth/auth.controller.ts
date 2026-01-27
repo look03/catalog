@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterCommand } from './commands/impl/register.command';
 import { LoginCommand } from './commands/impl/login.command';
@@ -7,9 +7,9 @@ import { LogoutCommand } from './commands/impl/logout.command';
 import { JwtGuard } from './infrastructure/jwt.guard';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import type { RequestWithUser, ResponseCreateUser, Tokens } from './types/auth.types';
+import { JwtUser, ResponseCreateUser, Tokens } from './types/auth.types';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 @Controller('auth/')
 @ApiTags('auth')
 export class AuthController {
@@ -30,12 +30,13 @@ export class AuthController {
   @Post('refresh/')
   async refresh(@Req() req: Request): Promise<Tokens> {
     const refreshToken = req.cookies['token'] as string;
+    const sessionId = req.cookies['sessionId'] as string;
 
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token missing or invalid');
     }
 
-    return this.commandBus.execute(new RefreshCommand(refreshToken));
+    return this.commandBus.execute(new RefreshCommand(refreshToken, sessionId));
   }
 
   @UseGuards(JwtGuard)
@@ -43,7 +44,21 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Выход пользователя (logout)' })
   @ApiResponse({ status: 200, description: 'Успешный выход, токены удалены' })
-  async logout(@Req() req: RequestWithUser): Promise<void> {
-    return this.commandBus.execute(new LogoutCommand(req.user.userId));
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<void> {
+    const sessionId = req.cookies['sessionId'] as string;
+    await this.commandBus.execute(new LogoutCommand(sessionId));
+
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+    });
+    res.clearCookie('sessionId', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+    });
   }
 }

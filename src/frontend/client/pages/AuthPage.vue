@@ -1,23 +1,15 @@
 <template>
   <div class="auth-container">
     <div class="tabs">
-      <ui-button
-        :class="{ active: tab === 'login' }"
-        name="Вход"
-        @click="tab = 'login'"
-      />
+      <ui-button :class="{ active: tab === 'login' }" name="Вход" @click="tab = 'login'" />
       <ui-button
         :class="{ active: tab === 'register' }"
         name="Регистрация"
         @click="tab = 'register'"
       />
     </div>
-    <WgAuth
-      v-if="tab === 'login'"
-    />
-    <WgRegister
-      v-if="tab === 'register'"
-    />
+    <WgAuth v-if="tab === 'login'" />
+    <WgRegister v-if="tab === 'register'" />
   </div>
 </template>
 
@@ -25,7 +17,6 @@
 import { ref } from 'vue';
 
 const tab = ref('login');
-
 </script>
 
 <style scoped>
@@ -51,5 +42,4 @@ const tab = ref('login');
   background: #0070f3;
   color: white;
 }
-
 </style>

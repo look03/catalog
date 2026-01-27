@@ -7,6 +7,6 @@ export class LogoutHandler implements ICommandHandler<LogoutCommand> {
   constructor(private readonly refreshTokenService: RefreshTokenService) {}
 
   async execute(command: LogoutCommand): Promise<void> {
-    await this.refreshTokenService.deleteRefreshToken(command.userId);
+    await this.refreshTokenService.deleteSession(command.sessionId);
   }
 }

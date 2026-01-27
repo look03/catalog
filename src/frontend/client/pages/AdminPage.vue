@@ -1,13 +1,7 @@
 <template>
-  <div>
-    <span v-text="`sadasdasd`" />
-  </div>
+  <wg-admin />
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts"></script>
 
-</script>
-
-<style scoped>
-
-</style>
+<style scoped></style>

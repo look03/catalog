@@ -5,6 +5,8 @@ import { JwtService } from '@nestjs/jwt';
 import { RefreshTokenService } from '../../services/refresh-token.service';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Tokens } from '../../types/auth.types';
+import { randomUUID } from 'crypto';
+import { JwtTokenService } from '../../services/jwt-token.service';
 
 @CommandHandler(LoginCommand)
 export class LoginHandler implements ICommandHandler<LoginCommand> {
@@ -12,6 +14,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly refreshTokenService: RefreshTokenService,
+    private readonly jwtTokenService: JwtTokenService,
   ) {}
 
   async execute(command: LoginCommand): Promise<Tokens> {
@@ -29,12 +32,23 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
       throw new InternalServerErrorException('Invalid credentials');
     }
 
+    const sessionId = randomUUID();
+    const jti = randomUUID();
     const payload = { sub: user.userId, email: user.email, roles: user.roles };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const refreshToken = this.jwtTokenService.createJwtRefreshToken(payload, {
+      sid: sessionId,
+      jti,
+    });
 
-    await this.refreshTokenService.saveRefreshToken(user.userId, refreshToken, 7 * 24 * 3600);
+    await this.refreshTokenService.saveSession(
+      sessionId,
+      user.userId,
+      refreshToken,
+      jti,
+      7 * 24 * 3600,
+    );
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, sessionId };
   }
 }

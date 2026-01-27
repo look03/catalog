@@ -1,16 +1,16 @@
 <template>
   <div class="form-wrapper">
-    <h2>{{$t('auth.signIn')}}</h2>
+    <h2>{{ $t('auth.signIn') }}</h2>
     <form @submit.prevent="handleLogin">
       <label>
         Email:
-        <input type="email" v-model="loginEmail" required />
+        <input v-model="loginEmail" type="email" required />
       </label>
       <label>
         Пароль:
-        <input type="password" v-model="loginPassword" required />
+        <input v-model="loginPassword" type="password" required />
       </label>
-      <button type="submit">{{$t('auth.login')}}</button>
+      <button type="submit">{{ $t('auth.login') }}</button>
     </form>
   </div>
 </template>
@@ -18,14 +18,18 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+const { login } = useAuthModule();
+
 const loginEmail = ref('');
 const loginPassword = ref('');
 
 const handleLogin = async () => {
-  // Здесь можно сделать вызов API для входа
-  alert(`Вход: ${loginEmail.value}, пароль: ${loginPassword.value}`);
-}
+  if (!loginEmail.value && !loginPassword.value) {
+    return;
+  }
 
+  await login(loginEmail.value, loginPassword.value);
+};
 </script>
 
 <style scoped lang="scss">
@@ -60,5 +64,4 @@ button[type='submit'] {
 button[type='submit']:hover {
   background-color: #005bb5;
 }
-
 </style>

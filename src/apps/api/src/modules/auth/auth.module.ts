@@ -11,6 +11,7 @@ import { UserService } from './services/user.service';
 import { RefreshTokenService } from './services/refresh-token.service';
 import * as process from 'node:process';
 import { entities } from './entities';
+import { JwtTokenService } from './services/jwt-token.service';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { entities } from './entities';
     JwtGuard,
     UserService,
     RefreshTokenService,
+    JwtTokenService,
   ],
   controllers: [AuthController],
   exports: ['REDIS_CLIENT', UserService, RefreshTokenService],

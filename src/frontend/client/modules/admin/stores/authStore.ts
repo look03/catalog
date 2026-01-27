@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import type { AuthStore } from '../types';
 
-export const useAuthStore = defineStore('auth-store', {
+export const useAdminStore = defineStore('admin-store', {
   state: (): AuthStore => ({
     accessToken: undefined
   }),

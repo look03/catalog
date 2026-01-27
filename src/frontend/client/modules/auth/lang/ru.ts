@@ -1,6 +1,7 @@
 export default {
   auth: {
     login: 'Войти',
-    signIn: 'Вход'
+    signIn: 'Вход',
+    logout: 'Выйти из профиля'
   }
-}
+};
