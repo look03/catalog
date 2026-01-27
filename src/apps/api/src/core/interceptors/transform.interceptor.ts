@@ -25,15 +25,7 @@ export class TransformInterceptor implements NestInterceptor<unknown, ApiRespons
 
     return next.handle().pipe(
       map((data: TokenResponse) => {
-        if (data?.refreshToken && data?.sessionId) {
-          res.cookie('token', data.refreshToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            path: '/',
-          });
-
+        if (data?.sessionId) {
           res.cookie('sessionId', data.sessionId, {
             httpOnly: true,
             secure: true,
@@ -43,7 +35,6 @@ export class TransformInterceptor implements NestInterceptor<unknown, ApiRespons
           });
 
           const rest = { ...data };
-          delete rest.refreshToken;
           delete rest.sessionId;
 
           return {

@@ -49,6 +49,6 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
       7 * 24 * 3600,
     );
 
-    return { accessToken, refreshToken, sessionId };
+    return { accessToken, sessionId };
   }
 }

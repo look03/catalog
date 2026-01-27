@@ -1,10 +1,16 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import Redis from 'ioredis';
-import { RefreshSession } from '../types/auth.types';
+import { JwtPayload, RefreshSession } from '../types/auth.types';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class RefreshTokenService {
-  constructor(@Inject('REDIS_CLIENT') private readonly redisClient: Redis) {}
+  constructor(
+    @Inject('REDIS_CLIENT')
+    private readonly redisClient: Redis,
+
+    private readonly jwtService: JwtService,
+  ) {}
 
   async saveSession(
     sessionId: string,
@@ -34,15 +40,19 @@ export class RefreshTokenService {
     return data ? JSON.parse(data) : null;
   }
 
-  async validateSession(sessionId: string, jti: string): Promise<void> {
+  async validateSession(sessionId: string): Promise<JwtPayload> {
     const session = await this.getSession(sessionId);
     if (!session) {
       throw new UnauthorizedException('Session not found');
     }
-    console.log(session, '<<<<<<<<<<<<<< session');
-    if (session.jti !== jti) {
+
+    const payload = this.jwtService.verify<JwtPayload>(session.refreshToken);
+
+    if (session.jti !== payload.jti) {
       throw new UnauthorizedException('Invalid refresh token');
     }
+
+    return payload;
   }
 
   async updateSessionToken(

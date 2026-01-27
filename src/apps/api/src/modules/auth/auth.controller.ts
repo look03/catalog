@@ -29,14 +29,13 @@ export class AuthController {
 
   @Post('refresh/')
   async refresh(@Req() req: Request): Promise<Tokens> {
-    const refreshToken = req.cookies['token'] as string;
     const sessionId = req.cookies['sessionId'] as string;
 
-    if (!refreshToken) {
-      throw new UnauthorizedException('Refresh token missing or invalid');
+    if (!sessionId) {
+      throw new UnauthorizedException('SessionId missing or invalid');
     }
 
-    return this.commandBus.execute(new RefreshCommand(refreshToken, sessionId));
+    return this.commandBus.execute(new RefreshCommand(sessionId));
   }
 
   @UseGuards(JwtGuard)
@@ -48,12 +47,6 @@ export class AuthController {
     const sessionId = req.cookies['sessionId'] as string;
     await this.commandBus.execute(new LogoutCommand(sessionId));
 
-    res.clearCookie('token', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-      path: '/',
-    });
     res.clearCookie('sessionId', {
       httpOnly: true,
       secure: true,

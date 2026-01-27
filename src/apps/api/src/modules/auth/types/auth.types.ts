@@ -16,7 +16,6 @@ export type UserByEmail = ResponseCreateUser & {
 
 export interface Tokens {
   accessToken: string;
-  refreshToken: string;
   sessionId?: string;
 }
 
