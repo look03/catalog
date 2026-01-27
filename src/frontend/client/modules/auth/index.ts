@@ -25,7 +25,7 @@ export default defineNuxtModule({
         langDir: resolve('./lang'),
         locales: [
           {
-            code: 'ru',
+              code: 'ru',
             file: 'ru.ts',
           },
         ]
