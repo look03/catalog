@@ -7,7 +7,7 @@ import { LogoutCommand } from './commands/impl/logout.command';
 import { JwtGuard } from './infrastructure/jwt.guard';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { JwtUser, ResponseCreateUser, Tokens } from './types/auth.types';
+import { ResponseCreateUser, Tokens } from './types/auth.types';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 @Controller('auth/')

@@ -12,6 +12,10 @@ export class RefreshTokenService {
     private readonly jwtService: JwtService,
   ) {}
 
+  private getRedisKey(sessionId: string): string {
+    return `refresh_session:${sessionId}`;
+  }
+
   async saveSession(
     sessionId: string,
     userId: string,
@@ -28,7 +32,7 @@ export class RefreshTokenService {
     };
 
     await this.redisClient.set(
-      `refresh_session:${sessionId}`,
+      this.getRedisKey(sessionId),
       JSON.stringify(payload),
       'EX',
       expiresInSec,
@@ -36,8 +40,12 @@ export class RefreshTokenService {
   }
 
   async getSession(sessionId: string): Promise<RefreshSession | null> {
-    const data = await this.redisClient.get(`refresh_session:${sessionId}`);
-    return data ? JSON.parse(data) : null;
+    const data = await this.redisClient.get(this.getRedisKey(sessionId));
+    if (!data) {
+      return null;
+    }
+
+    return JSON.parse(data) as RefreshSession;
   }
 
   async validateSession(sessionId: string): Promise<JwtPayload> {
@@ -74,15 +82,14 @@ export class RefreshTokenService {
     };
 
     await this.redisClient.set(
-      `refresh_session:${sessionId}`,
+      this.getRedisKey(sessionId),
       JSON.stringify(updatedSession),
       'EX',
       expiresInSec,
     );
   }
 
-  // ✅ logout ТОЛЬКО текущего устройства
   async deleteSession(sessionId: string): Promise<void> {
-    await this.redisClient.del(`refresh_session:${sessionId}`);
+    await this.redisClient.del(this.getRedisKey(sessionId));
   }
 }
