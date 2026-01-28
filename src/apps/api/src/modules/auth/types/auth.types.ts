@@ -32,15 +32,16 @@ export type RefreshSession = JwtSessions & {
 
 export interface JwtPayload {
   sub: string;
-  email: string;
   roles: string[];
+  email?: string;
   jti?: string;
   sid?: string;
   iat?: number;
   exp?: number;
 }
 
-export type JwtUser = ResponseCreateUser & {
+export type JwtUser = {
+  userId: string;
   roles: string[];
 };
 

@@ -35,7 +35,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
     const sessionId = randomUUID();
     const jti = randomUUID();
-    const payload = { sub: user.userId, email: user.email, roles: user.roles };
+    const payload = { sub: user.userId, roles: user.roles };
     const accessToken = this.jwtService.sign(payload, { expiresIn: JWT.ACCESS_TOKEN_EXPIRES_IN });
     const refreshToken = this.jwtTokenService.createJwtRefreshToken(payload, {
       sid: sessionId,

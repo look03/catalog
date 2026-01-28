@@ -1,42 +1,41 @@
 <template>
   <div class="form-wrapper">
-    <h2>Регистрация</h2>
+    <h2>{{ $t('register.register') }}</h2>
     <form @submit.prevent="handleRegister">
       <label>
-        Email:
-        <input type="email" v-model="registerEmail" required />
+        {{ $t('email') }}
+        <input v-model="registerEmail" type="email" required />
       </label>
       <label>
-        Пароль:
-        <input type="password" v-model="registerPassword" required />
+        {{ $t('password') }}
+        <input v-model="registerPassword" type="password" required />
       </label>
       <label>
-        Подтверждение пароля:
-        <input type="password" v-model="registerPasswordConfirm" required />
+        {{ $t('register.confirmPassword') }}
+        <input v-model="registerPasswordConfirm" type="password" required />
       </label>
-      <button type="submit">Зарегистрироваться</button>
+      <button type="submit">{{ $t('register.toRegister') }}</button>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
-
 import { ref } from 'vue';
+
+const { register } = useAuthModule();
 
 const registerEmail = ref('');
 const registerPassword = ref('');
 const registerPasswordConfirm = ref('');
 
-
-function handleRegister() {
+const handleRegister = async () => {
   if (registerPassword.value !== registerPasswordConfirm.value) {
     alert('Пароли не совпадают');
     return;
   }
-  // Здесь можно сделать вызов API для регистрации
-  alert(`Регистрация: ${registerEmail.value}`);
-}
 
+  await register(registerEmail.value, registerPassword.value);
+};
 </script>
 
 <style scoped lang="scss">

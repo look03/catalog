@@ -3,11 +3,11 @@
     <h2>{{ $t('auth.signIn') }}</h2>
     <form @submit.prevent="handleLogin">
       <label>
-        Email:
+        {{ $t('email') }}
         <input v-model="loginEmail" type="email" required />
       </label>
       <label>
-        Пароль:
+        {{ $t('password') }}
         <input v-model="loginPassword" type="password" required />
       </label>
       <button type="submit">{{ $t('auth.login') }}</button>

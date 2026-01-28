@@ -1,5 +1,6 @@
 export type ApiOptions = {
   auth?: boolean;
+  retry?: boolean;
 };
 
 export type Tokens = {

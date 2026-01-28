@@ -1,4 +1,4 @@
-export async function getList() {
+export async function getList(): Promise<void> {
   try {
     const response = await useApi.get<any>(
       '/admin/products',

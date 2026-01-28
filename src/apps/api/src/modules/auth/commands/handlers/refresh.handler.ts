@@ -22,7 +22,6 @@ export class RefreshHandler implements ICommandHandler<RefreshCommand> {
 
     const tokenData = {
       sub: payload.sub,
-      email: payload.email,
       roles: payload.roles,
     };
 

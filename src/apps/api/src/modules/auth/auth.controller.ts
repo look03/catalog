@@ -41,7 +41,7 @@ export class AuthController {
     const sessionId = req.cookies['sessionId'] as string;
 
     if (!sessionId) {
-      throw new BadRequestException('SessionId missing or invalid');
+      throw new UnauthorizedException('SessionId missing or invalid');
     }
 
     return this.commandBus.execute(new RefreshCommand(sessionId));
@@ -56,7 +56,7 @@ export class AuthController {
     const sessionId = req.cookies['sessionId'] as string;
 
     if (!sessionId) {
-      throw new BadRequestException('SessionId missing or invalid');
+      throw new UnauthorizedException('SessionId missing or invalid');
     }
 
     await this.commandBus.execute(new LogoutCommand(sessionId));

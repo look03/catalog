@@ -1,5 +1,5 @@
 import { useAuthStore } from '../stores/authStore';
-import { login, logout } from '../api';
+import { login, logout, register } from '../api';
 
 export function useAuthModule() {
   const authStore = useAuthStore();
@@ -9,6 +9,7 @@ export function useAuthModule() {
     accessToken,
     login,
     logout,
+    register,
     setToken: authStore.setAccessToken,
     clearToken: authStore.clearAccessToken
   };

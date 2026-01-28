@@ -1,4 +1,4 @@
-export async function getCatalogData(path: string) {
+export async function getCatalogData(path: string): Promise<void> {
   try {
     console.log(path, '<<<<<<<<<<<<<< url');
     const response = await useApi.get<any>(

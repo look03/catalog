@@ -5,3 +5,8 @@ export type AuthStore = {
 export type LoginResponse = {
   accessToken?: string;
 };
+
+export type RegisterResponse = {
+  userId: string;
+  email: string;
+};
