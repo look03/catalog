@@ -1,13 +1,5 @@
-import { GetCatalogUpdatesHandler } from './get-catalog-updates.handler';
-import { GetProductsHandler } from './get-products.handler';
-import { GetSectionsHandler } from './get-sections.handler';
-import { GetBrandsHandler } from './get-brands.handler';
-import { GetModalSectionsHandler } from './get-modal-sections.handler';
+import { GetPageByUrlHandler } from './get-page-by-url.handler';
+import { GetProductPageHandler } from './get-product-page.handler';
+import { GetSectionPageHandler } from './get-section-page.handler';
 
-export const queryHandlers = [
-  GetCatalogUpdatesHandler,
-  GetProductsHandler,
-  GetSectionsHandler,
-  GetBrandsHandler,
-  GetModalSectionsHandler,
-];
+export const queryHandlers = [GetPageByUrlHandler, GetProductPageHandler, GetSectionPageHandler];

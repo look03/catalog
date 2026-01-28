@@ -3,7 +3,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { InternalServerErrorException } from '@nestjs/common';
 import { ReIndexSearchCommand } from '../impl/reindex-search.command';
 import { IndexSearchService } from '../../services/index-search.service';
-import { ReIndexCommand } from '../../../search/commands/impl/re-index.command';
+import { ReIndexCommand } from '../../../catalog/commands/impl/re-index.command';
 import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 
 @CommandHandler(ReIndexSearchCommand)

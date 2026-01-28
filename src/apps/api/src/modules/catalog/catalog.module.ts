@@ -1,20 +1,17 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { CatalogController } from './catalog.controller';
-import { entities } from './entities';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { CommonModule } from '../common/common.module';
-import { SearchModule } from '../search/search.module';
-import { AuthModule } from '../auth/auth.module';
 import { commandHandlers } from './commands/handlers';
-import { queryHandlers } from './queries/handlers';
 import { services } from './services';
-import { sagas } from './sagas';
+import { CatalogController } from './catalog.controller';
+import { workers } from './workers';
+import { CommonModule } from '../common/common.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { queryHandlers } from './queries/handlers';
 
 @Module({
-  imports: [CqrsModule, CommonModule, SearchModule, AuthModule, TypeOrmModule.forFeature(entities)],
+  imports: [CqrsModule, CommonModule, ScheduleModule.forRoot()],
   controllers: [CatalogController],
-  providers: [...commandHandlers, ...queryHandlers, ...services, ...sagas],
-  exports: services,
+  providers: [...commandHandlers, ...queryHandlers, ...services, ...workers],
+  exports: [...services, ...workers],
 })
 export class CatalogModule {}

@@ -4,7 +4,7 @@ import { Product } from '../../entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotFoundException, InternalServerErrorException } from '@nestjs/common';
-import { DeleteDocumentCommand } from '../../../search/commands/impl/delete-document.command';
+import { DeleteDocumentCommand } from '../../../catalog/commands/impl/delete-document.command';
 import { ProductImage } from '../../entities/product-images.entity';
 import path from 'path';
 import { FileStorageService } from '../../../common/services/file-storage.service';

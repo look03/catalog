@@ -3,7 +3,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { ElasticService } from '../services/elastic.service';
 import { SyncMetaService } from '../../common/services/sync-meta.service';
 import { QueryBus } from '@nestjs/cqrs';
-import { GetCatalogUpdatesQuery } from '../../catalog/queries/impl/get-catalog-updates.query';
+import { GetCatalogUpdatesQuery } from '../../admin/queries/impl/get-catalog-updates.query';
 import { SearchSectionsAndProducts } from '../../../types/global.catalog';
 
 @Injectable()

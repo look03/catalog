@@ -1,5 +1,5 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { GetPageByUrlQuery } from '../impl/get-page-by-url.query';
 import { ElasticService } from '../../services/elastic.service';
 import { SearchDocument } from '../../types/document.types';
@@ -9,6 +9,10 @@ export class GetPageByUrlHandler implements IQueryHandler<GetPageByUrlQuery> {
   constructor(private readonly elasticService: ElasticService) {}
 
   async execute({ url }: GetPageByUrlQuery): Promise<string> {
+    if (!url) {
+      throw new BadRequestException('Not URL');
+    }
+
     if (url === '/catalog/') {
       return 'section';
     }

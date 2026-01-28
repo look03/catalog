@@ -1,4 +1,4 @@
-import { SectionService } from './section.service';
-import { ProductService } from './product.service';
-import { IndexSearchService } from './index-search.service';
-export const services = [SectionService, ProductService, IndexSearchService];
+import { SearchService } from './search.service';
+import { ElasticService } from './elastic.service';
+
+export const services = [SearchService, ElasticService];

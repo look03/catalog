@@ -1,34 +1,31 @@
-import type { RouterConfig } from '@nuxt/schema'
+import type { RouterConfig } from '@nuxt/schema';
 
 export default <RouterConfig>{
   routes: (_routes) => [
     {
       path: '/',
-      redirect: '/catalog',
+      redirect: '/catalog/'
     },
     {
-      path: '/auth',
-      component: () =>
-        import('~/pages/AuthPage.vue'),
+      path: '/auth/',
+      component: () => import('~/pages/AuthPage.vue'),
       meta: {
-        layout: 'auth',
-      },
+        layout: 'auth'
+      }
     },
     {
-      path: '/catalog',
-      component: () =>
-        import('~/pages/CatalogPage.vue'),
+      path: '/catalog/:catalogPath(.*)*',
+      component: () => import('~/pages/CatalogPage.vue'),
       meta: {
-        layout: 'catalog',
-      },
+        layout: 'catalog'
+      }
     },
     {
-      path: '/admin',
-      component: () =>
-        import('~/pages/AdminPage.vue'),
+      path: '/admin/',
+      component: () => import('~/pages/AdminPage.vue'),
       meta: {
-        layout: 'admin',
-      },
-    },
-  ],
-}
+        layout: 'admin'
+      }
+    }
+  ]
+};

@@ -26,7 +26,14 @@ export default defineNuxtConfig({
       extensions: ['vue']
     }
   ],
-  modules: ['@vueuse/nuxt', '@pinia/nuxt', '@nuxtjs/i18n', '~/modules/auth', '~/modules/admin'],
+  modules: [
+    '@vueuse/nuxt',
+    '@pinia/nuxt',
+    '@nuxtjs/i18n',
+    '~/modules/auth',
+    '~/modules/admin',
+    '~/modules/catalog'
+  ],
   i18n: {
     defaultLocale: 'ru',
     locales: ['ru']

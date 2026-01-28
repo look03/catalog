@@ -1,4 +1,13 @@
-import { Body, Controller, Post, UseGuards, Req, Res, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  Req,
+  Res,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterCommand } from './commands/impl/register.command';
 import { LoginCommand } from './commands/impl/login.command';
@@ -32,7 +41,7 @@ export class AuthController {
     const sessionId = req.cookies['sessionId'] as string;
 
     if (!sessionId) {
-      throw new UnauthorizedException('SessionId missing or invalid');
+      throw new BadRequestException('SessionId missing or invalid');
     }
 
     return this.commandBus.execute(new RefreshCommand(sessionId));
@@ -45,6 +54,11 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Успешный выход, токены удалены' })
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response): Promise<void> {
     const sessionId = req.cookies['sessionId'] as string;
+
+    if (!sessionId) {
+      throw new BadRequestException('SessionId missing or invalid');
+    }
+
     await this.commandBus.execute(new LogoutCommand(sessionId));
 
     res.clearCookie('sessionId', {

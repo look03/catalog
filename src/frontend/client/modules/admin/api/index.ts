@@ -1,7 +1,8 @@
 export async function getList() {
   try {
     const response = await useApi.get<any>(
-      '/catalog/products',
+      '/admin/products',
+      {},
       {
         page: 1,
         limit: 10,
@@ -10,7 +11,6 @@ export async function getList() {
       },
       { auth: true }
     );
-    console.log(response, '<<<<<<<<<<<<<< response');
   } catch (error) {
     logError('AUTH_LOGIN', 'GET', error);
   }

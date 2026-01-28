@@ -1,7 +1,9 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import Redis from 'ioredis';
 import { JwtPayload, RefreshSession } from '../types/auth.types';
 import { JwtService } from '@nestjs/jwt';
+import { REDIS } from '../constants/redis.constants';
+import { getDetailsErrorUtil } from '../../../common/utils/error.utils';
 
 @Injectable()
 export class RefreshTokenService {
@@ -16,12 +18,15 @@ export class RefreshTokenService {
     return `refresh_session:${sessionId}`;
   }
 
+  private getRevokedRedisKey(sessionId: string): string {
+    return `revoked_session:${sessionId}`;
+  }
+
   async saveSession(
     sessionId: string,
     userId: string,
     refreshToken: string,
     jti: string,
-    expiresInSec: number,
   ): Promise<void> {
     const payload: RefreshSession = {
       userId,
@@ -31,12 +36,20 @@ export class RefreshTokenService {
       createdAt: Date.now(),
     };
 
-    await this.redisClient.set(
-      this.getRedisKey(sessionId),
-      JSON.stringify(payload),
-      'EX',
-      expiresInSec,
-    );
+    try {
+      await this.redisClient.set(
+        this.getRedisKey(sessionId),
+        JSON.stringify(payload),
+        'EX',
+        REDIS.EXPIRES_IN_SEC,
+      );
+    } catch (error) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Failed to save session token in redis',
+        details: getDetailsErrorUtil(error),
+      });
+    }
   }
 
   async getSession(sessionId: string): Promise<RefreshSession | null> {
@@ -48,27 +61,79 @@ export class RefreshTokenService {
     return JSON.parse(data) as RefreshSession;
   }
 
+  async isSessionRevoked(sessionId: string): Promise<boolean> {
+    const revokedKey = this.getRevokedRedisKey(sessionId);
+    const exists = await this.redisClient.exists(revokedKey);
+    return exists === 1;
+  }
+
+  /**
+   * Отзывает сессию (принудительно делает ее недействительной)
+   * @param sessionId ID сессии для отзыва
+   * @param reason Причина отзыва (для логов)
+   * @param ttl Время хранения записи об отзыве в секундах (по умолчанию 7 дней)
+   */
+  async revokeSession(sessionId: string, reason: string = 'manual_revoke'): Promise<void> {
+    const session = await this.getSession(sessionId);
+
+    await this.deleteSession(sessionId);
+
+    const revokeData = {
+      sessionId,
+      revokedAt: Date.now(),
+      reason,
+      userId: session?.userId,
+      originalJti: session?.jti,
+    };
+
+    try {
+      await this.redisClient.set(
+        this.getRevokedRedisKey(sessionId),
+        JSON.stringify(revokeData),
+        'EX',
+        REDIS.EXPIRES_IN_SEC,
+      );
+    } catch (error) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Failed to save revoke session token in redis',
+        details: getDetailsErrorUtil(error),
+      });
+    }
+  }
+
+  /**
+   *
+   * @param sessionId
+   */
   async validateSession(sessionId: string): Promise<JwtPayload> {
+    const isRevoked = await this.isSessionRevoked(sessionId);
+    if (isRevoked) {
+      throw new UnauthorizedException('Session revoked');
+    }
+
     const session = await this.getSession(sessionId);
     if (!session) {
       throw new UnauthorizedException('Session not found');
     }
 
-    const payload = this.jwtService.verify<JwtPayload>(session.refreshToken);
+    let payload: JwtPayload;
+    try {
+      payload = this.jwtService.verify<JwtPayload>(session.refreshToken);
+    } catch (error) {
+      await this.deleteSession(sessionId);
+      throw new UnauthorizedException(`Invalid or expired token ${error}`);
+    }
 
     if (session.jti !== payload.jti) {
+      await this.revokeSession(sessionId, 'jti_mismatch');
       throw new UnauthorizedException('Invalid refresh token');
     }
 
     return payload;
   }
 
-  async updateSessionToken(
-    sessionId: string,
-    newRefreshToken: string,
-    jti: string,
-    expiresInSec: number,
-  ): Promise<void> {
+  async updateSessionToken(sessionId: string, newRefreshToken: string, jti: string): Promise<void> {
     const session = await this.getSession(sessionId);
 
     if (!session) {
@@ -81,15 +146,35 @@ export class RefreshTokenService {
       refreshToken: newRefreshToken,
     };
 
-    await this.redisClient.set(
-      this.getRedisKey(sessionId),
-      JSON.stringify(updatedSession),
-      'EX',
-      expiresInSec,
-    );
+    try {
+      await this.redisClient.set(
+        this.getRedisKey(sessionId),
+        JSON.stringify(updatedSession),
+        'EX',
+        REDIS.EXPIRES_IN_SEC,
+      );
+    } catch (error) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Failed to update session in redis',
+        details: getDetailsErrorUtil(error),
+      });
+    }
   }
 
   async deleteSession(sessionId: string): Promise<void> {
-    await this.redisClient.del(this.getRedisKey(sessionId));
+    if (!sessionId) {
+      throw new BadRequestException('Not session id');
+    }
+
+    try {
+      await this.redisClient.del(this.getRedisKey(sessionId));
+    } catch (error) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Failed to delete session in redis',
+        details: getDetailsErrorUtil(error),
+      });
+    }
   }
 }

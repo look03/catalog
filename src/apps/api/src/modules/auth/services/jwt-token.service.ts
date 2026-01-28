@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtPayload, JwtSessions } from '../types/auth.types';
 import { JwtService } from '@nestjs/jwt';
+import { JWT } from '../constants/jwt.constants';
 
 @Injectable()
 export class JwtTokenService {
@@ -13,7 +14,7 @@ export class JwtTokenService {
         ...sessions,
         type: 'refresh',
       },
-      { expiresIn: '7d' },
+      { expiresIn: JWT.REFRESH_TOKEN_EXPIRES_IN },
     );
   }
 }

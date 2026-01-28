@@ -22,6 +22,7 @@ const refreshToken = async (
 const fetch = async <T>(
   url: string,
   options: any = {},
+  params: any = {},
   apiOptions: ApiOptions = { auth: true }
 ): Promise<T> => {
   const config = useRuntimeConfig();
@@ -30,6 +31,7 @@ const fetch = async <T>(
   const makeRequest = async () => {
     return await $fetch<ApiResponse<T>>(url, {
       baseURL: config.public.apiBase,
+      query: params,
       ...options,
       headers: {
         ...(apiOptions.auth && accessToken?.value
@@ -67,15 +69,15 @@ const fetch = async <T>(
 };
 
 export const useApi = {
-  get: <T>(url: string, opts = {}, apiOpts?: ApiOptions) =>
-    fetch<T>(url, { method: 'GET', ...opts }, apiOpts),
+  get: <T>(url: string, opts = {}, params = {}, apiOpts?: ApiOptions) =>
+    fetch<T>(url, { method: 'GET', ...opts }, params, apiOpts),
 
-  post: <T>(url: string, body?: any, opts = {}, apiOpts?: ApiOptions) =>
-    fetch<T>(url, { method: 'POST', body, ...opts }, apiOpts),
+  post: <T>(url: string, body?: any, opts = {}, params = {}, apiOpts?: ApiOptions) =>
+    fetch<T>(url, { method: 'POST', body, ...opts }, params, apiOpts),
 
-  patch: <T>(url: string, body?: any, opts = {}, apiOpts?: ApiOptions) =>
-    fetch<T>(url, { method: 'PATCH', body, ...opts }, apiOpts),
+  patch: <T>(url: string, body?: any, opts = {}, params = {}, apiOpts?: ApiOptions) =>
+    fetch<T>(url, { method: 'PATCH', body, ...opts }, params, apiOpts),
 
-  delete: <T>(url: string, opts = {}, apiOpts?: ApiOptions) =>
-    fetch<T>(url, { method: 'DELETE', ...opts }, apiOpts)
+  delete: <T>(url: string, opts = {}, params = {}, apiOpts?: ApiOptions) =>
+    fetch<T>(url, { method: 'DELETE', ...opts }, params, apiOpts)
 };

@@ -4,7 +4,7 @@ import { NotFoundException, InternalServerErrorException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm';
 import { Section } from '../../entities/section.entity';
 import { Repository } from 'typeorm';
-import { DeleteDocumentCommand } from '../../../search/commands/impl/delete-document.command';
+import { DeleteDocumentCommand } from '../../../catalog/commands/impl/delete-document.command';
 import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 
 @CommandHandler(DeleteSectionCommand)

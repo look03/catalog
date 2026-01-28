@@ -6,6 +6,8 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { Tokens } from '../../types/auth.types';
 import { randomUUID } from 'crypto';
 import { JwtTokenService } from '../../services/jwt-token.service';
+import { JWT } from '../../constants/jwt.constants';
+import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
 
 @CommandHandler(RefreshCommand)
 export class RefreshHandler implements ICommandHandler<RefreshCommand> {
@@ -18,33 +20,26 @@ export class RefreshHandler implements ICommandHandler<RefreshCommand> {
   async execute(command: RefreshCommand): Promise<Tokens> {
     const payload = await this.refreshTokenService.validateSession(command.sessionId);
 
-    try {
-      const tokenData = {
-        sub: payload.sub,
-        email: payload.email,
-        roles: payload.roles,
-      };
+    const tokenData = {
+      sub: payload.sub,
+      email: payload.email,
+      roles: payload.roles,
+    };
 
-      const accessToken = this.jwtService.sign(tokenData, { expiresIn: '15m' });
-      const jti = randomUUID();
-      const newRefreshToken = this.jwtTokenService.createJwtRefreshToken(tokenData, {
-        sid: command.sessionId,
-        jti,
-      });
+    const accessToken = this.jwtService.sign(tokenData, {
+      expiresIn: JWT.ACCESS_TOKEN_EXPIRES_IN,
+    });
+    const jti = randomUUID();
+    const newRefreshToken = this.jwtTokenService.createJwtRefreshToken(tokenData, {
+      sid: command.sessionId,
+      jti,
+    });
 
-      await this.refreshTokenService.updateSessionToken(
-        command.sessionId,
-        newRefreshToken,
-        jti,
-        7 * 24 * 3600,
-      );
+    await this.refreshTokenService.updateSessionToken(command.sessionId, newRefreshToken, jti);
 
-      return {
-        accessToken,
-        sessionId: command.sessionId,
-      };
-    } catch {
-      throw new InternalServerErrorException('Invalid refresh token');
-    }
+    return {
+      accessToken,
+      sessionId: command.sessionId,
+    };
   }
 }

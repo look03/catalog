@@ -8,6 +8,7 @@ export async function login(email: string, password: string) {
       '/auth/login',
       { email, password },
       { credentials: 'include' },
+      {},
       { auth: false }
     );
     if (response.accessToken) {
@@ -21,7 +22,7 @@ export async function login(email: string, password: string) {
 
 export async function logout() {
   try {
-    await useApi.post('/auth/logout/', {}, {}, { auth: true });
+    await useApi.post('/auth/logout/', {}, { credentials: 'include' }, { auth: true });
 
     navigateTo('/auth');
   } catch (error) {
