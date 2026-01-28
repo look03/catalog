@@ -36,9 +36,10 @@ import { JwtGuard } from '../auth/infrastructure/jwt.guard';
 import { RolesGuard } from '../auth/infrastructure/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { BrandProduct } from './interfaces/brand.interface';
+import { DecryptJwtGuard } from '../auth/infrastructure/decript.guard';
 
 @Roles('admin')
-@UseGuards(JwtGuard, RolesGuard)
+@UseGuards(DecryptJwtGuard, JwtGuard, RolesGuard)
 @ApiTags('admin')
 @Controller('admin/')
 export class AdminController {

@@ -12,6 +12,7 @@ import { RefreshTokenService } from './services/refresh-token.service';
 import * as process from 'node:process';
 import { entities } from './entities';
 import { JwtTokenService } from './services/jwt-token.service';
+import { CryptoService } from './services/crypto.service';
 
 @Module({
   imports: [
@@ -38,8 +39,9 @@ import { JwtTokenService } from './services/jwt-token.service';
     UserService,
     RefreshTokenService,
     JwtTokenService,
+    CryptoService,
   ],
   controllers: [AuthController],
-  exports: ['REDIS_CLIENT', UserService, RefreshTokenService],
+  exports: ['REDIS_CLIENT', UserService, RefreshTokenService, JwtTokenService, CryptoService],
 })
 export class AuthModule {}

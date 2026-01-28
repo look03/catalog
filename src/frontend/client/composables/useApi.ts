@@ -6,6 +6,8 @@ const DEFAULT_API_OPTIONS: ApiOptions = {
   retry: true
 };
 
+const MAX_RETRIES = 2;
+
 export const refreshToken = async (): Promise<void> => {
   const config = useRuntimeConfig();
   const auth = useAuthModule();
@@ -24,12 +26,16 @@ export const refreshToken = async (): Promise<void> => {
   auth.setToken(response.data.accessToken);
 };
 
-const handleApiError = async <T>(error: any, retry: () => Promise<T>): Promise<T> => {
+const handleApiError = async <T>(
+  error: any,
+  retry: () => Promise<T>,
+  retryCount: number
+): Promise<T> => {
   const auth = useAuthModule();
 
   const status = error?.response?.status;
 
-  if (status === 401) {
+  if (status === 401 && retryCount > 0) {
     try {
       await refreshToken();
       return await retry();
@@ -54,7 +60,8 @@ const request = async <T>(
   url: string,
   options: any = {},
   params: any = {},
-  apiOptions: ApiOptions = DEFAULT_API_OPTIONS
+  apiOptions: ApiOptions = DEFAULT_API_OPTIONS,
+  retryCount = MAX_RETRIES
 ): Promise<T> => {
   const config = useRuntimeConfig();
   const auth = useAuthModule();
@@ -79,8 +86,14 @@ const request = async <T>(
 
     return response.data;
   } catch (error: any) {
-    return handleApiError<T>(error, () =>
-      request<T>(url, options, params, { ...apiOptions, retry: false })
+    if (retryCount <= 0) {
+      throw error;
+    }
+
+    return handleApiError<T>(
+      error,
+      () => request<T>(url, options, params, { ...apiOptions, retry: false }, retryCount - 1),
+      retryCount - 1
     );
   }
 };

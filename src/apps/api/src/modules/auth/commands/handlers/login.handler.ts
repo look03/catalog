@@ -8,6 +8,7 @@ import { Tokens } from '../../types/auth.types';
 import { randomUUID } from 'crypto';
 import { JwtTokenService } from '../../services/jwt-token.service';
 import { JWT } from '../../constants/jwt.constants';
+import { CryptoService } from '../../services/crypto.service';
 
 @CommandHandler(LoginCommand)
 export class LoginHandler implements ICommandHandler<LoginCommand> {
@@ -16,6 +17,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
     private readonly jwtService: JwtService,
     private readonly refreshTokenService: RefreshTokenService,
     private readonly jwtTokenService: JwtTokenService,
+    private readonly cryptoService: CryptoService,
   ) {}
 
   async execute(command: LoginCommand): Promise<Tokens> {
@@ -44,6 +46,9 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
     await this.refreshTokenService.saveSession(sessionId, user.userId, refreshToken, jti);
 
-    return { accessToken, sessionId };
+    return {
+      accessToken: this.cryptoService.encrypt(accessToken),
+      sessionId,
+    };
   }
 }

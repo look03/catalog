@@ -47,4 +47,5 @@ export type JwtUser = {
 
 export interface Context {
   user: JwtPayload;
+  headers: [];
 }

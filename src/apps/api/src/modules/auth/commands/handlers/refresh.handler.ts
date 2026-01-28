@@ -7,7 +7,7 @@ import { Tokens } from '../../types/auth.types';
 import { randomUUID } from 'crypto';
 import { JwtTokenService } from '../../services/jwt-token.service';
 import { JWT } from '../../constants/jwt.constants';
-import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
+import { CryptoService } from '../../services/crypto.service';
 
 @CommandHandler(RefreshCommand)
 export class RefreshHandler implements ICommandHandler<RefreshCommand> {
@@ -15,6 +15,7 @@ export class RefreshHandler implements ICommandHandler<RefreshCommand> {
     private readonly jwtService: JwtService,
     private readonly refreshTokenService: RefreshTokenService,
     private readonly jwtTokenService: JwtTokenService,
+    private readonly cryptoService: CryptoService,
   ) {}
 
   async execute(command: RefreshCommand): Promise<Tokens> {
@@ -37,7 +38,7 @@ export class RefreshHandler implements ICommandHandler<RefreshCommand> {
     await this.refreshTokenService.updateSessionToken(command.sessionId, newRefreshToken, jti);
 
     return {
-      accessToken,
+      accessToken: this.cryptoService.encrypt(accessToken),
       sessionId: command.sessionId,
     };
   }

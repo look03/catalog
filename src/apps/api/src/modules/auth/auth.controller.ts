@@ -19,6 +19,7 @@ import { LoginDto } from './dto/login.dto';
 import { ResponseCreateUser, Tokens } from './types/auth.types';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
+import { DecryptJwtGuard } from './infrastructure/decript.guard';
 @Controller('auth/')
 @ApiTags('auth')
 export class AuthController {
@@ -47,7 +48,7 @@ export class AuthController {
     return this.commandBus.execute(new RefreshCommand(sessionId));
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(DecryptJwtGuard, JwtGuard)
   @Post('logout/')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Выход пользователя (logout)' })
