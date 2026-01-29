@@ -137,7 +137,11 @@ export class RefreshTokenService {
     return { payload, session };
   }
 
-  async rotateRefreshSession(sessionId: string, payload: JwtPayload): Promise<void> {
+  async rotateRefreshSession(
+    sessionId: string,
+    payload: JwtPayload,
+    existingSession?: RefreshSession | null,
+  ): Promise<void> {
     const newJti = randomUUID();
 
     const newRefreshToken = this.jwtService.sign(
@@ -153,7 +157,7 @@ export class RefreshTokenService {
       },
     );
 
-    const session = await this.getSession(sessionId);
+    const session = existingSession ?? (await this.getSession(sessionId));
     if (!session) {
       throw new UnauthorizedException('Session not found');
     }
@@ -164,12 +168,20 @@ export class RefreshTokenService {
       refreshToken: newRefreshToken,
     };
 
-    await this.redisClient.set(
-      this.getRedisKey(sessionId),
-      JSON.stringify(updatedSession),
-      'EX',
-      JWT.REFRESH_TTL_SEC,
-    );
+    try {
+      await this.redisClient.set(
+        this.getRedisKey(sessionId),
+        JSON.stringify(updatedSession),
+        'EX',
+        JWT.REFRESH_TTL_SEC,
+      );
+    } catch (error) {
+      throw new BadRequestException({
+        success: false,
+        message: 'Failed to rotate session in redis',
+        details: getDetailsErrorUtil(error),
+      });
+    }
   }
 
   async deleteSession(sessionId: string): Promise<void> {

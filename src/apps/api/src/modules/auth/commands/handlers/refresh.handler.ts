@@ -2,10 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { RefreshCommand } from '../impl/refresh.command';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshTokenService } from '../../services/refresh-token.service';
-import { InternalServerErrorException } from '@nestjs/common';
 import { Tokens } from '../../types/auth.types';
-import { randomUUID } from 'crypto';
-import { JwtTokenService } from '../../services/jwt-token.service';
 import { JWT } from '../../constants/jwt.constants';
 import { CryptoService } from '../../services/crypto.service';
 
@@ -14,16 +11,15 @@ export class RefreshHandler implements ICommandHandler<RefreshCommand> {
   constructor(
     private readonly jwtService: JwtService,
     private readonly refreshTokenService: RefreshTokenService,
-    private readonly jwtTokenService: JwtTokenService,
     private readonly cryptoService: CryptoService,
   ) {}
 
   async execute(command: RefreshCommand): Promise<Tokens> {
-    const { payload } = await this.refreshTokenService.validateSession(command.sessionId);
+    const { payload, session } = await this.refreshTokenService.validateSession(command.sessionId);
 
-    // если refresh_token истечет через сутки, то обновляем
+    // если refresh_token истечёт через сутки — обновляем (rotation)
     if (payload.exp && this.refreshTokenService.shouldRotateRefresh(payload.exp)) {
-      await this.refreshTokenService.rotateRefreshSession(command.sessionId, payload);
+      await this.refreshTokenService.rotateRefreshSession(command.sessionId, payload, session);
     }
 
     const accessToken = this.jwtService.sign(
