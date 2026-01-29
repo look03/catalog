@@ -16,6 +16,10 @@ export class GetBrandsHandler implements IQueryHandler<GetBrandsQuery> {
 
   private readonly logger = new Logger('GetBrandsHandler');
 
+  /**
+   * Возвращает список брендов (id, name).
+   * @returns массив брендов или null
+   */
   async execute(): Promise<BrandProduct[] | null> {
     try {
       const brands = await this.repo.find({

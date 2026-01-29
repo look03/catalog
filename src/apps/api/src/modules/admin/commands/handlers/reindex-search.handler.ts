@@ -13,6 +13,10 @@ export class ReIndexSearchHandler implements ICommandHandler<ReIndexSearchComman
     private readonly reIndexSearchService: IndexSearchService,
   ) {}
 
+  /**
+   * Получает данные секций и продуктов и запускает переиндексацию в Elasticsearch.
+   * @returns сообщение или результат команды
+   */
   async execute() {
     try {
       const response = await this.reIndexSearchService.getIndexData();

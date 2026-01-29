@@ -6,6 +6,10 @@ import { ElasticService } from '../../services/elastic.service';
 export class DeleteDocumentHandler implements ICommandHandler<DeleteDocumentCommand> {
   constructor(private readonly elasticService: ElasticService) {}
 
+  /**
+   * Удаляет документ из Elasticsearch по id.
+   * @param command — команда с id документа
+   */
   async execute(command: DeleteDocumentCommand) {
     await this.elasticService.deleteDocument(command.id);
   }

@@ -23,6 +23,10 @@ export class DeleteProductHandler implements ICommandHandler<DeleteProductComman
     private readonly fileStorage: FileStorageService,
   ) {}
 
+  /**
+   * Удаляет продукт из БД, документ из Elasticsearch и файлы изображений.
+   * @param command — команда с id продукта
+   */
   async execute(command: DeleteProductCommand) {
     try {
       const product = await this.repo.findOneBy({ id: command.id });

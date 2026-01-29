@@ -11,6 +11,11 @@ import { ProductIndexEvent } from '../interfaces/product.interfaces';
 export class ProductChangesSaga {
   constructor(private readonly fileStorage: FileStorageService) {}
 
+  /**
+   * Переносит файлы из temp в целевую директорию; при ошибке очищает temp.
+   * @param event — событие с путями к изображениям и старой директорией
+   * @returns Observable
+   */
   private handleFilesAndIndex(event: ProductIndexEvent): Observable<void> {
     return from(this.fileStorage.moveFromTemp(event.images, event.oldFileDir)).pipe(
       catchError(async (error) => {
@@ -20,6 +25,11 @@ export class ProductChangesSaga {
     );
   }
 
+  /**
+   * Обрабатывает создание продукта: перенос загруженных изображений из temp.
+   * @param events$ — поток событий ProductCreatedEvent
+   * @returns Observable
+   */
   @Saga()
   productCreated(events$: Observable<ProductCreatedEvent>): Observable<void> {
     return events$.pipe(
@@ -28,6 +38,11 @@ export class ProductChangesSaga {
     );
   }
 
+  /**
+   * Обрабатывает обновление продукта: перенос/очистка файлов изображений.
+   * @param events$ — поток событий ProductUpdatedEvent
+   * @returns Observable
+   */
   @Saga()
   productUpdated(events$: Observable<ProductUpdatedEvent>): Observable<void> {
     return events$.pipe(

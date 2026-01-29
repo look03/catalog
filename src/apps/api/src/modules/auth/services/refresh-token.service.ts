@@ -16,14 +16,31 @@ export class RefreshTokenService {
     private readonly jwtService: JwtService,
   ) {}
 
+  /**
+   * Ключ Redis для активной сессии.
+   * @param sessionId — id сессии
+   * @returns строка ключа
+   */
   private getRedisKey(sessionId: string): string {
     return `refresh_session:${sessionId}`;
   }
 
+  /**
+   * Ключ Redis для отозванной сессии.
+   * @param sessionId — id сессии
+   * @returns строка ключа
+   */
   private getRevokedRedisKey(sessionId: string): string {
     return `revoked_session:${sessionId}`;
   }
 
+  /**
+   * Сохраняет сессию в Redis (refresh_session:sessionId) с TTL.
+   * @param sessionId — id сессии
+   * @param userId — id пользователя
+   * @param refreshToken — refresh-токен
+   * @param jti — уникальный идентификатор токена
+   */
   async saveSession(
     sessionId: string,
     userId: string,
@@ -54,6 +71,11 @@ export class RefreshTokenService {
     }
   }
 
+  /**
+   * Возвращает данные сессии из Redis или null.
+   * @param sessionId — id сессии
+   * @returns данные сессии или null
+   */
   async getSession(sessionId: string): Promise<RefreshSession | null> {
     const data = await this.redisClient.get(this.getRedisKey(sessionId));
     if (!data) {
@@ -63,6 +85,11 @@ export class RefreshTokenService {
     return JSON.parse(data) as RefreshSession;
   }
 
+  /**
+   * Проверяет, есть ли сессия в списке отозванных (revoked_session:*).
+   * @param sessionId — id сессии
+   * @returns true, если сессия отозвана
+   */
   async isSessionRevoked(sessionId: string): Promise<boolean> {
     const revokedKey = this.getRevokedRedisKey(sessionId);
     const exists = await this.redisClient.exists(revokedKey);
@@ -104,11 +131,21 @@ export class RefreshTokenService {
     }
   }
 
+  /**
+   * Нужно ли обновить refresh-токен: до истечения осталось не больше REFRESH_RENEW_THRESHOLD_SEC.
+   * @param exp — время истечения токена (unix)
+   * @returns true, если нужна ротация
+   */
   shouldRotateRefresh(exp: number): boolean {
     const now = Math.floor(Date.now() / 1000);
     return exp - now <= JWT.REFRESH_RENEW_THRESHOLD_SEC;
   }
 
+  /**
+   * Проверяет сессию: не отозвана, есть в Redis, JWT валиден, jti совпадает.
+   * @param sessionId — id сессии
+   * @returns payload и данные сессии
+   */
   async validateSession(
     sessionId: string,
   ): Promise<{ payload: JwtPayload; session: RefreshSession }> {
@@ -137,6 +174,12 @@ export class RefreshTokenService {
     return { payload, session };
   }
 
+  /**
+   * Обновляет refresh-токен сессии (новый jti и JWT) и перезаписывает данные в Redis.
+   * @param sessionId — id сессии
+   * @param payload — JWT payload
+   * @param existingSession — уже загруженная сессия (опционально, чтобы не читать Redis повторно)
+   */
   async rotateRefreshSession(
     sessionId: string,
     payload: JwtPayload,
@@ -184,6 +227,10 @@ export class RefreshTokenService {
     }
   }
 
+  /**
+   * Удаляет сессию из Redis по sessionId.
+   * @param sessionId — id сессии
+   */
   async deleteSession(sessionId: string): Promise<void> {
     if (!sessionId) {
       throw new BadRequestException('Not session id');

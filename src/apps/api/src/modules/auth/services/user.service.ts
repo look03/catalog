@@ -16,12 +16,24 @@ export class UserService {
     private readonly repoRole: Repository<Role>,
   ) {}
 
+  /**
+   * Возвращает id роли по её имени (например, 'user', 'admin').
+   * @param name — имя роли
+   * @returns id роли или undefined
+   */
   async getUserRoleIdByName(name: string): Promise<number | undefined> {
     const response = await this.repoRole.findOneBy({ name });
 
     return response?.id;
   }
 
+  /**
+   * Создаёт пользователя с хешем пароля и привязкой ролей по id. При пустом roleIds добавляется роль 'user'.
+   * @param email — email пользователя
+   * @param password — пароль (будет захеширован)
+   * @param roleIds — массив id ролей
+   * @returns данные созданного пользователя
+   */
   async create(email: string, password: string, roleIds: number[]): Promise<ResponseCreateUser> {
     const userRoleId = await this.getUserRoleIdByName('user');
     if (!roleIds.length && userRoleId) {
@@ -47,6 +59,11 @@ export class UserService {
     };
   }
 
+  /**
+   * Ищет пользователя по email и возвращает данные с ролями (имена) и хешем пароля.
+   * @param email — email пользователя
+   * @returns данные пользователя или null
+   */
   async findByEmail(email: string): Promise<UserByEmail | null> {
     const user = await this.repo.findOne({
       where: { email },
@@ -65,6 +82,12 @@ export class UserService {
     };
   }
 
+  /**
+   * Проверяет совпадение пароля с сохранённым bcrypt-хешем.
+   * @param passwordHash — хеш из БД
+   * @param password — введённый пароль
+   * @returns true при совпадении
+   */
   async validatePassword(passwordHash: string, password: string): Promise<boolean> {
     return bcrypt.compare(password, passwordHash);
   }

@@ -21,6 +21,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  /**
+   * Преобразует JWT payload в объект user (userId, roles) для request.user.
+   * @param payload — payload из JWT
+   * @returns объект пользователя
+   */
   validate(payload: JwtPayload): JwtUser {
     return {
       userId: payload.sub,

@@ -5,6 +5,14 @@ import { Logger } from '@nestjs/common';
 @Injectable()
 export class JwtGuard extends AuthGuard('jwt') {
   private logger = new Logger('JwtGuard');
+
+  /**
+   * При ошибке или отсутствии user логирует и бросает UnauthorizedException; иначе возвращает user.
+   * @param err — ошибка из стратегии
+   * @param user — пользователь или false
+   * @param info — доп. информация
+   * @returns объект пользователя
+   */
   handleRequest<TUser = JwtUser>(err: unknown, user: TUser | false, info: unknown): TUser {
     if (err || !user) {
       this.logger.error(err ?? info);

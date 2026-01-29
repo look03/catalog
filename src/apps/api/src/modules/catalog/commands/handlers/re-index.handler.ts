@@ -15,6 +15,10 @@ export class ReIndexHandler implements ICommandHandler<ReIndexCommand> {
     private readonly elasticService: ElasticService,
   ) {}
 
+  /**
+   * Возвращает mapping для индекса каталога (type, name, code, price, paths и т.д.).
+   * @returns объект маппинга
+   */
   private getMapping(): object {
     return {
       mappings: {
@@ -51,6 +55,10 @@ export class ReIndexHandler implements ICommandHandler<ReIndexCommand> {
     };
   }
 
+  /**
+   * Создаёт новый индекс, загружает в него секции и продукты, переключает алиас.
+   * @param command — команда с массивами sections и products
+   */
   async execute(command: ReIndexCommand) {
     try {
       const alias: string | undefined = process.env.ELASTIC_ALIAS || undefined;

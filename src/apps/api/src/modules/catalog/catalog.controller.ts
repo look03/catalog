@@ -14,6 +14,12 @@ import { SearchProducts, SearchSections } from './types/document.types';
 export class CatalogController {
   constructor(private readonly queryBus: QueryBus) {}
 
+  /**
+   * По url определяет тип страницы (section/element) и возвращает данные секции с фильтрами или карточку продукта.
+   * @param query — параметры запроса (url, page, limit, sort, order, onlyFilter)
+   * @param filter — фильтры (цена, бренды)
+   * @returns данные секции (продукты, фасеты, пагинация) или страницы продукта
+   */
   @Get('/')
   @ApiOperation({ summary: 'Получить товары или секции' })
   async getCatalogPage(

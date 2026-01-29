@@ -15,6 +15,10 @@ export class DeleteSectionHandler implements ICommandHandler<DeleteSectionComman
     private readonly commandBus: CommandBus,
   ) {}
 
+  /**
+   * Удаляет секцию из БД и соответствующий документ из Elasticsearch.
+   * @param command — команда с id секции
+   */
   async execute(command: DeleteSectionCommand) {
     try {
       const section = await this.repo.findOneBy({ id: command.id });

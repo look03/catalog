@@ -10,11 +10,21 @@ export class SyncMetaService {
     private readonly repo: Repository<SyncMeta>,
   ) {}
 
+  /**
+   * Возвращает дату последней синхронизации для сущности.
+   * @param entityName — имя сущности (ключ записи)
+   * @returns дата или null
+   */
   async getLastSync(entityName: string): Promise<Date | null> {
     const record = await this.repo.findOneBy({ entityName });
     return record?.lastSyncAt ?? null;
   }
 
+  /**
+   * Сохраняет дату последней синхронизации для сущности.
+   * @param entityName — имя сущности
+   * @param date — дата синхронизации
+   */
   async updateLastSync(entityName: string, date: Date): Promise<void> {
     try {
       await this.repo.save({ entityName, lastSyncAt: date });

@@ -48,6 +48,11 @@ export class AdminController {
     private readonly queryBus: QueryBus,
   ) {}
 
+  /**
+   * Создаёт секцию по title и parent_section_id, возвращает список секций.
+   * @param dto — DTO с title и parent_section_id
+   * @returns список секций
+   */
   @Post('section/')
   @ApiOperation({ summary: 'Создать секцию' })
   async createSection(@Body() dto: BaseSectionDto): Promise<Sections> {
@@ -56,6 +61,12 @@ export class AdminController {
     return this.queryBus.execute(new GetSectionsQuery(1, 10, undefined));
   }
 
+  /**
+   * Обновляет секцию по id (active, title, parent_section_id), возвращает список секций.
+   * @param id — id секции
+   * @param dto — DTO с полями для обновления
+   * @returns список секций
+   */
   @Patch('section/:id')
   @ApiOperation({ summary: 'Обновить секцию по id' })
   @ApiParam({ name: 'id', type: Number })
@@ -70,6 +81,11 @@ export class AdminController {
     return this.queryBus.execute(new GetSectionsQuery(1, 10, undefined));
   }
 
+  /**
+   * Удаляет секцию по id, возвращает список секций.
+   * @param id — id секции
+   * @returns список секций
+   */
   @Delete('section/:id')
   @ApiOperation({ summary: 'Удалить секцию по id' })
   @ApiParam({ name: 'id', type: Number })
@@ -79,6 +95,11 @@ export class AdminController {
     return this.queryBus.execute(new GetSectionsQuery(1, 10, undefined));
   }
 
+  /**
+   * Возвращает список секций с пагинацией и фильтрами (name, sort, order).
+   * @param query — параметры пагинации и сортировки
+   * @returns список секций
+   */
   @Get('sections/')
   async getSections(
     @Query(new ValidationPipe({ transform: true, whitelist: true })) query: BasePaginationFilterDto,
@@ -87,6 +108,12 @@ export class AdminController {
     return this.queryBus.execute(new GetSectionsQuery(page, limit, name, sort, order));
   }
 
+  /**
+   * Создаёт продукт с изображениями и привязкой к секциям и бренду, возвращает список продуктов.
+   * @param dto — DTO продукта
+   * @param images — загруженные изображения
+   * @returns список продуктов
+   */
   @Post('product/')
   @ApiOperation({ summary: 'Создать продукт' })
   @UploadFiles()
@@ -109,6 +136,13 @@ export class AdminController {
     return this.queryBus.execute(new GetProductsQuery(1, 10, undefined));
   }
 
+  /**
+   * Обновляет продукт по id (включая изображения и секции), возвращает список продуктов.
+   * @param id — id продукта
+   * @param dto — DTO с полями для обновления
+   * @param images — загруженные изображения
+   * @returns список продуктов
+   */
   @Patch('product/:id')
   @ApiOperation({ summary: 'Обновить продукт по id' })
   @ApiParam({ name: 'id', type: Number })
@@ -135,6 +169,11 @@ export class AdminController {
     return this.queryBus.execute(new GetProductsQuery(1, 10, undefined));
   }
 
+  /**
+   * Удаляет продукт по id, возвращает список продуктов.
+   * @param id — id продукта
+   * @returns список продуктов
+   */
   @Delete('product/:id')
   @ApiOperation({ summary: 'Удалить продукт по id' })
   @ApiParam({ name: 'id', type: Number })
@@ -144,6 +183,11 @@ export class AdminController {
     return this.queryBus.execute(new GetProductsQuery(1, 10, undefined));
   }
 
+  /**
+   * Возвращает список продуктов с пагинацией и фильтрами (name, sort, order).
+   * @param query — параметры пагинации и сортировки
+   * @returns список продуктов
+   */
   @Get('products/')
   async getProducts(
     @Query(new ValidationPipe({ transform: true, whitelist: true })) query: BasePaginationFilterDto,
@@ -152,16 +196,28 @@ export class AdminController {
     return this.queryBus.execute(new GetProductsQuery(page, limit, name, sort, order));
   }
 
+  /**
+   * Возвращает список брендов.
+   * @returns список брендов (id, name)
+   */
   @Get('brands/')
   async getBrands(): Promise<BrandProduct[] | null> {
     return this.queryBus.execute(new GetBrandsQuery());
   }
 
+  /**
+   * Возвращает секции для модального окна (например, выбор родителя).
+   * @returns секции для модалки
+   */
   @Get('modal-sections/')
   async getModalSection(): Promise<BrandProduct[] | null> {
     return this.queryBus.execute(new GetModalSectionQuery());
   }
 
+  /**
+   * Запускает переиндексацию Elasticsearch.
+   * @returns результат выполнения команды
+   */
   @Post('re-index/')
   @ApiOperation({ summary: 'Переиндексировать эластик' })
   reIndex() {

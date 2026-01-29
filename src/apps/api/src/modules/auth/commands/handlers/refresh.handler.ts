@@ -14,6 +14,11 @@ export class RefreshHandler implements ICommandHandler<RefreshCommand> {
     private readonly cryptoService: CryptoService,
   ) {}
 
+  /**
+   * Валидирует сессию, при необходимости обновляет refresh-токен, выдаёт новый зашифрованный access-токен.
+   * @param command — команда с sessionId
+   * @returns зашифрованный access-токен и sessionId
+   */
   async execute(command: RefreshCommand): Promise<Tokens> {
     const { payload, session } = await this.refreshTokenService.validateSession(command.sessionId);
 

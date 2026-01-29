@@ -8,6 +8,11 @@ export abstract class BasePaginationFilterHandler {
     created_at: 'p.created_at',
   };
 
+  /**
+   * Проверяет и возвращает допустимую колонку сортировки или 'id' по умолчанию.
+   * @param sort — имя колонки (опционально)
+   * @returns допустимая колонка
+   */
   protected validateSortColumn(sort?: string): string {
     if (!sort || !this.allowedSortColumns.includes(sort)) {
       return 'id';
@@ -15,6 +20,11 @@ export abstract class BasePaginationFilterHandler {
     return sort;
   }
 
+  /**
+   * Возвращает направление сортировки: 'DESC' при order === 'desc', иначе 'ASC'.
+   * @param order — направление (опционально)
+   * @returns 'ASC' или 'DESC'
+   */
   protected getSortDirection(order?: string): 'ASC' | 'DESC' {
     return order?.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
   }

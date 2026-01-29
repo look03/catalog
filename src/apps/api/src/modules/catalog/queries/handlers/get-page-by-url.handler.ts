@@ -8,6 +8,11 @@ import { SearchDocument } from '../../types/document.types';
 export class GetPageByUrlHandler implements IQueryHandler<GetPageByUrlQuery> {
   constructor(private readonly elasticService: ElasticService) {}
 
+  /**
+   * Определяет тип страницы по url: 'section' для /catalog/ или по документу в Elastic (paths, active).
+   * @param query — запрос с url
+   * @returns тип страницы: 'section' или 'element'
+   */
   async execute({ url }: GetPageByUrlQuery): Promise<string> {
     if (!url) {
       throw new BadRequestException('Not URL');

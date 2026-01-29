@@ -7,6 +7,12 @@ import { JWT } from '../constants/jwt.constants';
 export class JwtTokenService {
   constructor(private readonly jwtService: JwtService) {}
 
+  /**
+   * Создаёт JWT refresh-токен с payload, sid, jti и типом 'refresh'.
+   * @param payload — данные для payload (sub, roles)
+   * @param sessions — sid и jti
+   * @returns подписанный JWT refresh-токен
+   */
   createJwtRefreshToken(payload: JwtPayload, sessions: JwtSessions) {
     return this.jwtService.sign(
       {

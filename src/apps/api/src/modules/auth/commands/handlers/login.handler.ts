@@ -20,6 +20,11 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
     private readonly cryptoService: CryptoService,
   ) {}
 
+  /**
+   * Проверяет email и пароль, создаёт сессию и refresh-токен, возвращает зашифрованный access-токен и sessionId.
+   * @param command — команда с email и паролем
+   * @returns зашифрованный access-токен и sessionId
+   */
   async execute(command: LoginCommand): Promise<Tokens> {
     const user = await this.userService.findByEmail(command.email);
 

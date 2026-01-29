@@ -16,6 +16,11 @@ export class CreateSectionHandler implements ICommandHandler<CreateSectionComman
     private readonly sectionService: SectionService,
   ) {}
 
+  /**
+   * Создаёт секцию с code из title и родительской секцией, возвращает section_id.
+   * @param command — команда с title и parent_section_id
+   * @returns объект с section_id
+   */
   async execute(command: CreateSectionCommand) {
     try {
       const code = transliterate(command.title) ?? undefined;

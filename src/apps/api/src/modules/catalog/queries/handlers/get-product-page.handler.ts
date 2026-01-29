@@ -71,6 +71,11 @@ export class GetProductPageHandler implements IQueryHandler<GetProductPageQuery>
     };
   }
 
+  /**
+   * Возвращает данные страницы продукта по url из Elasticsearch.
+   * @param query — запрос с url
+   * @returns данные продукта (type: element, products)
+   */
   async execute({ url }: GetProductPageQuery): Promise<SearchProducts> {
     const result = await this.elasticService.search<SearchDocument>({
       size: 1,

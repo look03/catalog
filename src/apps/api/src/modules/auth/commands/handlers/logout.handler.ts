@@ -6,6 +6,10 @@ import { RefreshTokenService } from '../../services/refresh-token.service';
 export class LogoutHandler implements ICommandHandler<LogoutCommand> {
   constructor(private readonly refreshTokenService: RefreshTokenService) {}
 
+  /**
+   * Удаляет сессию из Redis по sessionId.
+   * @param command — команда с sessionId
+   */
   async execute(command: LogoutCommand): Promise<void> {
     await this.refreshTokenService.deleteSession(command.sessionId);
   }

@@ -16,6 +16,10 @@ export class UpdateSectionHandler implements ICommandHandler<UpdateSectionComman
     private readonly sectionService: SectionService,
   ) {}
 
+  /**
+   * Обновляет секцию (title, code, active, parent_section) и пересчитывает path.
+   * @param command — команда с id и полями для обновления
+   */
   async execute(command: UpdateSectionCommand) {
     try {
       const section = await this.repo.findOneBy({ id: command.id });

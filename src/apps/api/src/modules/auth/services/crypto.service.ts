@@ -15,6 +15,10 @@ export class CryptoService {
   private readonly keyLength = KEY_LENGTH;
   private readonly salt = SALT;
 
+  /**
+   * Формирует ключ шифрования из CRYPTO_PASS и соли (scrypt).
+   * @returns буфер ключа
+   */
   private getKey(): Buffer {
     const pass = process.env.CRYPTO_PASS;
     if (!pass) {
@@ -26,6 +30,11 @@ export class CryptoService {
     return crypto.scryptSync(pass, this.salt, this.keyLength);
   }
 
+  /**
+   * Шифрует строку AES-256-GCM, возвращает base64 (iv + tag + ciphertext).
+   * @param text — строка для шифрования
+   * @returns зашифрованная строка в base64
+   */
   encrypt(text: string): string {
     const iv = crypto.randomBytes(this.ivLength);
     const key = this.getKey();
@@ -39,6 +48,11 @@ export class CryptoService {
     return encryptedBuffer.toString('base64');
   }
 
+  /**
+   * Расшифровывает строку из base64, ожидает формат iv + tag + ciphertext.
+   * @param data — зашифрованная строка в base64
+   * @returns расшифрованная строка
+   */
   decrypt(data: string): string {
     const bData = Buffer.from(data, 'base64');
 

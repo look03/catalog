@@ -43,6 +43,11 @@ export class GetSectionsHandler
     });
   }
 
+  /**
+   * Возвращает список секций с пагинацией, фильтром по имени и сортировкой.
+   * @param query — параметры запроса (page, limit, nameFilter, sort, order)
+   * @returns список секций
+   */
   async execute(query: GetSectionsQuery): Promise<Sections> {
     try {
       const { page, limit, nameFilter, sort, order } = query;

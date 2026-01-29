@@ -20,6 +20,9 @@ export class ElasticSyncWorker {
     private readonly syncMetaRepository: SyncMetaService,
   ) {}
 
+  /**
+   * Раз в минуту синхронизирует каталог с Elasticsearch (изменения после lastSync).
+   */
   @Cron(CronExpression.EVERY_MINUTE)
   async handleSync() {
     if (this.isRunning) {
@@ -39,6 +42,10 @@ export class ElasticSyncWorker {
     }
   }
 
+  /**
+   * Загружает изменения после lastSync, отправляет bulk в Elastic, обновляет lastSync; при ошибке повторяет до maxRetries.
+   * @param attempt — номер попытки (по умолчанию 1)
+   */
   private async syncWithRetry(attempt = 1): Promise<void> {
     const lastSync = (await this.syncMetaRepository.getLastSync(this.entityName)) || new Date(0);
 
@@ -78,6 +85,10 @@ export class ElasticSyncWorker {
     }
   }
 
+  /**
+   * Задержка в миллисекундах (для повтора при ошибке).
+   * @param ms — миллисекунды
+   */
   private delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }

@@ -10,14 +10,26 @@ export class FileStorageService {
   private tempDir = './tmp/uploads';
   private uploadRoot = './uploads';
 
+  /**
+   * Возвращает путь к директории временных загрузок.
+   * @returns путь к temp-директории
+   */
   getTmpDir() {
     return this.tempDir;
   }
 
+  /**
+   * Возвращает корневой путь для загруженных файлов.
+   * @returns корневой путь uploads
+   */
   getUploadRoot() {
     return this.uploadRoot;
   }
 
+  /**
+   * Рекурсивно удаляет содержимое директории и саму директорию (если пуста).
+   * @param dirPath — путь к директории
+   */
   async clearDirectory(dirPath: string): Promise<void> {
     const files = await fs.readdir(dirPath);
 
@@ -37,6 +49,10 @@ export class FileStorageService {
     await this.clearDirWithFiles(path.dirname(dirPath));
   }
 
+  /**
+   * Удаляет директорию со всем содержимым (рекурсивно).
+   * @param dirPath — путь к директории
+   */
   async clearDirWithFiles(dirPath: string): Promise<void> {
     const stat = await fs.stat(dirPath);
     if (stat.isDirectory()) {
@@ -74,6 +90,10 @@ export class FileStorageService {
     }
   }
 
+  /**
+   * Удаляет временные файлы и пустую temp-директорию (при ошибке после загрузки).
+   * @param files — массив путей к временным файлам
+   */
   async cleanupTemp(files: UpdateFiles[] | null | undefined): Promise<void> {
     if (!files || !files.length) {
       return;

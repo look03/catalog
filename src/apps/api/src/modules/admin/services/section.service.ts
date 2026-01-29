@@ -9,6 +9,13 @@ export class SectionService {
     @InjectRepository(Section)
     private readonly repo: Repository<Section>,
   ) {}
+
+  /**
+   * Устанавливает родительскую секцию и path для секции (path строится от родителя и code).
+   * @param parentSectionId — id родительской секции (опционально)
+   * @param code — код секции
+   * @param section — сущность секции для заполнения
+   */
   async designParentSection(
     parentSectionId: number | undefined,
     code: string | undefined,

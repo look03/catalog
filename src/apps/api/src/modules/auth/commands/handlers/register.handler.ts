@@ -8,6 +8,11 @@ import { InternalServerErrorException } from '@nestjs/common';
 export class RegisterHandler implements ICommandHandler<RegisterCommand> {
   constructor(private readonly usersRepo: UserService) {}
 
+  /**
+   * Проверяет отсутствие пользователя с таким email и создаёт нового пользователя с ролями.
+   * @param command — команда с email, паролем и ролями
+   * @returns данные созданного пользователя (userId, email)
+   */
   async execute(command: RegisterCommand): Promise<ResponseCreateUser> {
     const existingUser = await this.usersRepo.findByEmail(command.email);
     if (existingUser) {

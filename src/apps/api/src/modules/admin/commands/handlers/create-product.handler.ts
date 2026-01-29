@@ -18,6 +18,11 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
     private readonly eventBus: EventBus,
   ) {}
 
+  /**
+   * Создаёт продукт в транзакции: продукт, секции, изображения, бренд; публикует ProductCreatedEvent.
+   * @param command — команда с данными продукта и изображениями
+   * @returns id созданного продукта
+   */
   async execute(command: CreateProductCommand) {
     try {
       return await this.dataSource.transaction(async (manager): Promise<number> => {

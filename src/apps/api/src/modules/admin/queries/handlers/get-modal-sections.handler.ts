@@ -15,6 +15,10 @@ export class GetModalSectionsHandler implements IQueryHandler<GetModalSectionQue
 
   private readonly logger = new Logger('GetModalSectionsHandler');
 
+  /**
+   * Возвращает секции для модального окна (сейчас всегда null; загрузка есть, результат не возвращается).
+   * @returns null
+   */
   async execute(): Promise<null> {
     try {
       const sections = await this.repo.find({

@@ -25,6 +25,11 @@ import { DecryptJwtGuard } from './infrastructure/decript.guard';
 export class AuthController {
   constructor(private readonly commandBus: CommandBus) {}
 
+  /**
+   * Регистрация нового пользователя по email, паролю и ролям.
+   * @param body — DTO с email, паролем и опциональными ролями
+   * @returns данные созданного пользователя
+   */
   @Post('register/')
   async register(@Body() body: RegisterDto): Promise<ResponseCreateUser> {
     return this.commandBus.execute(
@@ -32,11 +37,21 @@ export class AuthController {
     );
   }
 
+  /**
+   * Вход по email и паролю, возвращает зашифрованный access-токен и sessionId.
+   * @param body — DTO с email и паролем
+   * @returns access-токен и sessionId
+   */
   @Post('login/')
   async login(@Body() body: LoginDto): Promise<Tokens> {
     return this.commandBus.execute(new LoginCommand(body.email, body.password));
   }
 
+  /**
+   * Обновление access-токена по sessionId из cookie.
+   * @param req — запрос с cookie sessionId
+   * @returns новый access-токен и sessionId
+   */
   @Post('refresh/')
   async refresh(@Req() req: Request): Promise<Tokens> {
     const sessionId = req.cookies['sessionId'] as string;
@@ -48,6 +63,11 @@ export class AuthController {
     return this.commandBus.execute(new RefreshCommand(sessionId));
   }
 
+  /**
+   * Выход: удаление сессии в Redis и очистка cookie sessionId. Требует JWT в заголовке.
+   * @param req — запрос с cookie sessionId
+   * @param res — ответ для очистки cookie
+   */
   @UseGuards(DecryptJwtGuard, JwtGuard)
   @Post('logout/')
   @ApiBearerAuth()

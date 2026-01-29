@@ -30,12 +30,24 @@ export class ProductService {
     private readonly fileStorageService: FileStorageService,
   ) {}
 
+  /**
+   * Возвращает относительный путь каталога для изображений продукта (по хешу id).
+   * @param productId — id продукта
+   * @returns путь к директории изображений
+   */
   getRelativeTargetDir(productId: number): string {
     const hashedDir = this.hashPath.getHashedPath(productId, 1);
     const dir = this.fileStorageService.getUploadRoot();
     return path.join(dir, 'images', hashedDir);
   }
 
+  /**
+   * Обновляет изображения продукта: удаляет старые, сохраняет новые из files в БД и возвращает пути для копирования.
+   * @param product — сущность продукта
+   * @param manager — менеджер транзакции
+   * @param files — загруженные файлы (опционально)
+   * @returns данные для переноса файлов или null
+   */
   async updateProductImages(
     product: Product,
     manager: EntityManager,
@@ -93,6 +105,13 @@ export class ProductService {
     }
   }
 
+  /**
+   * Находит секции по id и создаёт связи ProductSection для продукта (в транзакции при переданном manager).
+   * @param sectionIds — массив id секций
+   * @param product — сущность продукта
+   * @param manager — менеджер транзакции (опционально)
+   * @returns массив связей ProductSection
+   */
   async getSections(
     sectionIds: number[],
     product: Product,
@@ -112,6 +131,12 @@ export class ProductService {
     return sections.map((section) => repoProductSection.create({ product, section }));
   }
 
+  /**
+   * Заменяет связи продукта с секциями на новые по newSectionIds (удаляет старые, сохраняет новые).
+   * @param product — сущность продукта
+   * @param newSectionIds — массив id новых секций
+   * @param manager — менеджер транзакции
+   */
   async updateProductSections(
     product: Product,
     newSectionIds: number[],
@@ -136,6 +161,12 @@ export class ProductService {
     }
   }
 
+  /**
+   * Находит бренд по id; при отсутствии бренда бросает NotFoundException.
+   * @param brandId — id бренда (опционально)
+   * @param manager — менеджер транзакции (опционально)
+   * @returns сущность бренда или undefined
+   */
   async getBrand(
     brandId: number | null | undefined,
     manager?: EntityManager,

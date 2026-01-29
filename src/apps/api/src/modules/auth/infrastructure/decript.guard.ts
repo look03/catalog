@@ -6,6 +6,11 @@ import { Context } from '../types/auth.types';
 export class DecryptJwtGuard implements CanActivate {
   constructor(private readonly cryptoService: CryptoService) {}
 
+  /**
+   * Расшифровывает Bearer-токен из заголовка Authorization и подставляет расшифрованный JWT в заголовок.
+   * @param context — контекст выполнения (запрос)
+   * @returns true при успешной расшифровке
+   */
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Context>();
 

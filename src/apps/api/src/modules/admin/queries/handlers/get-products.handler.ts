@@ -92,6 +92,11 @@ export class GetProductsHandler
     });
   }
 
+  /**
+   * Возвращает список продуктов с пагинацией, фильтром по имени и сортировкой.
+   * @param query — параметры запроса (page, limit, nameFilter, sort, order)
+   * @returns список продуктов с общим количеством
+   */
   async execute(query: GetProductsQuery): Promise<Products> {
     try {
       const { page, limit, nameFilter, sort, order } = query;

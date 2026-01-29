@@ -8,6 +8,9 @@ import { getDetailsErrorUtil } from '../../../common/utils/error.utils';
 export class ElasticService implements OnModuleInit {
   private client: Client;
 
+  /**
+   * Инициализирует клиент Elasticsearch при старте модуля.
+   */
   onModuleInit() {
     this.client = new Client({
       node: process.env.ELASTICSEARCH_URL,
@@ -15,6 +18,10 @@ export class ElasticService implements OnModuleInit {
     });
   }
 
+  /**
+   * Возвращает имя индекса по алиасу (ELASTIC_ALIAS) или null, если алиас не найден.
+   * @returns имя индекса или null
+   */
   private async getIndex(): Promise<string | null> {
     try {
       const alias: string = process.env.ELASTIC_ALIAS || 'catalog_search';
@@ -37,6 +44,11 @@ export class ElasticService implements OnModuleInit {
     }
   }
 
+  /**
+   * Обновляет или создаёт документ в индексе по id (upsert).
+   * @param id — id документа
+   * @param doc — тело документа
+   */
   async updateOrCreate(id: string, doc: Record<string, any>): Promise<void> {
     try {
       const index = await this.getIndex();
@@ -60,6 +72,11 @@ export class ElasticService implements OnModuleInit {
     }
   }
 
+  /**
+   * Создаёт индекс с заданным mapping, если его ещё нет.
+   * @param index — имя индекса
+   * @param mapping — маппинг полей
+   */
   async createIndex(index: string, mapping: object): Promise<void> {
     try {
       const exists = await this.client.indices.exists({ index });
@@ -81,6 +98,10 @@ export class ElasticService implements OnModuleInit {
     }
   }
 
+  /**
+   * Удаляет индекс, если он существует.
+   * @param index — имя индекса
+   */
   async deleteIndex(index: string): Promise<void> {
     try {
       const exists = await this.client.indices.exists({ index });
@@ -115,6 +136,10 @@ export class ElasticService implements OnModuleInit {
     }
   }
 
+  /**
+   * Массовая синхронизация: активные документы — update/upsert, неактивные — delete.
+   * @param documents — массив документов (active: true/false, id обязателен)
+   */
   async syncDocumentsBulk(documents: Array<Record<string, unknown>>): Promise<void> {
     try {
       const index = await this.getIndex();
@@ -150,6 +175,10 @@ export class ElasticService implements OnModuleInit {
     }
   }
 
+  /**
+   * Удаляет документ из индекса по id.
+   * @param id — id документа
+   */
   async deleteDocument(id: string): Promise<void> {
     try {
       const index = await this.getIndex();
@@ -172,6 +201,11 @@ export class ElasticService implements OnModuleInit {
     }
   }
 
+  /**
+   * Переключает алиас на новый индекс и удаляет старые индексы.
+   * @param alias — имя алиаса
+   * @param newIndex — имя нового индекса
+   */
   async switchAlias(alias: string | undefined, newIndex: string): Promise<void> {
     if (!alias) {
       return;
@@ -221,6 +255,11 @@ export class ElasticService implements OnModuleInit {
       }
     }
   }
+  /**
+   * Выполняет поиск в индексе по query, sort, aggs и возвращает результат.
+   * @param options — параметры поиска (from, size, query, sort, aggs)
+   * @returns результат поиска Elasticsearch
+   */
   async search<T = any>(options: ElasticSearchOptions): Promise<ElasticSearchResult<T>> {
     try {
       const index = await this.getIndex();

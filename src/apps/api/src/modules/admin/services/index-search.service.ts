@@ -18,6 +18,11 @@ export class IndexSearchService {
     private readonly repoSection: Repository<Section>,
   ) {}
 
+  /**
+   * Возвращает данные для индекса: секции и продукты (опционально отфильтрованные по updatedSince).
+   * @param updatedSince — дата, после которой обновлены записи (опционально)
+   * @returns секции и продукты в формате для Elasticsearch
+   */
   async getIndexData(updatedSince?: Date): Promise<SearchSectionsAndProducts> {
     const sectionQuery = this.repoSection.createQueryBuilder('section');
 

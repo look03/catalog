@@ -7,6 +7,11 @@ import { Context } from '../types/auth.types';
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
+  /**
+   * Проверяет, что у пользователя есть одна из ролей из декоратора @Roles; иначе ForbiddenException.
+   * @param context — контекст выполнения (запрос)
+   * @returns true при наличии роли
+   */
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles =
       this.reflector.get<string[]>('roles', context.getHandler()) ||

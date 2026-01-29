@@ -19,6 +19,10 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
     private readonly eventBus: EventBus,
   ) {}
 
+  /**
+   * Обновляет продукт в транзакции (поля, секции, бренд, изображения); публикует ProductUpdatedEvent.
+   * @param command — команда с id и полями для обновления
+   */
   async execute(command: UpdateProductCommand): Promise<void> {
     try {
       return await this.dataSource.transaction(async (manager) => {

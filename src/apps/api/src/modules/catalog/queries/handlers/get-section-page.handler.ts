@@ -23,6 +23,7 @@ export class GetSectionPageHandler implements IQueryHandler<GetSectionPageQuery>
   constructor(private readonly elasticService: ElasticService) {}
   private MAX_ELASTIC_SIZE = 10000;
 
+  /** Добавляет элементы в target, если items не пустой массив. */
   private pushIfNotEmpty<T>(target: T[], items: T[] | null | undefined): void {
     if (Array.isArray(items) && items.length > 0) {
       for (const item of items) {
@@ -243,6 +244,11 @@ export class GetSectionPageHandler implements IQueryHandler<GetSectionPageQuery>
     return response;
   }
 
+  /**
+   * Возвращает страницу секции: продукты с фильтрами, сортировкой, пагинацией и фасетами.
+   * @param query — запрос с url, page, limit, filters, sort, order, onlyFilter
+   * @returns данные секции (продукты, пагинация, фасеты)
+   */
   async execute(query: GetSectionPageQuery): Promise<SearchSections> {
     const filters = await this.buildFilters(query);
     const sort = this.buildSort(query.sort, query.order);

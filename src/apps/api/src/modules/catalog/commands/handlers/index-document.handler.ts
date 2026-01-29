@@ -6,6 +6,10 @@ import { ElasticService } from '../../services/elastic.service';
 export class IndexDocumentHandler implements ICommandHandler<IndexDocumentCommand> {
   constructor(private readonly elasticService: ElasticService) {}
 
+  /**
+   * Индексирует документ в Elasticsearch (update или create по id).
+   * @param command — команда с документом
+   */
   async execute(command: IndexDocumentCommand) {
     await this.elasticService.updateOrCreate(command.document.id.toString(), command.document);
   }
