@@ -19,23 +19,23 @@ export class RefreshHandler implements ICommandHandler<RefreshCommand> {
   ) {}
 
   async execute(command: RefreshCommand): Promise<Tokens> {
-    const payload = await this.refreshTokenService.validateSession(command.sessionId);
+    const { payload } = await this.refreshTokenService.validateSession(command.sessionId);
 
-    const tokenData = {
-      sub: payload.sub,
-      roles: payload.roles,
-    };
+    // если refresh_token истечет через сутки, то обновляем
+    if (payload.exp && this.refreshTokenService.shouldRotateRefresh(payload.exp)) {
+      await this.refreshTokenService.rotateRefreshSession(command.sessionId, payload);
+    }
 
-    const accessToken = this.jwtService.sign(tokenData, {
-      expiresIn: JWT.ACCESS_TOKEN_EXPIRES_IN,
-    });
-    const jti = randomUUID();
-    const newRefreshToken = this.jwtTokenService.createJwtRefreshToken(tokenData, {
-      sid: command.sessionId,
-      jti,
-    });
-
-    await this.refreshTokenService.updateSessionToken(command.sessionId, newRefreshToken, jti);
+    const accessToken = this.jwtService.sign(
+      {
+        sub: payload.sub,
+        roles: payload.roles,
+        sid: command.sessionId,
+      },
+      {
+        expiresIn: JWT.ACCESS_TOKEN_EXPIRES_IN,
+      },
+    );
 
     return {
       accessToken: this.cryptoService.encrypt(accessToken),

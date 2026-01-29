@@ -4,6 +4,8 @@ import { JwtPayload, RefreshSession } from '../types/auth.types';
 import { JwtService } from '@nestjs/jwt';
 import { REDIS } from '../constants/redis.constants';
 import { getDetailsErrorUtil } from '../../../common/utils/error.utils';
+import { JWT } from '../constants/jwt.constants';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class RefreshTokenService {
@@ -102,13 +104,15 @@ export class RefreshTokenService {
     }
   }
 
-  /**
-   *
-   * @param sessionId
-   */
-  async validateSession(sessionId: string): Promise<JwtPayload> {
-    const isRevoked = await this.isSessionRevoked(sessionId);
-    if (isRevoked) {
+  shouldRotateRefresh(exp: number): boolean {
+    const now = Math.floor(Date.now() / 1000);
+    return exp - now <= JWT.REFRESH_RENEW_THRESHOLD_SEC;
+  }
+
+  async validateSession(
+    sessionId: string,
+  ): Promise<{ payload: JwtPayload; session: RefreshSession }> {
+    if (await this.isSessionRevoked(sessionId)) {
       throw new UnauthorizedException('Session revoked');
     }
 
@@ -120,46 +124,52 @@ export class RefreshTokenService {
     let payload: JwtPayload;
     try {
       payload = this.jwtService.verify<JwtPayload>(session.refreshToken);
-    } catch (error) {
+    } catch {
       await this.deleteSession(sessionId);
-      throw new UnauthorizedException(`Invalid or expired token ${error}`);
+      throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
-    if (session.jti !== payload.jti) {
+    if (payload.jti !== session.jti) {
       await this.revokeSession(sessionId, 'jti_mismatch');
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    return payload;
+    return { payload, session };
   }
 
-  async updateSessionToken(sessionId: string, newRefreshToken: string, jti: string): Promise<void> {
-    const session = await this.getSession(sessionId);
+  async rotateRefreshSession(sessionId: string, payload: JwtPayload): Promise<void> {
+    const newJti = randomUUID();
 
+    const newRefreshToken = this.jwtService.sign(
+      {
+        sub: payload.sub,
+        roles: payload.roles,
+        sid: sessionId,
+        jti: newJti,
+        type: 'refresh',
+      },
+      {
+        expiresIn: JWT.REFRESH_TOKEN_EXPIRES_IN,
+      },
+    );
+
+    const session = await this.getSession(sessionId);
     if (!session) {
       throw new UnauthorizedException('Session not found');
     }
 
     const updatedSession: RefreshSession = {
       ...session,
-      jti,
+      jti: newJti,
       refreshToken: newRefreshToken,
     };
 
-    try {
-      await this.redisClient.set(
-        this.getRedisKey(sessionId),
-        JSON.stringify(updatedSession),
-        'EX',
-        REDIS.EXPIRES_IN_SEC,
-      );
-    } catch (error) {
-      throw new BadRequestException({
-        success: false,
-        message: 'Failed to update session in redis',
-        details: getDetailsErrorUtil(error),
-      });
-    }
+    await this.redisClient.set(
+      this.getRedisKey(sessionId),
+      JSON.stringify(updatedSession),
+      'EX',
+      JWT.REFRESH_TTL_SEC,
+    );
   }
 
   async deleteSession(sessionId: string): Promise<void> {
