@@ -1,10 +1,10 @@
 <template>
   <div class="auth-container">
     <div class="tabs">
-      <ui-button :class="{ active: tab === 'login' }" name="Вход" @click="tab = 'login'" />
-      <ui-button
+      <UiButton :class="{ active: tab === 'login' }" :name="'login'" @click="tab = 'login'" />
+      <LazyUiButton
         :class="{ active: tab === 'register' }"
-        name="Регистрация"
+        :name="`Регистрация`"
         @click="tab = 'register'"
       />
     </div>
@@ -13,10 +13,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 
-const tab = ref('login');
+const tab = ref<'login' | 'register'>('login');
 </script>
 
 <style scoped>
