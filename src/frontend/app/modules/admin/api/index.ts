@@ -1,17 +1,25 @@
+import type { ProductsResponse } from '../types';
+import { useAdminStore } from '../stores/adminStore';
+
 export async function getList(): Promise<void> {
   try {
-    const response = await useApi.get<any>(
+    const adminStore = useAdminStore();
+    console.log(adminStore.limit, '<<<<<<<<<<<<<< adminStore.limit');
+    const response = await useApi.get<ProductsResponse>(
       '/admin/products',
-      {},
       {
-        page: 1,
-        limit: 10,
-        order: 'desc',
-        sort: 'id'
+        page: adminStore.page,
+        limit: adminStore.limit,
+        order: adminStore.order,
+        sort: adminStore.sort
       },
+      {},
       { auth: true }
     );
-    console.log(response, '<<<<<<<<<<<<<< response');
+
+    if (response?.items && response.items?.length > 0) {
+      adminStore.setProductsData(response);
+    }
   } catch (error) {
     logError('ADMIN_GET_LIST', 'GET', error);
   }

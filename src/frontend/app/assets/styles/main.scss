@@ -1,6 +1,10 @@
-@use './variables';
-@import "tailwindcss";
-@import "@nuxt/ui";
+@use './variables' as *;
+
+/* Плавное появление после загрузки стилей (убирает мигание Nuxt UI) */
+html.nuxt-ready #__nuxt {
+  opacity: 1;
+  transition: opacity 0.12s ease-out;
+}
 
 p,
 ol,

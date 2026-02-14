@@ -17,12 +17,24 @@ export interface CatalogProduct {
   sections: SectionForProduct[];
   paths: string[];
   code: string;
-  price: number;
+  price: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductHeaders {
+  id: string;
+  name: string;
+  sections: string;
+  paths: string;
+  code: string;
+  price: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface Products {
+  headers: ProductHeaders | null;
   items: CatalogProduct[] | null;
   total: number;
 }

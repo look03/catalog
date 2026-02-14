@@ -1,10 +1,16 @@
 import { getList } from '../api';
+import { useAdminStore } from '../stores/adminStore';
 
 export function useAdminModule() {
-  // const authStore = useAuthStore();
-  // const { accessToken } = storeToRefs(authStore);
+  const adminStore = useAdminStore();
+  const { tableData, tableHeaders, total, limit, page } = storeToRefs(adminStore);
 
   return {
-    getList
+    getList,
+    tableData,
+    tableHeaders,
+    total,
+    limit,
+    page
   };
 }

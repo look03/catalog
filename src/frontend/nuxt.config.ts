@@ -2,7 +2,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-01-17',
   devtools: { enabled: false },
   srcDir: 'app',
-  css: ['~/assets/styles/main.scss'],
+  css: ['~/assets/styles/ui.css', '~/assets/styles/main.scss'],
   ssr: true,
   typescript: {
     typeCheck: true
@@ -35,6 +35,14 @@ export default defineNuxtConfig({
     '~/modules/admin',
     '~/modules/catalog'
   ],
+  ui: {
+    prefix: 'U',
+    fonts: false,
+    colorMode: false,
+    theme: {
+      transitions: false
+    }
+  },
   i18n: {
     defaultLocale: 'ru',
     locales: ['ru']

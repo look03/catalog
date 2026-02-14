@@ -1,6 +1,11 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetProductsQuery } from '../impl/get-products.query';
-import { CatalogProduct, IdResultItem, Products } from '../../interfaces/product.interfaces';
+import {
+  CatalogProduct,
+  IdResultItem,
+  ProductHeaders,
+  Products,
+} from '../../interfaces/product.interfaces';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../../entities/product.entity';
 import { Repository } from 'typeorm';
@@ -79,7 +84,7 @@ export class GetProductsHandler
         id: el.id,
         name: el.title,
         code: el.code,
-        price: el.price,
+        price: `${el.price} ₽`,
         createdAt: formatDate(el.created_at),
         updatedAt: formatDate(el.updated_at),
         paths,
@@ -90,6 +95,19 @@ export class GetProductsHandler
         })),
       };
     });
+  }
+
+  getProductsHeaders(): ProductHeaders {
+    return {
+      id: 'Ид',
+      name: 'Наименование товара',
+      code: 'Код товара',
+      price: 'Цена товара',
+      sections: 'Категории',
+      paths: 'Детальная страница',
+      createdAt: 'Дата добавления',
+      updatedAt: 'Дата обновления',
+    };
   }
 
   /**
@@ -111,6 +129,7 @@ export class GetProductsHandler
         return {
           total: 0,
           items: null,
+          headers: null,
         };
       }
 
@@ -122,6 +141,7 @@ export class GetProductsHandler
       return {
         total: totalCount,
         items: formattedItems.length > 0 ? formattedItems : null,
+        headers: this.getProductsHeaders(),
       };
     } catch (error) {
       this.logger.error(error);
