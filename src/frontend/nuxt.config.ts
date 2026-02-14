@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2026-01-17',
   devtools: { enabled: false },
-  srcDir: 'client',
+  srcDir: 'app',
   css: ['~/assets/styles/main.scss'],
   ssr: true,
   typescript: {
@@ -30,6 +30,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@pinia/nuxt',
     '@nuxtjs/i18n',
+    '@nuxt/ui',
     '~/modules/auth',
     '~/modules/admin',
     '~/modules/catalog'
