@@ -10,7 +10,8 @@ export default <RouterConfig>{
       path: '/auth/',
       component: () => import('~/pages/AuthPage.vue'),
       meta: {
-        layout: 'auth'
+        layout: 'auth',
+        middleware: ['guest']
       }
     },
     {
@@ -24,7 +25,8 @@ export default <RouterConfig>{
       path: '/admin/',
       component: () => import('~/pages/AdminPage.vue'),
       meta: {
-        layout: 'admin'
+        layout: 'admin',
+        middleware: ['auth']
       }
     }
   ]

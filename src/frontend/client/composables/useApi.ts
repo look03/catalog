@@ -8,21 +8,48 @@ const DEFAULT_API_OPTIONS: ApiOptions = {
 
 const MAX_RETRIES = 2;
 
+export async function redirectToAuth() {
+  if (import.meta.server) {
+    return navigateTo('/auth/', { replace: true });
+  }
+  await useNuxtApp().runWithContext(async () => {
+    await nextTick();
+    return useRouter().replace('/auth/');
+  });
+}
+
 export const refreshToken = async (): Promise<void> => {
   const config = useRuntimeConfig();
   const auth = useAuthModule();
-  const response = await $fetch<ApiResponse<Tokens>>('/auth/refresh', {
-    method: 'POST',
-    baseURL: config.public.apiBase,
-    credentials: 'include'
-  });
 
-  if (!response.data?.accessToken) {
-    logError('USE_API', 'Failed to refresh token');
-    throw new Error('REFRESH_FAILED');
+  const headers: HeadersInit = {};
+  if (import.meta.server) {
+    const reqHeaders = useRequestHeaders(['cookie']);
+    if (reqHeaders.cookie) {
+      headers.Cookie = reqHeaders.cookie;
+    }
   }
 
-  auth.setToken(response.data.accessToken);
+  try {
+    const response = await $fetch<ApiResponse<Tokens>>('/auth/refresh', {
+      method: 'POST',
+      baseURL: config.public.apiBase,
+      credentials: 'include',
+      headers
+    });
+
+    if (!response.data?.accessToken) {
+      logError('USE_API', 'Failed to refresh token');
+      throw new Error('REFRESH_FAILED');
+    }
+
+    auth.setToken(response.data.accessToken);
+  } catch (err: any) {
+    if (err?.statusCode === 401) {
+      auth.clearToken();
+    }
+    throw err;
+  }
 };
 
 const handleApiError = async <T>(
@@ -32,7 +59,9 @@ const handleApiError = async <T>(
 ): Promise<T> => {
   const auth = useAuthModule();
 
-  const status = error?.response?.status;
+  // ofetch/Nuxt даёт statusCode и data; axios — response.status и response.data
+  const status = error?.statusCode ?? error?.response?.status;
+  const body = error?.data ?? error?.response?.data;
 
   if (status === 401 && retryCount > 0) {
     try {
@@ -40,18 +69,20 @@ const handleApiError = async <T>(
       return await retry();
     } catch {
       auth.clearToken();
-      navigateTo('/auth');
+      await redirectToAuth();
+      return undefined as T;
     }
   }
 
   if (status === 403) {
     showError({
       status: 403,
-      statusText: error?.response?.message
+      statusText: body?.message ?? error?.response?.message ?? 'Forbidden'
     });
   }
 
   logError('USE_API', error);
+
   throw error;
 };
 
@@ -85,7 +116,7 @@ const request = async <T>(
 
     return response.data;
   } catch (error: any) {
-    if (retryCount <= 0) {
+    if (retryCount <= 0 || !apiOptions.auth) {
       throw error;
     }
 
