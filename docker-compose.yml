@@ -43,10 +43,10 @@ services:
     <<: *base
     container_name: api
     build:
-      context: ./src/apps/api
+      context: ./src/api
       dockerfile: Dockerfile
     volumes:
-      - ./src/apps/api:/app
+      - ./src/api:/app
     env_file:
       - .env
     ports:

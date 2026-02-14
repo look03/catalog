@@ -4,7 +4,7 @@
       <UiButton :class="{ active: tab === 'login' }" :name="'login'" @click="tab = 'login'" />
       <LazyUiButton
         :class="{ active: tab === 'register' }"
-        :name="`Регистрация`"
+        :name="'register'"
         @click="tab = 'register'"
       />
     </div>

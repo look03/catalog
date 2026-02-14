@@ -19,7 +19,7 @@ build-front: ## build front scripts from source
 	@cd ./src/front/src && npm i --no-package-lock && npm run build
 
 install-modules-api: ## webserver install modules
-	@cd ./src/apps/api && npm i --no-package-lock
+	@cd ./src/api && npm i --no-package-lock
 
 build: ## Сборка docker контейнеров приложения
 	@docker compose build

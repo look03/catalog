@@ -4,7 +4,7 @@
       <nav>
         <h1>Админка</h1>
       </nav>
-      <ui-button :name="`${$t('auth.logout')}`" @click="logout" />
+      <LazyUiButton :name="`${$t('auth.logout')}`" @click="logoutAction" />
     </header>
 
     <main>
@@ -19,6 +19,10 @@
 
 <script setup lang="ts">
 const { logout } = useAuthModule();
+
+const logoutAction = async () => {
+  await logout();
+};
 </script>
 
 <style scoped lang="scss">

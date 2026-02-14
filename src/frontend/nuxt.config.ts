@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   srcDir: 'client',
   css: ['~/assets/styles/main.scss'],
-  ssr: false,
+  ssr: true,
   typescript: {
     typeCheck: true
   },

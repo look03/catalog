@@ -11,7 +11,6 @@ const MAX_RETRIES = 2;
 export const refreshToken = async (): Promise<void> => {
   const config = useRuntimeConfig();
   const auth = useAuthModule();
-
   const response = await $fetch<ApiResponse<Tokens>>('/auth/refresh', {
     method: 'POST',
     baseURL: config.public.apiBase,
