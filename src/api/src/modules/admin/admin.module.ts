@@ -10,6 +10,7 @@ import { commandHandlers } from './commands/handlers';
 import { queryHandlers } from './queries/handlers';
 import { services } from './services';
 import { sagas } from './sagas';
+import { entitiesAuth } from '../auth/entities';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { sagas } from './sagas';
     CommonModule,
     CatalogModule,
     AuthModule,
-    TypeOrmModule.forFeature(entities),
+    TypeOrmModule.forFeature([...entities, ...entitiesAuth]),
   ],
   controllers: [AdminController],
   providers: [...commandHandlers, ...queryHandlers, ...services, ...sagas],

@@ -21,7 +21,6 @@ export async function login(email: string, password: string): Promise<void> {
       navigateTo('/admin');
     }
   } catch (error) {
-    console.log(555555555, '<<<<<<<<<<<<<< 555555555');
     logError('AUTH_LOGIN', 'POST', error);
   }
 }
@@ -50,11 +49,11 @@ export async function register(email: string, password: string): Promise<void> {
 
 export async function logout(): Promise<void> {
   try {
-    console.log(44444444444, '<<<<<<<<<<<<<< 44444444444');
     await useApi.post('/auth/logout/', {}, { credentials: 'include' }, { auth: true });
-
-    navigateTo('/auth');
   } catch (error) {
     logError('AUTH_LOGOUT', 'POST', error);
+  } finally {
+    useAuthStore().clearUserInfo();
+    navigateTo('/auth');
   }
 }

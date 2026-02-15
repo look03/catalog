@@ -11,6 +11,6 @@ export function useAuthModule() {
     logout,
     register,
     setToken: authStore.setAccessToken,
-    clearToken: authStore.clearAccessToken
+    clearUserInfo: authStore.clearUserInfo
   };
 }

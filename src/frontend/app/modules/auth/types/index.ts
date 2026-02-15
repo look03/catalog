@@ -1,5 +1,6 @@
 export type AuthStore = {
   accessToken?: string;
+  userEmail?: string;
 };
 
 export type LoginResponse = {
@@ -8,5 +9,4 @@ export type LoginResponse = {
 
 export type RegisterResponse = {
   userId: string;
-  email: string;
 };

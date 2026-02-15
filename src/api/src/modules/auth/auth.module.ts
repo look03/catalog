@@ -10,7 +10,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserService } from './services/user.service';
 import { RefreshTokenService } from './services/refresh-token.service';
 import * as process from 'node:process';
-import { entities } from './entities';
+import { entitiesAuth } from './entities';
 import { JwtTokenService } from './services/jwt-token.service';
 import { CryptoService } from './services/crypto.service';
 
@@ -21,7 +21,7 @@ import { CryptoService } from './services/crypto.service';
       secret: process.env.JWT_SECRET_KEY,
       signOptions: { expiresIn: '15m' },
     }),
-    TypeOrmModule.forFeature(entities),
+    TypeOrmModule.forFeature(entitiesAuth),
   ],
   providers: [
     ...commandHandlers,

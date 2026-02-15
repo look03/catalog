@@ -15,6 +15,7 @@ export default defineNuxtConfig({
   imports: {
     autoImport: true,
     dirs: [
+      'stores/*/index.ts'
       // 'client/composables',
       // 'client/modules/**/composables',
     ]

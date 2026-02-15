@@ -9,7 +9,7 @@ export const useAuthStore = defineStore('auth-store', {
     setAccessToken(accessToken: string) {
       this.accessToken = accessToken;
     },
-    clearAccessToken() {
+    clearUserInfo() {
       this.accessToken = undefined;
     }
   }

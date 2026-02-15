@@ -1,10 +1,12 @@
 import type { ProductsResponse } from '../types';
 import { useAdminStore } from '../stores/adminStore';
+import type { User } from '~/types';
+import { isNotEmptyObject } from '~/utils/object.operations';
 
 export async function getList(): Promise<void> {
   try {
     const adminStore = useAdminStore();
-    console.log(adminStore.limit, '<<<<<<<<<<<<<< adminStore.limit');
+
     const response = await useApi.get<ProductsResponse>(
       '/admin/products',
       {
@@ -22,5 +24,24 @@ export async function getList(): Promise<void> {
     }
   } catch (error) {
     logError('ADMIN_GET_LIST', 'GET', error);
+  }
+}
+
+export async function getUserData(): Promise<void> {
+  try {
+    const appStore = useAppStore();
+
+    const response = await useApi.get<User>(
+      '/admin/user',
+      {},
+      {},
+      { auth: true }
+    );
+
+    if (isNotEmptyObject(response)) {
+      appStore.setUserData(response);
+    }
+  } catch (error) {
+    logError('ADMIN_GET_USER_DATA', 'GET', error);
   }
 }

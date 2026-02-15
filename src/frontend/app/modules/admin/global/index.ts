@@ -1,4 +1,4 @@
-import { getList } from '../api';
+import { getList, getUserData } from '../api';
 import { useAdminStore } from '../stores/adminStore';
 
 export function useAdminModule() {
@@ -7,6 +7,7 @@ export function useAdminModule() {
 
   return {
     getList,
+    getUserData,
     tableData,
     tableHeaders,
     total,

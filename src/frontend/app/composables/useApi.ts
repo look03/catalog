@@ -46,7 +46,7 @@ export const refreshToken = async (): Promise<void> => {
     auth.setToken(response.data.accessToken);
   } catch (err: any) {
     if (err?.statusCode === 401) {
-      auth.clearToken();
+      auth.clearUserInfo();
     }
     throw err;
   }
@@ -68,7 +68,7 @@ const handleApiError = async <T>(
       await refreshToken();
       return await retry();
     } catch {
-      auth.clearToken();
+      auth.clearUserInfo();
       await redirectToAuth();
       return undefined as T;
     }

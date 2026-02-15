@@ -9,9 +9,11 @@ import {
   Delete,
   UploadedFiles,
   Query,
+  Req,
   ValidationPipe,
   UseGuards,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { BaseProductDto } from './dto/base-product.dto';
 import { BaseSectionDto } from './dto/base-section.dto';
@@ -37,6 +39,9 @@ import { RolesGuard } from '../auth/infrastructure/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { BrandProduct } from './interfaces/brand.interface';
 import { DecryptJwtGuard } from '../auth/infrastructure/decript.guard';
+import type { JwtUser } from '../auth/types/auth.types';
+import { UserInfo } from './interfaces/user.interface';
+import { GetUserDataQuery } from './queries/impl/get-user-data.query';
 
 @Roles('admin')
 @UseGuards(DecryptJwtGuard, JwtGuard, RolesGuard)
@@ -222,5 +227,14 @@ export class AdminController {
   @ApiOperation({ summary: 'Переиндексировать эластик' })
   reIndex() {
     return this.commandBus.execute(new ReIndexSearchCommand());
+  }
+
+  /**
+   * Возвращает данные о пользователе
+   * @returns
+   */
+  @Get('user/')
+  async getUserData(@Req() req: Request & { user: JwtUser }): Promise<UserInfo | null> {
+    return this.queryBus.execute(new GetUserDataQuery(req.user.userId));
   }
 }
