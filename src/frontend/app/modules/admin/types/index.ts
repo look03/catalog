@@ -32,15 +32,22 @@ export type ProductsResponse = {
   total: number;
 };
 
+export type OrderType = 'asc' | 'desc';
+
+export type SortType = 'id' | 'name' | 'createdAt' | 'updatedAt';
+
+export type Sort = {
+  sort: SortType;
+  order: OrderType;
+}
+
 export type AdminStore = {
   tableData: CatalogProduct[] | undefined;
   tableHeaders: ProductHeaders | undefined;
   total: number;
   limit: number;
   page: number;
-  order: 'asc' | 'desc';
-  sort: string;
-};
+} & Sort;
 
 export type OptionsTable = {
   limit?: number;

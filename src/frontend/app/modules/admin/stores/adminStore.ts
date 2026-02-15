@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { AdminStore, CatalogProduct, ProductHeaders, ProductsResponse } from '../types';
+import type { AdminStore, CatalogProduct, ProductHeaders, ProductsResponse, Sort } from '../types';
 
 export const useAdminStore = defineStore('admin-store', {
   state: (): AdminStore => ({
@@ -21,6 +21,10 @@ export const useAdminStore = defineStore('admin-store', {
     },
     setPage(page: number) {
       this.page = page;
+    },
+    setSort(payload: Sort) {
+      this.sort = payload.sort;
+      this.order = payload.order;
     }
   }
 });

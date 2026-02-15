@@ -1,19 +1,22 @@
 <template>
   <AdminTable
-    :table-data="props.tableData"
-    :total="props.total"
-    :table-headers="props.tableHeaders"
-    :limit="props.limit"
-    :page="props.page"
+    :table-data="adminStore.tableData"
+    :total="adminStore.total"
+    :table-headers="adminStore.tableHeaders"
+    :limit="adminStore.limit"
+    :page="adminStore.page"
+    :sort="adminStore.sort"
+    :order="adminStore.order"
     @action:change-page="changePage"
+    @action:change-sort="changeSort"
   />
 </template>
 
 <script setup lang="ts">
 import AdminTable from '../components/AdminTable.vue';
 
-import type { CatalogProduct, ProductHeaders } from '../types';
 import { useAdminStore } from '../stores/adminStore';
+import type { Sort } from '~/modules/admin/types';
 
 const emits = defineEmits<{
   (e: 'action:update-data'): void;
@@ -21,22 +24,10 @@ const emits = defineEmits<{
 
 const adminStore = useAdminStore();
 
-const props = withDefaults(
-  defineProps<{
-    tableData: CatalogProduct[] | undefined;
-    tableHeaders: ProductHeaders | undefined;
-    total: number;
-    limit: number;
-    page: number;
-  }>(),
-  {
-    tableData: undefined,
-    tableHeaders: undefined,
-    total: 0,
-    limit: 0,
-    page: 1
-  }
-);
+const changeSort = (payload: Sort): void => {
+  adminStore.setSort(payload);
+  emits('action:update-data');
+}
 
 const changePage = (page: number): void => {
   adminStore.setPage(page);

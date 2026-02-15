@@ -1,11 +1,11 @@
 export abstract class BasePaginationFilterHandler {
-  protected readonly allowedSortColumns = ['id', 'title', 'createdAt'];
+  protected readonly allowedSortColumns = ['id', 'name', 'createdAt', 'updatedAt'];
 
   protected readonly SORT_MAP: Record<string, string> = {
     id: 'p.id',
-    title: 'p.title',
-    code: 'p.code',
-    created_at: 'p.created_at',
+    name: 'p.title',
+    updatedAt: 'p.updated_at',
+    createdAt: 'p.created_at',
   };
 
   /**
