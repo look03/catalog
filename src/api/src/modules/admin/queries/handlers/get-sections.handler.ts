@@ -61,6 +61,7 @@ export class GetSectionsHandler
       qb.select([
         'p.id',
         'p.title',
+        'p.code',
         'p.path',
         'p.created_at',
         'p.updated_at',

@@ -28,20 +28,51 @@ export class GetProductsHandler
 
   private readonly logger = new Logger('GetProductsHandler');
 
+  private buildWhereParams(alias: string) {
+    return (params: {
+      nameFilter?: string;
+      codeFilter?: string;
+      idFilter?: number;
+    }) => {
+      const conditions: string[] = [];
+      const whereParams: Record<string, string | number> = {};
+      if (params.nameFilter) {
+        conditions.push(`${alias}.title ILIKE :title`);
+        whereParams.title = `%${params.nameFilter}%`;
+      }
+      if (params.codeFilter) {
+        conditions.push(`${alias}.code ILIKE :code`);
+        whereParams.code = `%${params.codeFilter}%`;
+      }
+      if (params.idFilter != null) {
+        conditions.push(`${alias}.id = :id`);
+        whereParams.id = params.idFilter;
+      }
+      return { where: conditions.length ? conditions.join(' AND ') : '1=1', params: whereParams };
+    };
+  }
+
   private async getPagedIds(
     page: number,
     limit: number,
     nameFilter: string | undefined,
     sortColumn: string,
     sortDirection: 'ASC' | 'DESC',
+    codeFilter?: string,
+    idFilter?: number,
   ): Promise<string[]> {
     const alias = 'p2';
     const adjustedSortColumn = sortColumn.replace('p', alias);
+    const { where, params } = this.buildWhereParams(alias)({
+      nameFilter,
+      codeFilter,
+      idFilter,
+    });
 
     const idsSubQuery = this.repo
       .createQueryBuilder(alias)
       .select(`${alias}.id`)
-      .where(nameFilter ? `${alias}.title ILIKE :title` : '1=1', { title: `%${nameFilter}%` })
+      .where(where, params)
       .orderBy(adjustedSortColumn, sortDirection)
       .skip((page - 1) * limit)
       .take(limit);
@@ -63,12 +94,21 @@ export class GetProductsHandler
       .getMany();
   }
 
-  private async getTotalCount(nameFilter: string | undefined): Promise<number> {
+  private async getTotalCount(
+    nameFilter: string | undefined,
+    codeFilter?: string,
+    idFilter?: number,
+  ): Promise<number> {
+    const { where, params } = this.buildWhereParams('p')({
+      nameFilter,
+      codeFilter,
+      idFilter,
+    });
     const totalQuery = this.repo
       .createQueryBuilder('p')
       .leftJoin('p.productSections', 'productSections')
       .leftJoin('productSections.section', 'section')
-      .where(nameFilter ? 'p.title ILIKE :title' : '1=1', { title: `%${nameFilter}%` });
+      .where(where, params);
 
     const totalRaw = await totalQuery
       .select('COUNT(DISTINCT p.id)', 'count')
@@ -117,13 +157,21 @@ export class GetProductsHandler
    */
   async execute(query: GetProductsQuery): Promise<Products> {
     try {
-      const { page, limit, nameFilter, sort, order } = query;
+      const { page, limit, nameFilter, sort, order, codeFilter, idFilter } = query;
 
       const sortBy = this.validateSortColumn(sort);
       const sortDirection = this.getSortDirection(order);
       const sortColumn = this.SORT_MAP[sortBy] ?? 'p.id';
 
-      const ids = await this.getPagedIds(page, limit, nameFilter, sortColumn, sortDirection);
+      const ids = await this.getPagedIds(
+        page,
+        limit,
+        nameFilter,
+        sortColumn,
+        sortDirection,
+        codeFilter,
+        idFilter,
+      );
 
       if (ids.length === 0) {
         return {
@@ -134,7 +182,7 @@ export class GetProductsHandler
       }
 
       const items = await this.getProductsByIds(ids, sortColumn, sortDirection);
-      const totalCount = await this.getTotalCount(nameFilter);
+      const totalCount = await this.getTotalCount(nameFilter, codeFilter, idFilter);
 
       const formattedItems = this.formatProducts(items);
 

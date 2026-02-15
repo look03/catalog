@@ -13,7 +13,8 @@ export async function getList(): Promise<void> {
         page: adminStore.page,
         limit: adminStore.limit,
         order: adminStore.order,
-        sort: adminStore.sort
+        sort: adminStore.sort,
+        filters: adminStore.filters
       },
       {},
       { auth: true }
@@ -31,12 +32,7 @@ export async function getUserData(): Promise<void> {
   try {
     const appStore = useAppStore();
 
-    const response = await useApi.get<User>(
-      '/admin/user',
-      {},
-      {},
-      { auth: true }
-    );
+    const response = await useApi.get<User>('/admin/user', {}, {}, { auth: true });
 
     if (isNotEmptyObject(response)) {
       appStore.setUserData(response);

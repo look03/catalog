@@ -5,5 +5,7 @@ export class BasePaginationFilterQuery {
     public readonly nameFilter?: string,
     public readonly sort: string = 'id',
     public readonly order: 'asc' | 'desc' = 'desc',
+    public readonly codeFilter?: string,
+    public readonly idFilter?: number,
   ) {}
 }

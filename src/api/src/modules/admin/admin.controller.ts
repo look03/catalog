@@ -197,8 +197,10 @@ export class AdminController {
   async getProducts(
     @Query(new ValidationPipe({ transform: true, whitelist: true })) query: BasePaginationFilterDto,
   ): Promise<Products> {
-    const { page, limit, name, sort, order } = query;
-    return this.queryBus.execute(new GetProductsQuery(page, limit, name, sort, order));
+    const { page, limit, name, sort, order, code, id } = query;
+    return this.queryBus.execute(
+      new GetProductsQuery(page, limit, name, sort, order, code, id),
+    );
   }
 
   /**

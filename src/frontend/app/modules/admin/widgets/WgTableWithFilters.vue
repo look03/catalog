@@ -1,20 +1,23 @@
 <template>
-  <AdminTable
-    :table-data="adminStore.tableData"
-    :total="adminStore.total"
-    :table-headers="adminStore.tableHeaders"
-    :limit="adminStore.limit"
-    :page="adminStore.page"
-    :sort="adminStore.sort"
-    :order="adminStore.order"
-    @action:change-page="changePage"
-    @action:change-sort="changeSort"
-  />
+  <div class="wg-table-with-filters">
+    <AdminTableFilter @action:search="onSearch" />
+    <AdminTable
+      :table-data="adminStore.tableData"
+      :total="adminStore.total"
+      :table-headers="adminStore.tableHeaders"
+      :limit="adminStore.limit"
+      :page="adminStore.page"
+      :sort="adminStore.sort"
+      :order="adminStore.order"
+      @action:change-page="changePage"
+      @action:change-sort="changeSort"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
 import AdminTable from '../components/AdminTable.vue';
-
+import AdminTableFilter from '../components/AdminTableFilter.vue';
 import { useAdminStore } from '../stores/adminStore';
 import type { Sort } from '~/modules/admin/types';
 
@@ -24,10 +27,14 @@ const emits = defineEmits<{
 
 const adminStore = useAdminStore();
 
+const onSearch = () => {
+  emits('action:update-data');
+};
+
 const changeSort = (payload: Sort): void => {
   adminStore.setSort(payload);
   emits('action:update-data');
-}
+};
 
 const changePage = (page: number): void => {
   adminStore.setPage(page);

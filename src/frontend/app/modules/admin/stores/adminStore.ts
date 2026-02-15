@@ -1,5 +1,12 @@
 import { defineStore } from 'pinia';
-import type { AdminStore, CatalogProduct, ProductHeaders, ProductsResponse, Sort } from '../types';
+import type {
+  AdminFilters,
+  AdminStore,
+  CatalogProduct,
+  ProductsResponse,
+  Sort,
+  TableType
+} from '../types';
 
 export const useAdminStore = defineStore('admin-store', {
   state: (): AdminStore => ({
@@ -9,15 +16,19 @@ export const useAdminStore = defineStore('admin-store', {
     limit: 4,
     page: 1,
     order: 'asc',
-    sort: 'id'
+    sort: 'id',
+    tableType: 'products',
+    filters: {
+      name: undefined,
+      code: undefined,
+      id: undefined
+    }
   }),
   actions: {
     setProductsData(data: ProductsResponse) {
-      this.tableData = data.items ?? undefined;
-      if (!this.tableHeaders) {
-        this.tableHeaders = data.headers ?? undefined;
-      }
-      this.total = data.total;
+      this.tableData = (data.items ?? undefined) as CatalogProduct[] | undefined;
+      this.tableHeaders = data.headers ?? undefined;
+      this.total = data.total ?? 0;
     },
     setPage(page: number) {
       this.page = page;
@@ -25,6 +36,24 @@ export const useAdminStore = defineStore('admin-store', {
     setSort(payload: Sort) {
       this.sort = payload.sort;
       this.order = payload.order;
+    },
+    setTableType(type: TableType) {
+      this.tableType = type;
+      this.page = 1;
+    },
+    setFilters(payload: AdminFilters) {
+      if (payload.name !== undefined) {
+        this.filters.name = payload.name;
+      }
+
+      if (payload.code !== undefined) {
+        this.filters.code = payload.code;
+      }
+
+      if (payload.code !== undefined) {
+        this.filters.id = payload.id;
+      }
+      this.page = 1;
     }
   }
 });
