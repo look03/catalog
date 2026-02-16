@@ -19,22 +19,6 @@ export class BasePaginationFilterDto {
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ example: 'Ботинки', description: 'Фильтр по имени' })
-  name?: string;
-
-  @IsOptional()
-  @IsString()
-  @ApiProperty({ example: 'ABC-001', description: 'Фильтр по символьному коду' })
-  code?: string;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @ApiProperty({ example: 1, description: 'Фильтр по ID' })
-  id?: number;
-
-  @IsOptional()
-  @IsString()
   @IsIn(['id', 'name', 'createdAt', 'updatedAt'], {
     message: 'sortBy must be one of id, name, createdAt, updatedAt',
   })

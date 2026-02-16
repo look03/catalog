@@ -50,7 +50,7 @@ export class GetSectionsHandler
    */
   async execute(query: GetSectionsQuery): Promise<Sections> {
     try {
-      const { page, limit, nameFilter, sort, order } = query;
+      const { page, limit, sort, order, filters } = query;
 
       const sortBy = this.validateSortColumn(sort);
       const sortDirection = this.getSortDirection(order);
@@ -70,8 +70,8 @@ export class GetSectionsHandler
         'parent.path',
       ]);
 
-      if (nameFilter) {
-        qb.where('p.title ILIKE :title', { title: `%${nameFilter}%` });
+      if (filters?.name) {
+        qb.where('p.title ILIKE :title', { title: `%${filters.name}%` });
       }
 
       qb.orderBy(sortColumn, sortDirection);

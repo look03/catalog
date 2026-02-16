@@ -9,6 +9,9 @@ export default {
     code: 'Символьный код',
     placeholderCode: 'Поиск по коду',
     id: 'Ид',
-    placeholderId: 'Поиск по ид'
+    placeholderId: 'Поиск по ид',
+    clear: 'Очистить',
+    search: 'Найти',
+    table: 'Таблица'
   }
 };

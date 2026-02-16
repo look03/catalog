@@ -14,7 +14,7 @@ export async function getList(): Promise<void> {
         limit: adminStore.limit,
         order: adminStore.order,
         sort: adminStore.sort,
-        filters: adminStore.filters
+        filters: JSON.stringify(adminStore.filters)
       },
       {},
       { auth: true }

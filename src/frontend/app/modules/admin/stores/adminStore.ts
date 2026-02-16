@@ -50,9 +50,17 @@ export const useAdminStore = defineStore('admin-store', {
         this.filters.code = payload.code;
       }
 
-      if (payload.code !== undefined) {
+      if (payload.id !== undefined) {
         this.filters.id = payload.id;
       }
+
+      this.page = 1;
+    },
+    clearFilters() {
+      this.filters.name = undefined;
+      this.filters.code = undefined;
+      this.filters.id = undefined;
+
       this.page = 1;
     }
   }

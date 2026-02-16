@@ -13,6 +13,7 @@ import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { formatDate } from '../../../../common/utils/date-format.util';
 import { BasePaginationFilterHandler } from './base-pagination-filter.handler';
 import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
+import { AdminFilters } from '../../interfaces/products-and-sections.interfaces';
 
 @QueryHandler(GetProductsQuery)
 export class GetProductsHandler
@@ -28,46 +29,36 @@ export class GetProductsHandler
 
   private readonly logger = new Logger('GetProductsHandler');
 
-  private buildWhereParams(alias: string) {
-    return (params: {
-      nameFilter?: string;
-      codeFilter?: string;
-      idFilter?: number;
-    }) => {
-      const conditions: string[] = [];
-      const whereParams: Record<string, string | number> = {};
-      if (params.nameFilter) {
-        conditions.push(`${alias}.title ILIKE :title`);
-        whereParams.title = `%${params.nameFilter}%`;
-      }
-      if (params.codeFilter) {
-        conditions.push(`${alias}.code ILIKE :code`);
-        whereParams.code = `%${params.codeFilter}%`;
-      }
-      if (params.idFilter != null) {
-        conditions.push(`${alias}.id = :id`);
-        whereParams.id = params.idFilter;
-      }
-      return { where: conditions.length ? conditions.join(' AND ') : '1=1', params: whereParams };
-    };
+  private buildWhereParams(alias: string, filters?: AdminFilters) {
+    const conditions: string[] = [];
+    const whereParams: Record<string, string | number> = {};
+    if (filters?.name) {
+      conditions.push(`${alias}.title ILIKE :title`);
+      whereParams.title = `%${filters.name}%`;
+    }
+
+    if (filters?.code) {
+      conditions.push(`${alias}.code ILIKE :code`);
+      whereParams.code = `%${filters.code}%`;
+    }
+    if (filters?.id != null) {
+      conditions.push(`${alias}.id = :id`);
+      whereParams.id = filters.id;
+    }
+
+    return { where: conditions.length ? conditions.join(' AND ') : '1=1', params: whereParams };
   }
 
   private async getPagedIds(
     page: number,
     limit: number,
-    nameFilter: string | undefined,
     sortColumn: string,
     sortDirection: 'ASC' | 'DESC',
-    codeFilter?: string,
-    idFilter?: number,
+    filters?: AdminFilters,
   ): Promise<string[]> {
     const alias = 'p2';
     const adjustedSortColumn = sortColumn.replace('p', alias);
-    const { where, params } = this.buildWhereParams(alias)({
-      nameFilter,
-      codeFilter,
-      idFilter,
-    });
+    const { where, params } = this.buildWhereParams(alias, filters);
 
     const idsSubQuery = this.repo
       .createQueryBuilder(alias)
@@ -94,16 +85,9 @@ export class GetProductsHandler
       .getMany();
   }
 
-  private async getTotalCount(
-    nameFilter: string | undefined,
-    codeFilter?: string,
-    idFilter?: number,
-  ): Promise<number> {
-    const { where, params } = this.buildWhereParams('p')({
-      nameFilter,
-      codeFilter,
-      idFilter,
-    });
+  private async getTotalCount(filters?: AdminFilters): Promise<number> {
+    const { where, params } = this.buildWhereParams('p', filters);
+
     const totalQuery = this.repo
       .createQueryBuilder('p')
       .leftJoin('p.productSections', 'productSections')
@@ -157,21 +141,13 @@ export class GetProductsHandler
    */
   async execute(query: GetProductsQuery): Promise<Products> {
     try {
-      const { page, limit, nameFilter, sort, order, codeFilter, idFilter } = query;
+      const { page, limit, sort, order, filters } = query;
 
       const sortBy = this.validateSortColumn(sort);
       const sortDirection = this.getSortDirection(order);
       const sortColumn = this.SORT_MAP[sortBy] ?? 'p.id';
 
-      const ids = await this.getPagedIds(
-        page,
-        limit,
-        nameFilter,
-        sortColumn,
-        sortDirection,
-        codeFilter,
-        idFilter,
-      );
+      const ids = await this.getPagedIds(page, limit, sortColumn, sortDirection, filters);
 
       if (ids.length === 0) {
         return {
@@ -182,7 +158,7 @@ export class GetProductsHandler
       }
 
       const items = await this.getProductsByIds(ids, sortColumn, sortDirection);
-      const totalCount = await this.getTotalCount(nameFilter, codeFilter, idFilter);
+      const totalCount = await this.getTotalCount(filters);
 
       const formattedItems = this.formatProducts(items);
 

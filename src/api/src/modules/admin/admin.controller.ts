@@ -42,6 +42,8 @@ import { DecryptJwtGuard } from '../auth/infrastructure/decript.guard';
 import type { JwtUser } from '../auth/types/auth.types';
 import { UserInfo } from './interfaces/user.interface';
 import { GetUserDataQuery } from './queries/impl/get-user-data.query';
+import { ParseJsonPipe } from '../../common/pipes/parse-json.pipe';
+import { AdminFiltersDto } from './dto/admin-filters.dto';
 
 @Roles('admin')
 @UseGuards(DecryptJwtGuard, JwtGuard, RolesGuard)
@@ -107,10 +109,11 @@ export class AdminController {
    */
   @Get('sections/')
   async getSections(
-    @Query(new ValidationPipe({ transform: true, whitelist: true })) query: BasePaginationFilterDto,
+    @Query() query: BasePaginationFilterDto,
+    @Query('filters', ParseJsonPipe) filters: AdminFiltersDto,
   ): Promise<Products> {
-    const { page, limit, name, sort, order } = query;
-    return this.queryBus.execute(new GetSectionsQuery(page, limit, name, sort, order));
+    const { page, limit, sort, order } = query;
+    return this.queryBus.execute(new GetSectionsQuery(page, limit, sort, order, filters));
   }
 
   /**
@@ -195,12 +198,11 @@ export class AdminController {
    */
   @Get('products/')
   async getProducts(
-    @Query(new ValidationPipe({ transform: true, whitelist: true })) query: BasePaginationFilterDto,
+    @Query() query: Omit<BasePaginationFilterDto, 'filters'>,
+    @Query('filters', ParseJsonPipe) filters: AdminFiltersDto,
   ): Promise<Products> {
-    const { page, limit, name, sort, order, code, id } = query;
-    return this.queryBus.execute(
-      new GetProductsQuery(page, limit, name, sort, order, code, id),
-    );
+    const { page, limit, sort, order } = query;
+    return this.queryBus.execute(new GetProductsQuery(page, limit, sort, order, filters));
   }
 
   /**

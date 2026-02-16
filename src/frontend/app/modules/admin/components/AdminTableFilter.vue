@@ -24,28 +24,31 @@
           @action:on-search="onSearch"
         />
       </div>
-
       <div class="admin-table-filter__row admin-table-filter__actions">
-        <div class="admin-table-filter__toggle">
-          <span class="admin-table-filter__toggle-label">Таблица:</span>
-          <div class="admin-table-filter__toggle-buttons">
-            <UButton
-              :color="adminStore.tableType === 'products' ? 'primary' : 'neutral'"
-              :variant="adminStore.tableType === 'products' ? 'solid' : 'outline'"
-              size="sm"
-              label="Продукты"
-              @click="setTableType('products')"
-            />
-            <UButton
-              :color="adminStore.tableType === 'sections' ? 'primary' : 'neutral'"
-              :variant="adminStore.tableType === 'sections' ? 'solid' : 'outline'"
-              size="sm"
-              label="Секции"
-              @click="setTableType('sections')"
-            />
-          </div>
+        <UiSwitcherFilter
+          :label="$t('filter.table')"
+          :tabs="tabs"
+          :model-value="tableType"
+          @action:switch="setTableType($event as TableType)"
+        />
+        <div class="admin-table-filter__submit-group">
+          <UiButton
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-filter-x"
+            :name="$t('filter.clear')"
+            size="md"
+            class="admin-table-filter__btn-clear"
+            @click="clearFilters"
+          />
+          <UiButton
+            color="primary"
+            icon="i-lucide-search"
+            size="md"
+            :name="$t('filter.search')"
+            @click="onSearch"
+          />
         </div>
-        <UButton color="primary" icon="i-lucide-search" label="Найти" size="md" @click="onSearch" />
       </div>
     </div>
   </div>
@@ -62,11 +65,22 @@ const emits = defineEmits<{
 
 const adminStore = useAdminStore();
 
-const { filters } = storeToRefs(adminStore);
+const { filters, tableType } = storeToRefs(adminStore);
+
+const tabs = [
+  {
+    label: 'Продукты',
+    value: 'products'
+  },
+  {
+    label: 'Разделы',
+    value: 'sections'
+  }
+];
 
 const setFilter = (field: keyof AdminFilters, value: string) => {
   adminStore.setFilters({
-    [field]: value
+    [field]: value ?? undefined
   });
 };
 
@@ -75,9 +89,14 @@ const setTableType = (type: TableType) => {
   emits('action:search');
 };
 
-function onSearch() {
+const onSearch = () => {
   emits('action:search');
-}
+};
+
+const clearFilters = () => {
+  adminStore.clearFilters();
+  emits('action:search');
+};
 </script>
 
 <style scoped lang="scss">
@@ -110,35 +129,17 @@ function onSearch() {
     border-top: 1px solid var(--ui-border, #e2e8f0);
   }
 
-  &__toggle {
+  &__submit-group {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
+  }
 
-    &-label {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--ui-text-muted, #64748b);
-    }
+  &__btn-clear {
+    opacity: 0.9;
 
-    &-buttons {
-      display: inline-flex;
-      gap: 0;
-      border-radius: 6px;
-      overflow: hidden;
-      box-shadow: 0 0 0 1px var(--ui-border, #e2e8f0);
-
-      button {
-        border-radius: 0;
-        border: none;
-        box-shadow: none;
-      }
-      button:first-child {
-        border-radius: 6px 0 0 6px;
-      }
-      button:last-child {
-        border-radius: 0 6px 6px 0;
-      }
+    &:hover {
+      opacity: 1;
     }
   }
 }

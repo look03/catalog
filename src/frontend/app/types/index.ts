@@ -15,6 +15,10 @@ export interface ApiResponse<T> {
 }
 
 export type User = {
-  email?: string,
-}
+  email?: string;
+};
 
+export type TabItemBase = {
+  label: string;
+  value?: string | number;
+};
