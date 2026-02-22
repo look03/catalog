@@ -1,5 +1,6 @@
 <template>
   <UButton
+    class="ui-button"
     :color="props.color"
     :icon="props.icon"
     :label="props.name"
@@ -32,3 +33,11 @@ const props = withDefaults(
   }
 );
 </script>
+
+<style scoped lang="scss">
+.ui-button {
+  &:hover {
+    cursor: pointer;
+  }
+}
+</style>

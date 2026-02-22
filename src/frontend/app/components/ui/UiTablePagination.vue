@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full space-y-4 pb-4">
+  <div class="u-table-pagination w-full space-y-4 pb-4">
     <UTable
       ref="table"
       :data="props.data"
@@ -57,17 +57,29 @@ const updatePage = (page: number): void => {
 <style scoped lang="scss">
 $table-border: var(--ui-border, #e5e7eb);
 
-/* Вертикальные разделители между столбцами */
-:deep(th:not(:last-child)),
-:deep(td:not(:last-child)) {
-  border-right: 1px solid $table-border;
-}
+.u-table-pagination {
+  :deep([data-slot='leadingIcon']) {
+    cursor: pointer;
+  }
 
-/* Шапка таблицы: фон и линия снизу */
-:deep(thead th) {
-  background-color: var(--ui-table-header-bg, #f1f5f9);
-  color: var(--ui-table-header-color, #334155);
-  font-weight: 600;
-  border-top: 1px solid $table-border;
+  /* Вертикальные разделители между столбцами */
+  :deep(th:not(:last-child)),
+  :deep(td:not(:last-child)) {
+    border-right: 1px solid $table-border;
+  }
+
+  /* Шапка таблицы: фон и линия снизу */
+  :deep(thead th) {
+    background-color: var(--ui-table-header-bg, #f1f5f9);
+    color: var(--ui-table-header-color, #334155);
+    font-weight: 600;
+    border-top: 1px solid $table-border;
+  }
+
+  /* Пагинация: курсор-указатель на цифрах и кнопках */
+  .ui-pagination-stable :deep(nav a),
+  .ui-pagination-stable :deep(nav button) {
+    cursor: pointer;
+  }
 }
 </style>
