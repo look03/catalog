@@ -2,9 +2,9 @@
   <div class="wg-table-with-filters">
     <AdminTableFilter @action:search="onSearch" />
     <AdminTable
-      :table-data="adminStore.tableData"
+      :table-data="tableData"
       :total="adminStore.total"
-      :table-headers="adminStore.tableHeaders"
+      :table-headers="tableHeaders"
       :limit="adminStore.limit"
       :page="adminStore.page"
       :sort="adminStore.sort"
@@ -26,6 +26,16 @@ const emits = defineEmits<{
 }>();
 
 const adminStore = useAdminStore();
+
+const tableData = computed(() =>
+  adminStore.tableType === 'products' ? adminStore.tableProductsData : adminStore.tableSectionsData
+);
+
+const tableHeaders = computed(() =>
+  adminStore.tableType === 'products'
+    ? adminStore.tableProductsHeaders
+    : adminStore.tableSectionsHeaders
+);
 
 const onSearch = () => {
   emits('action:update-data');

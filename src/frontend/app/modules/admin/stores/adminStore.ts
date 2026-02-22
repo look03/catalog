@@ -3,15 +3,19 @@ import type {
   AdminFilters,
   AdminStore,
   CatalogProduct,
+  CatalogSection,
   ProductsResponse,
+  SectionsResponse,
   Sort,
   TableType
 } from '../types';
 
 export const useAdminStore = defineStore('admin-store', {
   state: (): AdminStore => ({
-    tableData: undefined,
-    tableHeaders: undefined,
+    tableProductsData: undefined,
+    tableProductsHeaders: undefined,
+    tableSectionsData: undefined,
+    tableSectionsHeaders: undefined,
     total: 0,
     limit: 4,
     page: 1,
@@ -26,8 +30,13 @@ export const useAdminStore = defineStore('admin-store', {
   }),
   actions: {
     setProductsData(data: ProductsResponse) {
-      this.tableData = (data.items ?? undefined) as CatalogProduct[] | undefined;
-      this.tableHeaders = data.headers ?? undefined;
+      this.tableProductsData = (data.items ?? undefined) as CatalogProduct[] | undefined;
+      this.tableProductsHeaders = data.headers ?? undefined;
+      this.total = data.total ?? 0;
+    },
+    setSectionsData(data: SectionsResponse) {
+      this.tableSectionsData = (data.items ?? undefined) as CatalogSection[] | undefined;
+      this.tableSectionsHeaders = data.headers ?? undefined;
       this.total = data.total ?? 0;
     },
     setPage(page: number) {
@@ -39,21 +48,16 @@ export const useAdminStore = defineStore('admin-store', {
     },
     setTableType(type: TableType) {
       this.tableType = type;
-      this.page = 1;
+      this.clearFilters();
+      this.setSort({
+        sort: 'id',
+        order: 'asc'
+      });
     },
     setFilters(payload: AdminFilters) {
-      if (payload.name !== undefined) {
-        this.filters.name = payload.name;
-      }
-
-      if (payload.code !== undefined) {
-        this.filters.code = payload.code;
-      }
-
-      if (payload.id !== undefined) {
-        this.filters.id = payload.id;
-      }
-
+      this.filters.name = payload.name;
+      this.filters.code = payload.code;
+      this.filters.id = payload.id;
       this.page = 1;
     },
     clearFilters() {

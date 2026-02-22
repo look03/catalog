@@ -14,8 +14,8 @@ export interface CatalogSection {
   name: string;
   code: string;
   path: string;
-  parent_section_id: number | undefined | null;
-  parent_section: ParentSection | null;
+  parentSectionId: number | undefined | null;
+  parentSection: ParentSection | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -23,4 +23,16 @@ export interface CatalogSection {
 export interface Sections {
   items: CatalogSection[] | null;
   total: number;
+  headers: SectionHeaders | null;
+}
+
+export interface SectionHeaders {
+  id: string;
+  name: string;
+  code: string;
+  path: string;
+  parentSectionId: string;
+  parentSection: string;
+  createdAt: string;
+  updatedAt: string;
 }

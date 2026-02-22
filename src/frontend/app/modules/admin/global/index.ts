@@ -3,15 +3,17 @@ import { useAdminStore } from '../stores/adminStore';
 
 export function useAdminModule() {
   const adminStore = useAdminStore();
-  const { tableData, tableHeaders, total, limit, page } = storeToRefs(adminStore);
+  const { tableProductsData, tableProductsHeaders, total, limit, page, tableType } =
+    storeToRefs(adminStore);
 
   return {
     getList,
     getUserData,
-    tableData,
-    tableHeaders,
+    tableProductsData,
+    tableProductsHeaders,
     total,
     limit,
-    page
+    page,
+    tableType
   };
 }

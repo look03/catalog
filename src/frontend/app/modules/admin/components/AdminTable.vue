@@ -28,12 +28,28 @@
         />
       </div>
     </template>
+    <template #[`parentSection-cell`]="{ row }">
+      <div v-if="(row.original as CatalogSection).parentSection" class="flex flex-col">
+        <UiLink
+          :to="(row.original as CatalogSection).parentSection?.path"
+          :name="(row.original as CatalogSection).parentSection?.name"
+        />
+      </div>
+    </template>
   </UiTablePagination>
 </template>
 
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui';
-import type { CatalogProduct, OrderType, ProductHeaders, Sort, SortType } from '../types';
+import type {
+  CatalogProduct,
+  CatalogSection,
+  OrderType,
+  ProductHeaders,
+  SectionHeaders,
+  Sort,
+  SortType
+} from '../types';
 const UButton = resolveComponent('UButton');
 const emits = defineEmits<{
   (e: 'action:change-page', page: number): void;
@@ -42,8 +58,8 @@ const emits = defineEmits<{
 
 const props = withDefaults(
   defineProps<{
-    tableData: CatalogProduct[] | undefined;
-    tableHeaders: ProductHeaders | undefined;
+    tableData: CatalogProduct[] | CatalogSection[] | undefined;
+    tableHeaders: ProductHeaders | SectionHeaders | undefined;
     total: number;
     limit: number;
     page: number;

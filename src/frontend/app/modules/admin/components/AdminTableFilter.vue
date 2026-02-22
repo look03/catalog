@@ -80,7 +80,7 @@ const tabs = [
 
 const setFilter = (field: keyof AdminFilters, value: string) => {
   adminStore.setFilters({
-    [field]: value ?? undefined
+    [field]: value || undefined
   });
 };
 

@@ -7,13 +7,10 @@
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    to: string;
-    name: string;
+    to?: string;
+    name?: string;
   }>(),
-  {
-    to: '',
-    name: ''
-  }
+  {}
 );
 </script>
 

@@ -109,7 +109,7 @@ export class AdminController {
    */
   @Get('sections/')
   async getSections(
-    @Query() query: BasePaginationFilterDto,
+    @Query() query: Omit<BasePaginationFilterDto, 'filters'>,
     @Query('filters', ParseJsonPipe) filters: AdminFiltersDto,
   ): Promise<Products> {
     const { page, limit, sort, order } = query;

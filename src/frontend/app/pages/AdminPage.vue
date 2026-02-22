@@ -1,7 +1,5 @@
 <template>
-  <WgTableWithFilters
-    @action:update-data="getList"
-  />
+  <WgTableWithFilters @action:update-data="getList" />
 </template>
 
 <script setup lang="ts">

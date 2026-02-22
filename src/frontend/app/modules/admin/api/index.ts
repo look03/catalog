@@ -1,12 +1,10 @@
-import type { ProductsResponse } from '../types';
+import type { ProductsResponse, SectionsResponse } from '../types';
 import { useAdminStore } from '../stores/adminStore';
 import type { User } from '~/types';
 import { isNotEmptyObject } from '~/utils/object.operations';
 
-export async function getList(): Promise<void> {
+export async function getListProducts(adminStore: ReturnType<typeof useAdminStore>): Promise<void> {
   try {
-    const adminStore = useAdminStore();
-
     const response = await useApi.get<ProductsResponse>(
       '/admin/products',
       {
@@ -20,11 +18,42 @@ export async function getList(): Promise<void> {
       { auth: true }
     );
 
-    if (response?.items && response.items?.length > 0) {
-      adminStore.setProductsData(response);
-    }
+    adminStore.setProductsData(response);
   } catch (error) {
-    logError('ADMIN_GET_LIST', 'GET', error);
+    logError('ADMIN_GET_LIST_PRODUCTS', 'GET', error);
+  }
+}
+
+export async function getListSections(adminStore: ReturnType<typeof useAdminStore>): Promise<void> {
+  try {
+    console.log(adminStore.filters, '<<<<<<<<<<<<<< adminStore.filters');
+    const response = await useApi.get<SectionsResponse>(
+      '/admin/sections',
+      {
+        page: adminStore.page,
+        limit: adminStore.limit,
+        order: adminStore.order,
+        sort: adminStore.sort,
+        filters: JSON.stringify(adminStore.filters)
+      },
+      {},
+      { auth: true }
+    );
+
+    adminStore.setSectionsData(response);
+  } catch (error) {
+    logError('ADMIN_GET_LIST_SECTIONS', 'GET', error);
+  }
+}
+
+export async function getList(): Promise<void> {
+  const adminStore = useAdminStore();
+  const { tableType } = storeToRefs(adminStore);
+
+  if (tableType.value === 'products') {
+    await getListProducts(adminStore);
+  } else {
+    await getListSections(adminStore);
   }
 }
 

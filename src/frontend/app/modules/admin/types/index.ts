@@ -43,13 +43,18 @@ export type Sort = {
 
 export type TableType = 'products' | 'sections';
 
+export type ParentSection = {
+  name: string | undefined;
+  path: string | undefined;
+};
+
 export type CatalogSection = {
   id: number;
   name: string;
   code: string;
   path: string;
-  parent_section_id: number | null;
-  parent_section: { name?: string; path?: string } | null;
+  parentSectionId: number | undefined | null;
+  parentSection: ParentSection | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -57,6 +62,18 @@ export type CatalogSection = {
 export type SectionsResponse = {
   items: CatalogSection[] | null;
   total: number;
+  headers: SectionHeaders | null;
+};
+
+export type SectionHeaders = {
+  id: string;
+  name: string;
+  code: string;
+  path: string;
+  parent_section_id: string;
+  parent_section: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type AdminFilters = {
@@ -66,21 +83,13 @@ export type AdminFilters = {
 };
 
 export type AdminStore = {
-  tableData: CatalogProduct[] | undefined;
-  tableHeaders: ProductHeaders | undefined;
+  tableProductsData: CatalogProduct[] | undefined;
+  tableProductsHeaders: ProductHeaders | undefined;
+  tableSectionsData: CatalogSection[] | undefined;
+  tableSectionsHeaders: SectionHeaders | undefined;
   total: number;
   limit: number;
   page: number;
   tableType: TableType;
   filters: AdminFilters;
 } & Sort;
-
-export type OptionsTable = {
-  limit?: number;
-  page?: number;
-  order?: string;
-  sort?: string;
-  name?: string;
-  code?: string;
-  id?: number;
-};

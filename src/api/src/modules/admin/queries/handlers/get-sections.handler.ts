@@ -6,8 +6,10 @@ import { Repository } from 'typeorm';
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { formatDate } from '../../../../common/utils/date-format.util';
 import { BasePaginationFilterHandler } from './base-pagination-filter.handler';
-import { CatalogSection, Sections } from '../../interfaces/section.interfaces';
+import { CatalogSection, SectionHeaders, Sections } from '../../interfaces/section.interfaces';
 import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
+import { ProductHeaders } from '../../interfaces/product.interfaces';
+import { AdminFilters } from '../../interfaces/products-and-sections.interfaces';
 
 @QueryHandler(GetSectionsQuery)
 export class GetSectionsHandler
@@ -29,8 +31,8 @@ export class GetSectionsHandler
         id: el.id,
         name: el.title,
         code: el.code,
-        parent_section_id: el.parent_section?.id || null,
-        parent_section: el.parent_section
+        parentSectionId: el.parent_section?.id || null,
+        parentSection: el.parent_section
           ? {
               name: el.parent_section?.title,
               path: el.parent_section?.path,
@@ -41,6 +43,45 @@ export class GetSectionsHandler
         path: el.path,
       };
     });
+  }
+
+  getSectionHeaders(): SectionHeaders {
+    return {
+      id: 'Ид',
+      name: 'Наименование раздела',
+      code: 'Код раздела',
+      path: 'Ссылка раздела',
+      parentSectionId: 'Идентификатор родительского раздела',
+      parentSection: 'Родительский раздел',
+      createdAt: 'Дата добавления',
+      updatedAt: 'Дата обновления',
+    };
+  }
+
+  /**
+   * Сборка фильтров для секции
+   * @param alias
+   * @param filters
+   * @private
+   */
+  private buildWhereParams(alias: string, filters?: AdminFilters) {
+    const conditions: string[] = [];
+    const whereParams: Record<string, string | number> = {};
+    if (filters?.name) {
+      conditions.push(`${alias}.title ILIKE :title`);
+      whereParams.title = `%${filters.name}%`;
+    }
+
+    if (filters?.code) {
+      conditions.push(`${alias}.code ILIKE :code`);
+      whereParams.code = `%${filters.code}%`;
+    }
+    if (filters?.id != null) {
+      conditions.push(`${alias}.id = :id`);
+      whereParams.id = filters.id;
+    }
+
+    return { where: conditions.length ? conditions.join(' AND ') : '1=1', params: whereParams };
   }
 
   /**
@@ -55,8 +96,8 @@ export class GetSectionsHandler
       const sortBy = this.validateSortColumn(sort);
       const sortDirection = this.getSortDirection(order);
       const sortColumn = this.SORT_MAP[sortBy] ?? 'p.id';
-
-      const qb = this.repo.createQueryBuilder('p');
+      const alias = 'p';
+      const qb = this.repo.createQueryBuilder(alias);
       qb.leftJoinAndSelect('p.parent_section', 'parent');
       qb.select([
         'p.id',
@@ -70,10 +111,9 @@ export class GetSectionsHandler
         'parent.path',
       ]);
 
-      if (filters?.name) {
-        qb.where('p.title ILIKE :title', { title: `%${filters.name}%` });
-      }
+      const { where, params } = this.buildWhereParams(alias, filters);
 
+      qb.where(where, params);
       qb.orderBy(sortColumn, sortDirection);
       qb.skip((page - 1) * limit).take(limit);
 
@@ -83,6 +123,7 @@ export class GetSectionsHandler
         return {
           total: 0,
           items: null,
+          headers: null,
         };
       }
 
@@ -91,6 +132,7 @@ export class GetSectionsHandler
       return {
         total,
         items: formatItems.length > 0 ? formatItems : null,
+        headers: this.getSectionHeaders(),
       };
     } catch (error) {
       this.logger.error(error);
