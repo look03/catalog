@@ -96,10 +96,15 @@ export class AdminController {
   @Delete('section/:id')
   @ApiOperation({ summary: 'Удалить секцию по id' })
   @ApiParam({ name: 'id', type: Number })
-  async deleteSection(@Param('id', ParseIntPipe) id: number): Promise<Sections> {
+  async deleteSection(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() query: Omit<BasePaginationFilterDto, 'filters'>,
+    @Query('filters', ParseJsonPipe) filters: AdminFiltersDto,
+  ): Promise<Sections> {
     await this.commandBus.execute(new DeleteSectionCommand(id));
 
-    return this.queryBus.execute(new GetSectionsQuery(1, 10, undefined));
+    const { page, limit, sort, order } = query;
+    return this.queryBus.execute(new GetSectionsQuery(page, limit, sort, order, filters));
   }
 
   /**
@@ -185,10 +190,15 @@ export class AdminController {
   @Delete('product/:id')
   @ApiOperation({ summary: 'Удалить продукт по id' })
   @ApiParam({ name: 'id', type: Number })
-  async deleteProduct(@Param('id', ParseIntPipe) id: number): Promise<Products> {
+  async deleteProduct(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() query: Omit<BasePaginationFilterDto, 'filters'>,
+    @Query('filters', ParseJsonPipe) filters: AdminFiltersDto,
+  ): Promise<Products> {
     await this.commandBus.execute(new DeleteProductCommand(id));
 
-    return this.queryBus.execute(new GetProductsQuery(1, 10, undefined));
+    const { page, limit, sort, order } = query;
+    return this.queryBus.execute(new GetProductsQuery(page, limit, sort, order, filters));
   }
 
   /**

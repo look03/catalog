@@ -1,5 +1,6 @@
 <template>
   <div class="wg-table-with-filters">
+    <AdminPanelHeader :table-type="adminStore.tableType" @action:add="onAdd" />
     <AdminTableFilter @action:search="onSearch" />
     <AdminTable
       :table-data="tableData"
@@ -11,21 +12,41 @@
       :order="adminStore.order"
       @action:change-page="changePage"
       @action:change-sort="changeSort"
+      @action:delete="openDeleteModal"
+      @action:edit="onEditRow"
+    />
+    <AdminDeleteModal
+      :open="deleteModalOpen"
+      :title="deleteModalTitle"
+      :item-name="itemToDelete?.name"
+      @close="closeDeleteModal"
+      @confirm="confirmDelete"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import AdminTable from '../components/AdminTable.vue';
+import AdminDeleteModal from '../components/AdminDeleteModal.vue';
+import AdminPanelHeader from '../components/AdminPanelHeader.vue';
 import AdminTableFilter from '../components/AdminTableFilter.vue';
 import { useAdminStore } from '../stores/adminStore';
-import type { Sort } from '~/modules/admin/types';
+import type { CatalogProduct, CatalogSection, Sort } from '~/modules/admin/types';
 
 const emits = defineEmits<{
-  (e: 'action:update-data'): void;
+  (e: 'action:update-data' | 'action:add'): void;
+  (e: 'action:delete' | 'action:edit', id: number): void;
 }>();
 
+const { t } = useI18n();
 const adminStore = useAdminStore();
+
+const deleteModalTitle = computed(() =>
+  adminStore.tableType === 'products' ? t('delete.product') : t('delete.section')
+);
+
+const deleteModalOpen = ref(false);
+const itemToDelete = ref<CatalogProduct | CatalogSection | null>(null);
 
 const tableData = computed(() =>
   adminStore.tableType === 'products' ? adminStore.tableProductsData : adminStore.tableSectionsData
@@ -39,6 +60,31 @@ const tableHeaders = computed(() =>
 
 const onSearch = () => {
   emits('action:update-data');
+};
+
+const onAdd = () => {
+  emits('action:add');
+};
+
+const openDeleteModal = (row: CatalogProduct | CatalogSection) => {
+  itemToDelete.value = row;
+  deleteModalOpen.value = true;
+};
+
+const closeDeleteModal = () => {
+  deleteModalOpen.value = false;
+  itemToDelete.value = null;
+};
+
+const confirmDelete = () => {
+  if (itemToDelete.value) {
+    emits('action:delete', itemToDelete.value.id);
+    closeDeleteModal();
+  }
+};
+
+const onEditRow = (id: number) => {
+  emits('action:edit', id);
 };
 
 const changeSort = (payload: Sort): void => {

@@ -3,6 +3,19 @@ export default {
     login: 'Войти',
     signIn: 'Вход'
   },
+  delete: {
+    product: 'Удалить товар',
+    section: 'Удалить раздел'
+  },
+  modal: {
+    cancel: 'Отменить',
+    delete: 'Удалить'
+  },
+  panel: {
+    title: 'Административная панель',
+    addProduct: 'Добавить товар',
+    addSection: 'Добавить раздел'
+  },
   filter: {
     name: 'Наименование',
     placeholderName: 'Поиск по названию',

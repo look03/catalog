@@ -21,14 +21,13 @@ defineEmits<{
 
 const props = withDefaults(
   defineProps<{
-    name: string;
+    name?: string;
     icon?: string;
     color?: 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral';
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
     variant?: 'link' | 'solid' | 'outline' | 'soft' | 'subtle' | 'ghost';
   }>(),
   {
-    name: '',
     color: 'primary'
   }
 );

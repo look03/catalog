@@ -26,7 +26,6 @@ export async function getListProducts(adminStore: ReturnType<typeof useAdminStor
 
 export async function getListSections(adminStore: ReturnType<typeof useAdminStore>): Promise<void> {
   try {
-    console.log(adminStore.filters, '<<<<<<<<<<<<<< adminStore.filters');
     const response = await useApi.get<SectionsResponse>(
       '/admin/sections',
       {
@@ -54,6 +53,65 @@ export async function getList(): Promise<void> {
     await getListProducts(adminStore);
   } else {
     await getListSections(adminStore);
+  }
+}
+
+export async function deleteProduct(
+  id: number,
+  adminStore: ReturnType<typeof useAdminStore>
+): Promise<void> {
+  try {
+    const response = await useApi.delete<ProductsResponse>(
+      `/admin/product/${id}/`,
+      {
+        page: adminStore.page,
+        limit: adminStore.limit,
+        order: adminStore.order,
+        sort: adminStore.sort,
+        filters: JSON.stringify(adminStore.filters)
+      },
+      {},
+      { auth: true }
+    );
+
+    adminStore.setProductsData(response);
+  } catch (error) {
+    logError('ADMIN_GET_LIST_SECTIONS', 'GET', error);
+  }
+}
+
+export async function deleteSection(
+  id: number,
+  adminStore: ReturnType<typeof useAdminStore>
+): Promise<void> {
+  try {
+    const response = await useApi.delete<SectionsResponse>(
+      `/admin/section/${id}/`,
+      {
+        page: adminStore.page,
+        limit: adminStore.limit,
+        order: adminStore.order,
+        sort: adminStore.sort,
+        filters: JSON.stringify(adminStore.filters)
+      },
+      {},
+      { auth: true }
+    );
+
+    adminStore.setSectionsData(response);
+  } catch (error) {
+    logError('ADMIN_GET_LIST_SECTIONS', 'GET', error);
+  }
+}
+
+export async function deleteRow(id: number): Promise<void> {
+  const adminStore = useAdminStore();
+  const { tableType } = storeToRefs(adminStore);
+
+  if (tableType.value === 'products') {
+    await deleteProduct(id, adminStore);
+  } else {
+    await deleteSection(id, adminStore);
   }
 }
 
