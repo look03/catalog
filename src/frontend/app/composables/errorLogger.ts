@@ -9,7 +9,7 @@ const getTime = () => {
   });
 };
 
-export function logError(moduleKey: string, actionKey: string, error?: any) {
+export function logError(moduleKey: string, actionKey: string, error?: unknown) {
   if (import.meta.server || import.meta.dev) {
     console.error(getTime(), `ERROR::${moduleKey}::${actionKey}`, error);
   }

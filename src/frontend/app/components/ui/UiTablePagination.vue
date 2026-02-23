@@ -44,7 +44,11 @@ const props = withDefaults(
     page?: number;
   }>(),
   {
-    data: () => []
+    data: () => [],
+    columns: undefined,
+    total: undefined,
+    limit: undefined,
+    page: undefined
   }
 );
 

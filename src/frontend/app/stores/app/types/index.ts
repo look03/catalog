@@ -1,5 +1,5 @@
 import type { User } from '~/types';
 
 export type AppState = {
-  user: User,
-}
+  user: User;
+};

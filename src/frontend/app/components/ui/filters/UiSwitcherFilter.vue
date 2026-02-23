@@ -25,11 +25,13 @@ const emits = defineEmits<{
 const props = withDefaults(
   defineProps<{
     label?: string;
-    tabs: TabItemBase[];
+    tabs?: TabItemBase[];
     modelValue?: string | number;
   }>(),
   {
-    tabs: () => []
+    tabs: () => [],
+    label: undefined,
+    modelValue: undefined
   }
 );
 

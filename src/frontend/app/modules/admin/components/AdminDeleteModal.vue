@@ -7,10 +7,10 @@
         role="dialog"
         aria-modal="true"
         aria-labelledby="admin-delete-modal-title"
-        @click.self="$emit('close')"
+        @click.self="emits('close')"
       >
         <div class="admin-delete-modal__box">
-          <UiClose @click="$emit('close')" />
+          <UiClose @click="emits('close')" />
           <h2 id="admin-delete-modal-title" class="admin-delete-modal__title">
             {{ title }}
           </h2>
@@ -22,9 +22,9 @@
               color="neutral"
               variant="outline"
               :label="$t('modal.cancel')"
-              @click="$emit('close')"
+              @click="emits('close')"
             />
-            <UiButton color="error" :label="$t('modal.delete')" @click="$emit('confirm')" />
+            <UiButton color="error" :label="$t('modal.delete')" @click="emits('confirm')" />
           </div>
         </div>
       </div>
@@ -41,9 +41,8 @@ defineProps<{
   itemName?: string;
 }>();
 
-defineEmits<{
-  (e: 'close'): void;
-  (e: 'confirm'): void;
+const emits = defineEmits<{
+  (e: 'close' | 'confirm'): void;
 }>();
 </script>
 

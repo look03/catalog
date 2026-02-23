@@ -81,13 +81,13 @@ const emits = defineEmits<{
 
 const props = withDefaults(
   defineProps<{
-    tableData: CatalogProduct[] | CatalogSection[] | undefined;
-    tableHeaders: ProductHeaders | SectionHeaders | undefined;
-    total: number;
-    limit: number;
-    page: number;
-    sort: SortType;
-    order: OrderType;
+    tableData?: CatalogProduct[] | CatalogSection[] | undefined;
+    tableHeaders?: ProductHeaders | SectionHeaders | undefined;
+    total?: number;
+    limit?: number;
+    page?: number;
+    sort?: SortType;
+    order?: OrderType;
   }>(),
   {
     tableData: undefined,

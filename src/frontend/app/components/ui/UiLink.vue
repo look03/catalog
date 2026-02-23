@@ -10,7 +10,10 @@ const props = withDefaults(
     to?: string;
     name?: string;
   }>(),
-  {}
+  {
+    to: undefined,
+    name: undefined
+  }
 );
 </script>
 

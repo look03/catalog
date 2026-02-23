@@ -1,7 +1,7 @@
 <template>
   <div class="admin-panel-header">
     <h1 class="admin-panel-header__title">{{ $t('panel.title') }}</h1>
-    <UiButton color="primary" :label="addButtonLabel" @click="$emit('action:add')" />
+    <UiButton color="primary" :label="addButtonLabel" @click="emits('action:add')" />
   </div>
 </template>
 
@@ -12,7 +12,7 @@ const props = defineProps<{
   tableType: TableType;
 }>();
 
-defineEmits<{
+const emits = defineEmits<{
   (e: 'action:add'): void;
 }>();
 

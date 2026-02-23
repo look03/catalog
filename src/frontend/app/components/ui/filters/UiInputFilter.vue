@@ -1,6 +1,6 @@
 <template>
   <div class="ui-input-filter">
-    <label class="ui-input-filter__label"> {{ props.title }}</label>
+    <label v-if="props.title" class="ui-input-filter__label"> {{ props.title }}</label>
     <UInput
       v-model="model"
       :placeholder="props.placeholder"
@@ -19,12 +19,14 @@ const emits = defineEmits<{
 
 const props = withDefaults(
   defineProps<{
-    title: string;
+    title?: string;
     placeholder?: string;
     value?: string;
   }>(),
   {
-    title: ''
+    title: undefined,
+    placeholder: undefined,
+    value: undefined
   }
 );
 

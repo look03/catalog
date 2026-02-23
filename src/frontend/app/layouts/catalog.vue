@@ -1,22 +1,20 @@
 <template>
-  <header>
-    <nav>
-      <h1>Каталddddог</h1>
-    </nav>
-  </header>
+  <div>
+    <header>
+      <nav>
+        <h1>Каталddddог</h1>
+      </nav>
+    </header>
 
-  <main>
-    <NuxtPage />
-  </main>
+    <main>
+      <NuxtPage />
+    </main>
 
-  <footer>
-    <p>© 2026 Моя компания</p>
-  </footer>
+    <footer>
+      <p>© 2026 Моя компания</p>
+    </footer>
+  </div>
 </template>
-<script setup lang="ts">
+<script setup lang="ts"></script>
 
-</script>
-
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -5,12 +5,12 @@ import type { User } from '~/types';
 export const useAppStore = defineStore('app-store', {
   state: (): AppState => ({
     user: {
-      email: undefined,
+      email: undefined
     }
   }),
   actions: {
     setUserData(userData: User) {
       this.user = userData;
-    },
+    }
   }
 });

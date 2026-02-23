@@ -8,6 +8,6 @@ export const useCatalogStore = defineStore('catalog-store', {
   actions: {
     setAccessToken(accessToken: string) {
       this.accessToken = accessToken;
-    },
+    }
   }
 });

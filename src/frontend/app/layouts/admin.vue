@@ -16,7 +16,6 @@
     <main class="admin-layout__main">
       <NuxtPage />
     </main>
-
   </div>
 </template>
 

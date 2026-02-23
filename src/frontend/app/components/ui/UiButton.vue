@@ -28,7 +28,11 @@ const props = withDefaults(
     variant?: 'link' | 'solid' | 'outline' | 'soft' | 'subtle' | 'ghost';
   }>(),
   {
-    color: 'primary'
+    name: undefined,
+    icon: undefined,
+    size: undefined,
+    color: 'primary',
+    variant: undefined
   }
 );
 </script>
