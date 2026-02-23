@@ -1,4 +1,10 @@
-import type { ProductsResponse, SectionsResponse, Sort } from '../types';
+import type {
+  PayloadProduct,
+  PayloadSection,
+  ProductsResponse,
+  SectionsResponse,
+  Sort
+} from '../types';
 import { useAdminStore } from '../stores/adminStore';
 import type { User } from '~/types';
 import { isNotEmptyObject } from '~/utils/object.operations';
@@ -160,10 +166,7 @@ export async function getSectionsForSelect(): Promise<SectionOption[]> {
   }
 }
 
-export async function createSection(payload: {
-  title: string;
-  parent_section_id?: number;
-}): Promise<void> {
+export async function createSection(payload: PayloadSection): Promise<void> {
   const adminStore = useAdminStore();
   adminStore.setLoadingForm(true);
   adminStore.setAddElementTableOptions();
@@ -189,19 +192,43 @@ export async function createSection(payload: {
   }
 }
 
-export async function createProduct(formData: FormData): Promise<void> {
-  const config = useRuntimeConfig();
-  const auth = useAuthModule();
-  const response = await $fetch<{ success: boolean; data?: unknown }>(
-    `${config.public.apiBase}/admin/product/`,
-    {
-      method: 'POST',
-      body: formData,
-      credentials: 'include',
-      headers: auth.accessToken?.value ? { Authorization: `Bearer ${auth.accessToken.value}` } : {}
+export async function createProduct(payload: PayloadProduct): Promise<void> {
+  const adminStore = useAdminStore();
+  adminStore.setLoadingForm(true);
+  adminStore.setAddElementTableOptions();
+  try {
+    const formData = new FormData();
+    formData.append('title', payload.title);
+    formData.append('price', String(payload.price));
+    formData.append('section_ids', JSON.stringify(payload.section_ids));
+    if (payload.color) {
+      formData.append('color', payload.color);
     }
-  );
-  if (!response?.success) {
-    throw new Error('API_ERROR');
+    if (payload.preview_text) {
+      formData.append('preview_text', payload.preview_text);
+    }
+    if (payload.brand_id != null && payload.brand_id > 0) {
+      formData.append('brand_id', String(payload.brand_id));
+    }
+    payload.files.forEach((file) => formData.append('images', file));
+
+    const response = await useApi.post<ProductsResponse>(
+      '/admin/product/',
+      formData,
+      {
+        sort: adminStore.sort,
+        order: adminStore.order,
+        limit: adminStore.limit,
+        page: adminStore.page
+      },
+      {},
+      { auth: true }
+    );
+
+    adminStore.setProductsData(response);
+  } catch (err) {
+    logError('ADMIN_CREATE_PRODUCT', 'POST', err);
+  } finally {
+    adminStore.resetFormLoading();
   }
 }

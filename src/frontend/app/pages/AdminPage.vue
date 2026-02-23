@@ -4,11 +4,12 @@
     @action:delete="deleteRow"
     @action:edit="onEditRow"
     @action:save-section="createSection"
+    @action:save-product="createProduct"
   />
 </template>
 
 <script setup lang="ts">
-const { getList, deleteRow, createSection } = useAdminModule();
+const { getList, deleteRow, createSection, createProduct } = useAdminModule();
 
 await getList();
 

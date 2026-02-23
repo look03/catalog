@@ -12,9 +12,7 @@
         ref="table"
         :data="props.data"
         :columns="props.columns"
-        :pagination-options="{
-          getPaginationRowModel: getPaginationRowModel()
-        }"
+        :pagination-options="paginationOptions"
         class="flex-1 ui-table-with-dividers"
       >
         <template v-for="(_, slotName) in $slots" :key="String(slotName)" #[slotName]="slotProps">
@@ -76,6 +74,16 @@ const props = withDefaults(
 );
 
 const limitOptions = [10, 25, 50, 100];
+
+const paginationOptions = computed(() => ({
+  getPaginationRowModel: getPaginationRowModel(),
+  initialState: {
+    pagination: {
+      pageSize: props.limit ?? 10,
+      pageIndex: 0
+    }
+  }
+}));
 
 const summaryText = computed(() => {
   const t = props.total ?? 0;

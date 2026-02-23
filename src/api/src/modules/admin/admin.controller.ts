@@ -137,6 +137,7 @@ export class AdminController {
   async createProduct(
     @Body() dto: BaseProductDto,
     @UploadedFiles() images: Express.Multer.File[],
+    @Query() query: Omit<BasePaginationFilterDto, 'filters'>,
   ): Promise<Products> {
     await this.commandBus.execute(
       new CreateProductCommand(
@@ -150,7 +151,8 @@ export class AdminController {
       ),
     );
 
-    return this.queryBus.execute(new GetProductsQuery(1, 10, undefined));
+    const { page, limit, sort, order } = query;
+    return this.queryBus.execute(new GetProductsQuery(page, limit, sort, order));
   }
 
   /**

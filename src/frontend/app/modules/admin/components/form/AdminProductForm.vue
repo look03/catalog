@@ -2,59 +2,62 @@
   <form class="admin-form admin-form--product" @submit.prevent="onSubmit">
     <UiInput
       v-model="form.title"
-      label="Название товара"
+      :label="$t('formProduct.nameProduct')"
       required
-      placeholder="Введите название"
+      :placeholder="$t('formProduct.nameProductPlaceholder')"
       size="md"
     />
-    <UiInput v-model.number="form.price" label="Цена" required min="0" step="0.01" size="md" />
+    <UiInput
+      v-model.number="form.price"
+      :label="$t('formProduct.price')"
+      required
+      min="0"
+      step="0.01"
+      size="md"
+    />
     <UiSelectMenu
       v-model="form.section_ids"
-      label="Разделы"
+      :label="$t('formProduct.sections')"
       required
       :items="sectionItems"
       value-key="id"
       label-key="name"
       multiple
-      placeholder="Выберите разделы"
+      :placeholder="$t('formProduct.sectionsPlaceholder')"
       size="md"
     />
     <div class="admin-form__row">
-      <UiInput v-model="form.color" label="Цвет" placeholder="#FFFFFF" size="md" maxlength="7" />
+      <UiInput
+        v-model="form.color"
+        :label="$t('formProduct.color')"
+        :placeholder="$t('formProduct.colorPlaceholder')"
+        size="md"
+        maxlength="7"
+      />
       <UiSelect
         v-model="form.brand_id"
-        label="Бренд"
+        :label="$t('formProduct.brand')"
         :items="brandItems"
         value-key="id"
         label-key="name"
-        placeholder="Выберите бренд"
+        :placeholder="$t('formProduct.brandPlaceholder')"
         size="md"
         class="admin-form__grow"
       />
     </div>
     <UiTextarea
       v-model="form.preview_text"
-      label="Краткое описание"
-      placeholder="Необязательно"
+      :label="$t('formProduct.previewText')"
+      :placeholder="$t('formProduct.previewPlaceholder')"
       :rows="3"
       size="md"
     />
-    <UiFileUpload v-model="files" label="Изображения" />
+    <UiFileUpload v-model="files" :label="$t('formProduct.images')" />
   </form>
 </template>
 
 <script setup lang="ts">
-export type SelectOption = { id: number; name: string };
-
-export type ProductFormPayload = {
-  title: string;
-  price: number;
-  section_ids: number[];
-  color: string;
-  preview_text: string;
-  brand_id: number | undefined;
-  files: File[];
-};
+import type { PayloadProduct, SelectOption } from '~/modules/admin/types';
 
 const props = withDefaults(
   defineProps<{
@@ -65,23 +68,30 @@ const props = withDefaults(
 );
 
 const emits = defineEmits<{
-  (e: 'submit', payload: ProductFormPayload): void;
+  (e: 'submit', payload: PayloadProduct): void;
 }>();
 
-const form = ref({
+const defaultForm = {
   title: '',
   price: 0,
-  section_ids: [] as number[],
+  section_ids: [],
   color: '',
   preview_text: '',
-  brand_id: undefined as number | undefined
-});
+  brand_id: undefined
+};
+
+const form = ref(defaultForm);
 
 const files = ref<File[] | File | null>(null);
 
-function onSubmit() {
-  if (!form.value.title?.trim() || form.value.section_ids.length === 0) return;
-  if (Number(form.value.price) < 0) return;
+const onSubmit = () => {
+  if (!form.value.title?.trim() || form.value.section_ids.length === 0) {
+    return;
+  }
+  if (Number(form.value.price) < 0) {
+    return;
+  }
+
   const fileList = Array.isArray(files.value) ? files.value : files.value ? [files.value] : [];
   emits('submit', {
     title: form.value.title.trim(),
@@ -92,19 +102,12 @@ function onSubmit() {
     brand_id: form.value.brand_id,
     files: fileList
   });
-}
+};
 
-function reset() {
-  form.value = {
-    title: '',
-    price: 0,
-    section_ids: [],
-    color: '',
-    preview_text: '',
-    brand_id: undefined
-  };
+const reset = () => {
+  form.value = defaultForm;
   files.value = null;
-}
+};
 
 defineExpose({ reset });
 </script>

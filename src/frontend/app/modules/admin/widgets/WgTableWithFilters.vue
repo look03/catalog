@@ -32,6 +32,7 @@
       :loading-form="loadingForm"
       @action:close="adminStore.setOpenActionsAside(false)"
       @action:save-section="emits('action:save-section', $event)"
+      @action:save-product="emits('action:save-product', $event)"
       @success="onSearch"
     />
   </div>
@@ -43,13 +44,20 @@ import AdminDeleteModal from '../components/AdminDeleteModal.vue';
 import AdminPanelHeader from '../components/AdminPanelHeader.vue';
 import AdminTableFilter from '../components/AdminTableFilter.vue';
 import { useAdminStore } from '../stores/adminStore';
-import type { CatalogProduct, CatalogSection, PayloadSection, Sort } from '~/modules/admin/types';
+import type {
+  CatalogProduct,
+  CatalogSection,
+  PayloadProduct,
+  PayloadSection,
+  Sort
+} from '~/modules/admin/types';
 import AdminAddAside from '../components/AdminAddAside.vue';
 
 const emits = defineEmits<{
   (e: 'action:update-data' | 'action:add'): void;
   (e: 'action:delete' | 'action:edit', id: number): void;
   (e: 'action:save-section', payload: PayloadSection): void;
+  (e: 'action:save-product', payload: PayloadProduct): void;
 }>();
 
 const { t } = useI18n();

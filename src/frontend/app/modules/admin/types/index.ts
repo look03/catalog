@@ -96,4 +96,16 @@ export type AdminStore = {
   loadingForm: boolean;
 } & Sort;
 
+export type SelectOption = { id: number; name: string };
+
 export type PayloadSection = { title: string; parent_section_id?: number };
+
+export type PayloadProduct = {
+  title: string;
+  price: number;
+  section_ids: number[];
+  color: string;
+  preview_text: string;
+  brand_id: number | undefined;
+  files: File[];
+};

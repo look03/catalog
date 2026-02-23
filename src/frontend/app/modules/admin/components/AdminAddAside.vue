@@ -12,7 +12,7 @@
         ref="productFormRef"
         :section-items="productSectionItems"
         :brand-items="brandSelectItems"
-        @submit="onProductSubmit"
+        @submit="emits('action:save-product', $event)"
       />
     </template>
     <template #footer>
@@ -28,17 +28,11 @@
 </template>
 
 <script setup lang="ts">
-import type { PayloadSection, TableType } from '../types';
+import type { PayloadProduct, PayloadSection, TableType } from '../types';
 import AdminSectionForm from '~/modules/admin/components/form/AdminSectionForm.vue';
 import AdminProductForm from '~/modules/admin/components/form/AdminProductForm.vue';
 import AdminFormActions from '~/modules/admin/components/form/AdminFormActions.vue';
-import {
-  getSectionsForSelect,
-  getBrands,
-  createProduct,
-  type BrandOption,
-  type SectionOption
-} from '../api';
+import { getSectionsForSelect, getBrands, type BrandOption, type SectionOption } from '../api';
 
 const props = withDefaults(
   defineProps<{
@@ -55,6 +49,7 @@ const props = withDefaults(
 const emits = defineEmits<{
   (e: 'success' | 'action:close'): void;
   (e: 'action:save-section', payload: PayloadSection): void;
+  (e: 'action:save-product', payload: PayloadProduct): void;
 }>();
 
 const sectionFormRef = ref<InstanceType<typeof AdminSectionForm> | null>(null);
@@ -70,10 +65,12 @@ const asideTitle = computed(() =>
 );
 
 const footerCancelLabel = computed(() =>
-  props.tableType === 'sections' ? t('formSection.buttonCancel') : 'Отмена'
+  props.tableType === 'sections' ? t('formSection.buttonCancel') : t('formProduct.buttonCancel')
 );
 const footerSubmitLabel = computed(() =>
-  props.tableType === 'sections' ? t('formSection.buttonAddSection') : 'Создать товар'
+  props.tableType === 'sections'
+    ? t('formSection.buttonAddSection')
+    : t('formProduct.buttonAddProduct')
 );
 
 const onFooterSubmit = () => {
@@ -112,34 +109,4 @@ watch(
     }
   }
 );
-
-async function onProductSubmit(payload: {
-  title: string;
-  price: number;
-  section_ids: number[];
-  color: string;
-  preview_text: string;
-  brand_id: number | undefined;
-  files: File[];
-}) {
-  try {
-    const formData = new FormData();
-    formData.append('title', payload.title);
-    formData.append('price', String(payload.price));
-    formData.append('section_ids', JSON.stringify(payload.section_ids));
-    if (payload.color) formData.append('color', payload.color);
-    if (payload.preview_text) formData.append('preview_text', payload.preview_text);
-    if (payload.brand_id != null && payload.brand_id > 0) {
-      formData.append('brand_id', String(payload.brand_id));
-    }
-    payload.files.forEach((file) => formData.append('images', file));
-
-    await createProduct(formData);
-    emits('action:close');
-    emits('success');
-  } catch (err) {
-    logError('ADMIN_CREATE_PRODUCT', 'POST', err);
-  } finally {
-  }
-}
 </script>

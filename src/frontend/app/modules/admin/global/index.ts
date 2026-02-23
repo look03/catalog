@@ -1,4 +1,4 @@
-import { getList, getUserData, deleteRow, createSection } from '../api';
+import { getList, getUserData, deleteRow, createSection, createProduct } from '../api';
 import { useAdminStore } from '../stores/adminStore';
 
 export function useAdminModule() {
@@ -11,6 +11,7 @@ export function useAdminModule() {
     getUserData,
     deleteRow,
     createSection,
+    createProduct,
     tableProductsData,
     tableProductsHeaders,
     total,

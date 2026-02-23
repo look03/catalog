@@ -35,5 +35,21 @@ export default {
     parentSectionPlaceholder: 'Без родителя',
     buttonCancel: 'Отмена',
     buttonAddSection: 'Создать раздел'
+  },
+  formProduct: {
+    nameProduct: 'Название товара',
+    nameProductPlaceholder: 'Введите название',
+    price: 'Цена',
+    sections: 'Разделы',
+    sectionsPlaceholder: 'Выберите разделы',
+    color: 'Цвет',
+    colorPlaceholder: '#FFFFFF',
+    brand: 'Бренд',
+    brandPlaceholder: 'Выберите бренд',
+    previewText: 'Краткое описание',
+    previewPlaceholder: 'Необязательно',
+    images: 'Изображения',
+    buttonCancel: 'Отмена',
+    buttonAddProduct: 'Создать товар'
   }
 };
