@@ -39,6 +39,7 @@ const props = withDefaults(
 
 <style scoped lang="scss">
 .ui-button {
+  cursor: pointer;
   &:hover {
     cursor: pointer;
   }

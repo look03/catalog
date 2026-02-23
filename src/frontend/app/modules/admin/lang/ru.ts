@@ -27,5 +27,13 @@ export default {
     clear: 'Очистить',
     search: 'Найти',
     table: 'Таблица'
+  },
+  formSection: {
+    nameSection: 'Название раздела',
+    nameSectionPlaceholder: 'Введите название',
+    parentSection: 'Родительский раздел',
+    parentSectionPlaceholder: 'Без родителя',
+    buttonCancel: 'Отмена',
+    buttonAddSection: 'Создать раздел'
   }
 };

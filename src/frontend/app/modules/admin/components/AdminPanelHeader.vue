@@ -1,7 +1,7 @@
 <template>
   <div class="admin-panel-header">
     <h1 class="admin-panel-header__title">{{ $t('panel.title') }}</h1>
-    <UiButton color="primary" :label="addButtonLabel" @click="emits('action:add')" />
+    <UiButton color="primary" :label="addButtonLabel" @click="emits('action:open-panel')" />
   </div>
 </template>
 
@@ -13,7 +13,7 @@ const props = defineProps<{
 }>();
 
 const emits = defineEmits<{
-  (e: 'action:add'): void;
+  (e: 'action:open-panel'): void;
 }>();
 
 const { t } = useI18n();

@@ -1,18 +1,21 @@
 <template>
   <div class="ui-field">
     <UiFieldLabel v-if="label" :label="label" :required="required" />
-    <USelect v-bind="$attrs" :model-value="modelValue" class="ui-select" v-on="selectListeners" />
+    <UTextarea
+      v-bind="$attrs"
+      :model-value="modelValue"
+      class="ui-textarea"
+      v-on="inputListeners"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Select } from '~/types/ui';
-
-defineOptions({ name: 'UiSelect', inheritAttrs: false });
+defineOptions({ name: 'UiTextarea', inheritAttrs: false });
 
 withDefaults(
   defineProps<{
-    modelValue?: Select;
+    modelValue?: string;
     label?: string;
     required?: boolean;
   }>(),
@@ -20,11 +23,11 @@ withDefaults(
 );
 
 const emits = defineEmits<{
-  (e: 'update:modelValue', value: Select): void;
+  (e: 'update:modelValue', value: string): void;
 }>();
 
-const selectListeners = computed(() => ({
-  'update:modelValue': (v: Select) => emits('update:modelValue', v)
+const inputListeners = computed(() => ({
+  'update:modelValue': (v: string) => emits('update:modelValue', v)
 }));
 </script>
 
@@ -35,7 +38,7 @@ const selectListeners = computed(() => ({
   gap: 0.5rem;
 }
 
-.ui-select {
+.ui-textarea {
   width: 100%;
 }
 </style>

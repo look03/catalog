@@ -92,4 +92,8 @@ export type AdminStore = {
   page: number;
   tableType: TableType;
   filters: AdminFilters;
+  openActionsAside: boolean;
+  loadingForm: boolean;
 } & Sort;
+
+export type PayloadSection = { title: string; parent_section_id?: number };

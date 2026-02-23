@@ -1,6 +1,9 @@
 <template>
   <div class="wg-table-with-filters">
-    <AdminPanelHeader :table-type="adminStore.tableType" @action:add="onAdd" />
+    <AdminPanelHeader
+      :table-type="adminStore.tableType"
+      @action:open-panel="adminStore.setOpenActionsAside(true)"
+    />
     <AdminTableFilter @action:search="onSearch" />
     <AdminTable
       :table-data="tableData"
@@ -23,6 +26,14 @@
       @close="closeDeleteModal"
       @confirm="confirmDelete"
     />
+    <AdminAddAside
+      :open="adminStore.openActionsAside"
+      :table-type="adminStore.tableType"
+      :loading-form="loadingForm"
+      @action:close="adminStore.setOpenActionsAside(false)"
+      @action:save-section="emits('action:save-section', $event)"
+      @success="onSearch"
+    />
   </div>
 </template>
 
@@ -32,15 +43,19 @@ import AdminDeleteModal from '../components/AdminDeleteModal.vue';
 import AdminPanelHeader from '../components/AdminPanelHeader.vue';
 import AdminTableFilter from '../components/AdminTableFilter.vue';
 import { useAdminStore } from '../stores/adminStore';
-import type { CatalogProduct, CatalogSection, Sort } from '~/modules/admin/types';
+import type { CatalogProduct, CatalogSection, PayloadSection, Sort } from '~/modules/admin/types';
+import AdminAddAside from '../components/AdminAddAside.vue';
 
 const emits = defineEmits<{
   (e: 'action:update-data' | 'action:add'): void;
   (e: 'action:delete' | 'action:edit', id: number): void;
+  (e: 'action:save-section', payload: PayloadSection): void;
 }>();
 
 const { t } = useI18n();
 const adminStore = useAdminStore();
+
+const { loadingForm } = storeToRefs(adminStore);
 
 const deleteModalTitle = computed(() =>
   adminStore.tableType === 'products' ? t('delete.product') : t('delete.section')
@@ -61,10 +76,6 @@ const tableHeaders = computed(() =>
 
 const onSearch = () => {
   emits('action:update-data');
-};
-
-const onAdd = () => {
-  emits('action:add');
 };
 
 const openDeleteModal = (row: CatalogProduct | CatalogSection) => {

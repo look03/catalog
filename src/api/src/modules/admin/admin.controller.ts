@@ -62,10 +62,14 @@ export class AdminController {
    */
   @Post('section/')
   @ApiOperation({ summary: 'Создать секцию' })
-  async createSection(@Body() dto: BaseSectionDto): Promise<Sections> {
+  async createSection(
+    @Body() dto: BaseSectionDto,
+    @Query() query: Omit<BasePaginationFilterDto, 'filters'>,
+  ): Promise<Sections> {
     await this.commandBus.execute(new CreateSectionCommand(dto.title, dto.parent_section_id));
 
-    return this.queryBus.execute(new GetSectionsQuery(1, 10, undefined));
+    const { page, limit, sort, order } = query;
+    return this.queryBus.execute(new GetSectionsQuery(page, limit, sort, order, undefined));
   }
 
   /**

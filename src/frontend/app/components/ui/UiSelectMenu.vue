@@ -1,18 +1,23 @@
 <template>
   <div class="ui-field">
     <UiFieldLabel v-if="label" :label="label" :required="required" />
-    <USelect v-bind="$attrs" :model-value="modelValue" class="ui-select" v-on="selectListeners" />
+    <USelectMenu
+      v-bind="$attrs"
+      :model-value="modelValue"
+      class="ui-select-menu"
+      v-on="menuListeners"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Select } from '~/types/ui';
 
-defineOptions({ name: 'UiSelect', inheritAttrs: false });
+defineOptions({ name: 'UiSelectMenu', inheritAttrs: false });
 
 withDefaults(
   defineProps<{
-    modelValue?: Select;
+    modelValue?: Select | Select[];
     label?: string;
     required?: boolean;
   }>(),
@@ -20,11 +25,11 @@ withDefaults(
 );
 
 const emits = defineEmits<{
-  (e: 'update:modelValue', value: Select): void;
+  (e: 'update:modelValue', value: Select | Select[]): void;
 }>();
 
-const selectListeners = computed(() => ({
-  'update:modelValue': (v: Select) => emits('update:modelValue', v)
+const menuListeners = computed(() => ({
+  'update:modelValue': (v: Select | Select[]) => emits('update:modelValue', v)
 }));
 </script>
 
@@ -35,7 +40,7 @@ const selectListeners = computed(() => ({
   gap: 0.5rem;
 }
 
-.ui-select {
+.ui-select-menu {
   width: 100%;
 }
 </style>

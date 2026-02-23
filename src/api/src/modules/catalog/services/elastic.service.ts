@@ -177,6 +177,7 @@ export class ElasticService implements OnModuleInit {
 
   /**
    * Удаляет документ из индекса по id.
+   * Если документа нет, метод завершается без ошибки (идемпотентность).
    * @param id — id документа
    */
   async deleteDocument(id: string): Promise<void> {
@@ -185,6 +186,11 @@ export class ElasticService implements OnModuleInit {
 
       if (!index) {
         throw new InternalServerErrorException('No such index');
+      }
+
+      const exists = await this.client.exists({ index, id });
+      if (!exists) {
+        return;
       }
 
       await this.client.delete({
