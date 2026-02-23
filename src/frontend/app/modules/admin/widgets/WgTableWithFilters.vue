@@ -11,6 +11,7 @@
       :sort="adminStore.sort"
       :order="adminStore.order"
       @action:change-page="changePage"
+      @action:change-limit="changeLimit"
       @action:change-sort="changeSort"
       @action:delete="openDeleteModal"
       @action:edit="onEditRow"
@@ -94,6 +95,11 @@ const changeSort = (payload: Sort): void => {
 
 const changePage = (page: number): void => {
   adminStore.setPage(page);
+  emits('action:update-data');
+};
+
+const changeLimit = (limit: number): void => {
+  adminStore.setLimit(limit);
   emits('action:update-data');
 };
 </script>

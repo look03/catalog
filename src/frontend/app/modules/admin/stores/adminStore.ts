@@ -17,7 +17,7 @@ export const useAdminStore = defineStore('admin-store', {
     tableSectionsData: undefined,
     tableSectionsHeaders: undefined,
     total: 0,
-    limit: 4,
+    limit: 10,
     page: 1,
     order: 'asc',
     sort: 'id',
@@ -41,6 +41,10 @@ export const useAdminStore = defineStore('admin-store', {
     },
     setPage(page: number) {
       this.page = page;
+    },
+    setLimit(limit: number) {
+      this.limit = limit;
+      this.page = 1;
     },
     setSort(payload: Sort) {
       this.sort = payload.sort;

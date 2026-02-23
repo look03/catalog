@@ -1,7 +1,8 @@
 export default {
   auth: {
     login: 'Войти',
-    signIn: 'Вход'
+    signIn: 'Вход',
+    register: 'Регистрация'
   },
   delete: {
     product: 'Удалить товар',

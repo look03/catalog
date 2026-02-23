@@ -100,43 +100,49 @@ const clearFilters = () => {
 </script>
 
 <style scoped lang="scss">
+$border: #e2e8f0;
+
 .admin-table-filter {
   margin-top: 1.5rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 
   &__card {
-    padding: 1.25rem;
-    background: var(--ui-bg, #fff);
-    border: 1px solid var(--ui-border, #e2e8f0);
-    border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    padding: 1.5rem 1.5rem 1.25rem;
+    background: #fff;
+    border: 1px solid $border;
+    border-radius: 6px;
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.04),
+      0 4px 12px rgba(0, 0, 0, 0.05);
   }
 
   &__row {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
-    gap: 1rem;
+    gap: 1.25rem;
   }
 
   &__filters {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid $border;
   }
 
   &__actions {
     justify-content: space-between;
-    padding-top: 0.5rem;
-    border-top: 1px solid var(--ui-border, #e2e8f0);
+    align-items: center;
+    gap: 1rem;
   }
 
   &__submit-group {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
   &__btn-clear {
-    opacity: 0.9;
+    transition: opacity 0.2s ease, background 0.2s ease;
 
     &:hover {
       opacity: 1;
