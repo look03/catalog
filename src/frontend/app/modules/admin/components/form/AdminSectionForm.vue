@@ -1,14 +1,15 @@
 <template>
   <form class="admin-form admin-form--section" @submit.prevent="onSubmit">
+    <UiCheckbox v-if="editIdItem" v-model="sectionForm.active" :label="$t('formSection.active')" />
     <UiInput
-      v-model="form.title"
+      v-model="sectionForm.sectionName"
       :label="$t('formSection.nameSection')"
       required
       :placeholder="$t('formSection.nameSectionPlaceholder')"
       size="md"
     />
     <UiSelect
-      v-model="form.parent_section_id"
+      v-model="sectionForm.parentSectionId"
       :label="$t('formSection.parentSection')"
       :items="parentSectionItems"
       value-key="id"
@@ -20,6 +21,9 @@
 </template>
 
 <script setup lang="ts">
+import { useAdminStore } from '../../stores/adminStore';
+import type { SectionForm } from '~/modules/admin/types';
+
 export type SectionOption = { id: number; name: string };
 
 const props = withDefaults(
@@ -30,13 +34,12 @@ const props = withDefaults(
 );
 
 const emits = defineEmits<{
-  (e: 'submit', payload: { title: string; parent_section_id?: number }): void;
+  (e: 'action:save-section', payload: SectionForm): void;
+  (e: 'action:update-section', id: number, payload: SectionForm): void;
 }>();
 
-const form = ref({
-  title: '',
-  parent_section_id: undefined as number | undefined
-});
+const adminStore = useAdminStore();
+const { sectionForm, editIdItem } = storeToRefs(adminStore);
 
 const parentSectionItems = computed(() => {
   const items = props.sectionItems.map((s) => ({ id: s.id, name: s.name }));
@@ -44,19 +47,31 @@ const parentSectionItems = computed(() => {
 });
 
 const onSubmit = () => {
-  if (!form.value.title?.trim()) {
+  if (!sectionForm.value.sectionName?.trim()) {
     return;
   }
 
-  const parentId = form.value.parent_section_id === 0 ? undefined : form.value.parent_section_id;
-  emits('submit', {
-    title: form.value.title.trim(),
-    parent_section_id: parentId
+  const parentId =
+    sectionForm.value.parentSectionId === 0 ? undefined : sectionForm.value.parentSectionId;
+
+  if (editIdItem.value) {
+    emits('action:update-section', editIdItem.value, {
+      sectionName: sectionForm.value.sectionName.trim(),
+      parentSectionId: parentId,
+      active: sectionForm.value.active ?? undefined
+    });
+    return;
+  }
+
+  emits('action:save-section', {
+    sectionName: sectionForm.value.sectionName.trim(),
+    parentSectionId: parentId,
+    active: sectionForm.value.active ?? true
   });
 };
 
 const reset = () => {
-  form.value = { title: '', parent_section_id: undefined };
+  adminStore.clearSectionForm();
 };
 
 defineExpose({ reset });

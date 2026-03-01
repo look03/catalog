@@ -17,7 +17,9 @@
           size="xs"
           icon="i-lucide-pencil"
           class="admin-table__action-btn"
-          @click="emits('action:edit', (row.original as CatalogProduct | CatalogSection).id)"
+          @click="
+            emits('action:show-edit-form', (row.original as CatalogProduct | CatalogSection).id)
+          "
         />
         <UiButton
           color="neutral"
@@ -73,7 +75,7 @@ import type {
 } from '../types';
 const UButton = resolveComponent('UButton');
 const emits = defineEmits<{
-  (e: 'action:change-page' | 'action:edit' | 'action:change-limit', value: number): void;
+  (e: 'action:change-page' | 'action:show-edit-form' | 'action:change-limit', value: number): void;
   (e: 'action:change-sort', payload: Sort): void;
   (e: 'action:delete', row: CatalogProduct | CatalogSection): void;
 }>();
@@ -103,7 +105,7 @@ const sortedColumn = ref('');
 
 const columns = computed<TableColumn<object, unknown>[]>(() => {
   const headers = Object.entries(props.tableHeaders || {}).map(([key, header]) => {
-    if (['id', 'name', 'createdAt', 'updatedAt'].includes(key)) {
+    if (['id', 'active', 'name', 'createdAt', 'updatedAt'].includes(key)) {
       const isSorted = sortedColumn.value === key;
       return {
         accessorKey: key,

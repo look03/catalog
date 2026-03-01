@@ -24,7 +24,7 @@ export class GetSectionByIdHandler implements IQueryHandler<GetSectionByIdQuery>
       const sectionInfo = await this.repo
         .createQueryBuilder('s')
         .leftJoinAndSelect('s.parent_section', 'ps')
-        .select(['s.title', 'ps.id'])
+        .select(['s.title', 's.active', 'ps.id'])
         .where('s.id = :id', { id: query.id })
         .getOne();
 
@@ -34,7 +34,8 @@ export class GetSectionByIdHandler implements IQueryHandler<GetSectionByIdQuery>
 
       return {
         sectionName: sectionInfo.title,
-        parentSectionId: sectionInfo.parent_section?.id ?? null,
+        parentSectionId: sectionInfo.parent_section?.id ?? undefined,
+        active: sectionInfo.active,
       };
     } catch (error) {
       this.logger.error(error);

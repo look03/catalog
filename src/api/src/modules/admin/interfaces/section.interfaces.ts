@@ -11,11 +11,13 @@ export interface ParentSection {
 
 export interface EditSection {
   sectionName: string;
-  parentSectionId: number | null;
+  parentSectionId: number | undefined;
+  active: boolean;
 }
 
 export interface CatalogSection {
   id: number;
+  active: boolean;
   name: string;
   code: string;
   path: string;
@@ -33,6 +35,7 @@ export interface Sections {
 
 export interface SectionHeaders {
   id: string;
+  active: string;
   name: string;
   code: string;
   path: string;

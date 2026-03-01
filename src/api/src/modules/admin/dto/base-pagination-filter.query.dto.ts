@@ -19,7 +19,7 @@ export class BasePaginationFilterDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(['id', 'name', 'createdAt', 'updatedAt'], {
+  @IsIn(['id', 'active', 'name', 'createdAt', 'updatedAt'], {
     message: 'sortBy must be one of id, name, createdAt, updatedAt',
   })
   @ApiProperty({ example: 'id', description: 'Поле для сортировки' })

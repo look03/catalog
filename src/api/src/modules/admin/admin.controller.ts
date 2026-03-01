@@ -67,10 +67,10 @@ export class AdminController {
     @Body() dto: BaseSectionDto,
     @Query() query: Omit<BasePaginationFilterDto, 'filters'>,
   ): Promise<Sections> {
-    await this.commandBus.execute(new CreateSectionCommand(dto.title, dto.parent_section_id));
+    await this.commandBus.execute(new CreateSectionCommand(dto.sectionName, dto.parentSectionId));
 
     const { page, limit, sort, order } = query;
-    return this.queryBus.execute(new GetSectionsQuery(page, limit, sort, order, undefined));
+    return this.queryBus.execute(new GetSectionsQuery(page, limit, sort, order));
   }
 
   /**
@@ -85,12 +85,14 @@ export class AdminController {
   async updateSection(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: BaseSectionDto,
+    @Query() query: Omit<BasePaginationFilterDto, 'filters'>,
   ): Promise<Sections> {
     await this.commandBus.execute(
-      new UpdateSectionCommand(id, dto.active, dto.title, dto.parent_section_id),
+      new UpdateSectionCommand(id, dto.active, dto.sectionName, dto.parentSectionId),
     );
 
-    return this.queryBus.execute(new GetSectionsQuery(1, 10, undefined));
+    const { page, limit, sort, order } = query;
+    return this.queryBus.execute(new GetSectionsQuery(page, limit, sort, order));
   }
 
   /**

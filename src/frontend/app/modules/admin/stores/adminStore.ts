@@ -7,7 +7,8 @@ import type {
   ProductsResponse,
   SectionsResponse,
   Sort,
-  TableType
+  TableType,
+  SectionForm
 } from '../types';
 
 export const useAdminStore = defineStore('admin-store', {
@@ -24,6 +25,16 @@ export const useAdminStore = defineStore('admin-store', {
     tableType: 'products',
     openActionsAside: false,
     loadingForm: false,
+    editIdItem: undefined,
+    sectionForm: {
+      sectionName: '',
+      parentSectionId: undefined,
+      active: undefined
+    },
+    productForm: {
+      sectionName: '',
+      parentSectionId: undefined as number | undefined
+    },
     filters: {
       name: undefined,
       code: undefined,
@@ -31,8 +42,28 @@ export const useAdminStore = defineStore('admin-store', {
     }
   }),
   actions: {
+    setSectionFormValues(form: SectionForm) {
+      (Object.entries(form) as [keyof SectionForm, SectionForm[keyof SectionForm]][]).forEach(
+        ([field, value]) => {
+          this.setSectionFormValue(field, value);
+        }
+      );
+    },
+    setSectionFormValue<K extends keyof SectionForm>(field: K, value: SectionForm[K]) {
+      this.sectionForm[field] = value;
+    },
+    clearSectionForm() {
+      this.sectionForm.sectionName = '';
+      this.sectionForm.parentSectionId = undefined;
+      this.sectionForm.active = undefined;
+
+      this.editIdItem = undefined;
+    },
     setOpenActionsAside(value: boolean) {
       this.openActionsAside = value;
+    },
+    setEditIdNumber(value: number | undefined) {
+      this.editIdItem = value;
     },
     setProductsData(data: ProductsResponse) {
       this.tableProductsData = (data.items ?? undefined) as CatalogProduct[] | undefined;

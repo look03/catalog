@@ -33,8 +33,10 @@ export default {
     nameSectionPlaceholder: 'Введите название',
     parentSection: 'Родительский раздел',
     parentSectionPlaceholder: 'Без родителя',
+    active: 'Активность раздела',
     buttonCancel: 'Отмена',
-    buttonAddSection: 'Создать раздел'
+    buttonAddSection: 'Создать раздел',
+    buttonUpdateSection: 'Обновить раздел'
   },
   formProduct: {
     nameProduct: 'Название товара',
@@ -50,6 +52,7 @@ export default {
     previewPlaceholder: 'Необязательно',
     images: 'Изображения',
     buttonCancel: 'Отмена',
-    buttonAddProduct: 'Создать товар'
+    buttonAddProduct: 'Создать товар',
+    buttonUpdateProduct: 'Обновить товар'
   }
 };

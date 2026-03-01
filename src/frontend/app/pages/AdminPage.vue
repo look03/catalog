@@ -2,20 +2,18 @@
   <WgTableWithFilters
     @action:update-data="getList"
     @action:delete="deleteRow"
-    @action:edit="onEditRow"
+    @action:show-edit-form="openEditForm"
     @action:save-section="createSection"
+    @action:update-section="updateSection"
     @action:save-product="createProduct"
   />
 </template>
 
 <script setup lang="ts">
-const { getList, deleteRow, createSection, createProduct } = useAdminModule();
+const { getList, deleteRow, createSection, createProduct, openEditForm, updateSection } =
+  useAdminModule();
 
 await getList();
-
-const onEditRow = (id: number) => {
-  console.log(id, '<<<<<<<<<<<<<< 44444444');
-};
 </script>
 
 <style scoped></style>

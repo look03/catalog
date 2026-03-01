@@ -6,6 +6,7 @@ export type SectionForProduct = {
 
 export type CatalogProduct = {
   id: number;
+  active: boolean;
   name: string;
   sections: SectionForProduct[];
   paths: string[];
@@ -17,6 +18,7 @@ export type CatalogProduct = {
 
 export type ProductHeaders = {
   id: string;
+  active: string;
   name: string;
   sections: string;
   paths: string;
@@ -50,6 +52,7 @@ export type ParentSection = {
 
 export type CatalogSection = {
   id: number;
+  active: boolean;
   name: string;
   code: string;
   path: string;
@@ -67,6 +70,7 @@ export type SectionsResponse = {
 
 export type SectionHeaders = {
   id: string;
+  active: string;
   name: string;
   code: string;
   path: string;
@@ -82,6 +86,12 @@ export type AdminFilters = {
   id?: string;
 };
 
+export type SectionForm = {
+  sectionName: string;
+  parentSectionId: number | undefined;
+  active?: boolean;
+};
+
 export type AdminStore = {
   tableProductsData: CatalogProduct[] | undefined;
   tableProductsHeaders: ProductHeaders | undefined;
@@ -94,11 +104,12 @@ export type AdminStore = {
   filters: AdminFilters;
   openActionsAside: boolean;
   loadingForm: boolean;
+  sectionForm: SectionForm;
+  productForm: SectionForm;
+  editIdItem: number | undefined;
 } & Sort;
 
 export type SelectOption = { id: number; name: string };
-
-export type PayloadSection = { title: string; parent_section_id?: number };
 
 export type PayloadProduct = {
   title: string;

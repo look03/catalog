@@ -1,9 +1,6 @@
 <template>
   <div class="wg-table-with-filters">
-    <AdminPanelHeader
-      :table-type="adminStore.tableType"
-      @action:open-panel="adminStore.setOpenActionsAside(true)"
-    />
+    <AdminPanelHeader :table-type="adminStore.tableType" @action:open-panel="setOpenActionsAside" />
     <AdminTableFilter @action:search="onSearch" />
     <AdminTable
       :table-data="tableData"
@@ -17,7 +14,7 @@
       @action:change-limit="changeLimit"
       @action:change-sort="changeSort"
       @action:delete="openDeleteModal"
-      @action:edit="onEditRow"
+      @action:show-edit-form="onEditRow"
     />
     <AdminDeleteModal
       :open="deleteModalOpen"
@@ -30,8 +27,10 @@
       :open="adminStore.openActionsAside"
       :table-type="adminStore.tableType"
       :loading-form="loadingForm"
+      :edit-id-item="editIdItem"
       @action:close="adminStore.setOpenActionsAside(false)"
       @action:save-section="emits('action:save-section', $event)"
+      @action:update-section="updateSection"
       @action:save-product="emits('action:save-product', $event)"
       @success="onSearch"
     />
@@ -48,22 +47,22 @@ import type {
   CatalogProduct,
   CatalogSection,
   PayloadProduct,
-  PayloadSection,
+  SectionForm,
   Sort
 } from '~/modules/admin/types';
-import AdminAddAside from '../components/AdminAddAside.vue';
+import AdminAddAside from '../components/AdminActionsAside.vue';
 
 const emits = defineEmits<{
   (e: 'action:update-data' | 'action:add'): void;
-  (e: 'action:delete' | 'action:edit', id: number): void;
-  (e: 'action:save-section', payload: PayloadSection): void;
+  (e: 'action:delete' | 'action:show-edit-form', id: number): void;
+  (e: 'action:save-section', payload: SectionForm): void;
+  (e: 'action:update-section', id: number, payload: SectionForm): void;
   (e: 'action:save-product', payload: PayloadProduct): void;
 }>();
 
 const { t } = useI18n();
 const adminStore = useAdminStore();
-
-const { loadingForm } = storeToRefs(adminStore);
+const { loadingForm, editIdItem } = storeToRefs(adminStore);
 
 const deleteModalTitle = computed(() =>
   adminStore.tableType === 'products' ? t('delete.product') : t('delete.section')
@@ -75,6 +74,15 @@ const itemToDelete = ref<CatalogProduct | CatalogSection | null>(null);
 const tableData = computed(() =>
   adminStore.tableType === 'products' ? adminStore.tableProductsData : adminStore.tableSectionsData
 );
+
+const setOpenActionsAside = () => {
+  if (adminStore.tableType === 'products') {
+    // adminStore.clearSectionForm();
+  } else {
+    adminStore.clearSectionForm();
+  }
+  adminStore.setOpenActionsAside(true);
+};
 
 const tableHeaders = computed(() =>
   adminStore.tableType === 'products'
@@ -103,8 +111,12 @@ const confirmDelete = () => {
   }
 };
 
+const updateSection = (id: number, payload: SectionForm) => {
+  emits('action:update-section', id, payload);
+};
+
 const onEditRow = (id: number) => {
-  emits('action:edit', id);
+  emits('action:show-edit-form', id);
 };
 
 const changeSort = (payload: Sort): void => {

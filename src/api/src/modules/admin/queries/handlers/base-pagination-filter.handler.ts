@@ -1,8 +1,7 @@
 export abstract class BasePaginationFilterHandler {
-  protected readonly allowedSortColumns = ['id', 'name', 'createdAt', 'updatedAt'];
-
   protected readonly SORT_MAP: Record<string, string> = {
     id: 'p.id',
+    active: 'p.active',
     name: 'p.title',
     updatedAt: 'p.updated_at',
     createdAt: 'p.created_at',
@@ -14,7 +13,7 @@ export abstract class BasePaginationFilterHandler {
    * @returns допустимая колонка
    */
   protected validateSortColumn(sort?: string): string {
-    if (!sort || !this.allowedSortColumns.includes(sort)) {
+    if (!sort || !Object.keys(this.SORT_MAP).includes(sort)) {
       return 'id';
     }
     return sort;

@@ -76,7 +76,7 @@ export class GetProductsHandler
   private async getProductsByIds(ids: string[], sortColumn: string, sortDirection: 'ASC' | 'DESC') {
     return this.repo
       .createQueryBuilder('p')
-      .select(['p.id', 'p.title', 'p.price', 'p.code', 'p.created_at', 'p.updated_at'])
+      .select(['p.id', 'p.active', 'p.title', 'p.price', 'p.code', 'p.created_at', 'p.updated_at'])
       .leftJoinAndSelect('p.productSections', 'productSections')
       .leftJoin('productSections.section', 'section')
       .addSelect(['section.path', 'section.title'])
@@ -106,6 +106,7 @@ export class GetProductsHandler
 
       return {
         id: el.id,
+        active: el.active,
         name: el.title,
         code: el.code,
         price: `${el.price} ₽`,
@@ -124,6 +125,7 @@ export class GetProductsHandler
   getProductsHeaders(): ProductHeaders {
     return {
       id: 'Ид',
+      active: 'Активность',
       name: 'Наименование товара',
       code: 'Код товара',
       price: 'Цена товара',

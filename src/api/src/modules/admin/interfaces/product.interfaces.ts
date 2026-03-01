@@ -13,6 +13,7 @@ export type UpdateImage = {
 
 export interface CatalogProduct {
   id: number;
+  active: boolean;
   name: string;
   sections: SectionForProduct[];
   paths: string[];
@@ -24,6 +25,7 @@ export interface CatalogProduct {
 
 export interface ProductHeaders {
   id: string;
+  active: string;
   name: string;
   sections: string;
   paths: string;

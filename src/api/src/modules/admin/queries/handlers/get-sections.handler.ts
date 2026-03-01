@@ -28,6 +28,7 @@ export class GetSectionsHandler
     return items.map((el) => {
       return {
         id: el.id,
+        active: el.active,
         name: el.title,
         code: el.code,
         parentSectionId: el.parent_section?.id || null,
@@ -47,6 +48,7 @@ export class GetSectionsHandler
   getSectionHeaders(): SectionHeaders {
     return {
       id: 'Ид',
+      active: 'Активность',
       name: 'Наименование раздела',
       code: 'Код раздела',
       path: 'Ссылка раздела',
@@ -91,8 +93,8 @@ export class GetSectionsHandler
   async execute(query: GetSectionsQuery): Promise<Sections> {
     try {
       const { page, limit, sort, order, filters } = query;
-
       const sortBy = this.validateSortColumn(sort);
+
       const sortDirection = this.getSortDirection(order);
       const sortColumn = this.SORT_MAP[sortBy] ?? 'p.id';
       const alias = 'p';
@@ -100,6 +102,7 @@ export class GetSectionsHandler
       qb.leftJoinAndSelect('p.parent_section', 'parent');
       qb.select([
         'p.id',
+        'p.active',
         'p.title',
         'p.code',
         'p.path',
@@ -111,7 +114,6 @@ export class GetSectionsHandler
       ]);
 
       const { where, params } = this.buildWhereParams(alias, filters);
-
       qb.where(where, params);
       qb.orderBy(sortColumn, sortDirection);
       qb.skip((page - 1) * limit).take(limit);

@@ -1,15 +1,8 @@
-import type {
-  PayloadProduct,
-  PayloadSection,
-  ProductsResponse,
-  SectionsResponse,
-  Sort
-} from '../types';
+import type { PayloadProduct, ProductsResponse, SectionForm, SectionsResponse } from '../types';
 import { useAdminStore } from '../stores/adminStore';
 import type { User } from '~/types';
 import { isNotEmptyObject } from '~/utils/object.operations';
 import { useApi } from '~/composables/useApi';
-import { useAuthModule } from '~/modules/auth/global';
 
 export type BrandOption = { id: number; name: string };
 export type SectionOption = { id: number; name: string; parent_section?: { id: number } | null };
@@ -166,7 +159,7 @@ export async function getSectionsForSelect(): Promise<SectionOption[]> {
   }
 }
 
-export async function createSection(payload: PayloadSection): Promise<void> {
+export async function createSection(payload: SectionForm): Promise<void> {
   const adminStore = useAdminStore();
   adminStore.setLoadingForm(true);
   adminStore.setAddElementTableOptions();
@@ -185,8 +178,62 @@ export async function createSection(payload: PayloadSection): Promise<void> {
     );
 
     adminStore.setSectionsData(response);
+    adminStore.clearSectionForm();
   } catch (err) {
     logError('ADMIN_CREATE_SECTION', 'POST', err);
+  } finally {
+    adminStore.resetFormLoading();
+  }
+}
+
+export async function openEditFormSection(
+  id: number,
+  adminStore: ReturnType<typeof useAdminStore>
+): Promise<void> {
+  try {
+    const response = await useApi.get<SectionForm>(`/admin/section/${id}/`, {}, {}, { auth: true });
+
+    adminStore.clearSectionForm();
+    adminStore.setSectionFormValues(response);
+    adminStore.setEditIdNumber(id);
+    adminStore.setOpenActionsAside(true);
+  } catch (error) {
+    logError('ADMIN_GET_SECTION_BY_ID', 'GET', error);
+  }
+}
+
+export async function openEditForm(id: number): Promise<void> {
+  const adminStore = useAdminStore();
+  const { tableType } = storeToRefs(adminStore);
+
+  if (tableType.value === 'products') {
+    // await deleteProduct(id, adminStore);
+  } else {
+    await openEditFormSection(id, adminStore);
+  }
+}
+
+export async function updateSection(id: number, payload: SectionForm): Promise<void> {
+  const adminStore = useAdminStore();
+  adminStore.setLoadingForm(true);
+  try {
+    const response = await useApi.patch<SectionsResponse>(
+      `/admin/section/${id}/`,
+      payload,
+      {
+        sort: adminStore.sort,
+        order: adminStore.order,
+        limit: adminStore.limit,
+        page: adminStore.page
+      },
+      {},
+      { auth: true }
+    );
+
+    adminStore.setSectionsData(response);
+    adminStore.clearSectionForm();
+  } catch (err) {
+    logError('ADMIN_UPDATE_SECTION', 'PATCH', err);
   } finally {
     adminStore.resetFormLoading();
   }

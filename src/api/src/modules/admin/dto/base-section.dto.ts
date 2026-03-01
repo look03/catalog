@@ -5,12 +5,12 @@ export class BaseSectionDto {
   @IsNotEmpty()
   @Length(2, 255)
   @ApiProperty({ example: 'Кружки', description: 'Название секции' })
-  title: string;
+  sectionName: string;
 
   @IsOptional()
   @IsNumber()
   @ApiProperty({ example: '1', description: 'Id родительской секции' })
-  parent_section_id?: number;
+  parentSectionId?: number;
 
   @IsOptional()
   @IsBoolean()

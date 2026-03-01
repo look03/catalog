@@ -5,7 +5,8 @@
         v-if="tableType === 'sections'"
         ref="sectionFormRef"
         :section-items="sectionSelectItems"
-        @submit="emits('action:save-section', $event)"
+        @action:save-section="emits('action:save-section', $event)"
+        @action:update-section="updateSection"
       />
       <AdminProductForm
         v-else
@@ -28,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PayloadProduct, PayloadSection, TableType } from '../types';
+import type { PayloadProduct, SectionForm, TableType } from '../types';
 import AdminSectionForm from '~/modules/admin/components/form/AdminSectionForm.vue';
 import AdminProductForm from '~/modules/admin/components/form/AdminProductForm.vue';
 import AdminFormActions from '~/modules/admin/components/form/AdminFormActions.vue';
@@ -39,16 +40,19 @@ const props = withDefaults(
     open?: boolean;
     tableType: TableType;
     loadingForm?: boolean;
+    editIdItem?: number;
   }>(),
   {
     open: false,
-    loadingForm: false
+    loadingForm: false,
+    editIdItem: undefined
   }
 );
 
 const emits = defineEmits<{
   (e: 'success' | 'action:close'): void;
-  (e: 'action:save-section', payload: PayloadSection): void;
+  (e: 'action:save-section', payload: SectionForm): void;
+  (e: 'action:update-section', id: number, payload: SectionForm): void;
   (e: 'action:save-product', payload: PayloadProduct): void;
 }>();
 
@@ -67,11 +71,17 @@ const asideTitle = computed(() =>
 const footerCancelLabel = computed(() =>
   props.tableType === 'sections' ? t('formSection.buttonCancel') : t('formProduct.buttonCancel')
 );
-const footerSubmitLabel = computed(() =>
-  props.tableType === 'sections'
+const footerSubmitLabel = computed(() => {
+  if (props.editIdItem) {
+    return props.tableType === 'sections'
+      ? t('formSection.buttonUpdateSection')
+      : t('formProduct.buttonUpdateProduct');
+  }
+
+  return props.tableType === 'sections'
     ? t('formSection.buttonAddSection')
-    : t('formProduct.buttonAddProduct')
-);
+    : t('formProduct.buttonAddProduct');
+});
 
 const onFooterSubmit = () => {
   const formEl =
@@ -79,6 +89,10 @@ const onFooterSubmit = () => {
   if (formEl?.requestSubmit) {
     formEl.requestSubmit();
   }
+};
+
+const updateSection = (id: number, payload: SectionForm) => {
+  emits('action:update-section', id, payload);
 };
 
 const sectionSelectItems = computed(() =>
