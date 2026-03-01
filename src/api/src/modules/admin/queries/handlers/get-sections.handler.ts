@@ -67,7 +67,7 @@ export class GetSectionsHandler
    */
   private buildWhereParams(alias: string, filters?: AdminFilters) {
     const conditions: string[] = [];
-    const whereParams: Record<string, string | number> = {};
+    const whereParams: Record<string, string | number | boolean> = {};
     if (filters?.name) {
       conditions.push(`${alias}.title ILIKE :title`);
       whereParams.title = `%${filters.name}%`;
@@ -80,6 +80,11 @@ export class GetSectionsHandler
     if (filters?.id != null) {
       conditions.push(`${alias}.id = :id`);
       whereParams.id = filters.id;
+    }
+
+    if (filters?.active != null) {
+      conditions.push(`${alias}.active = :active`);
+      whereParams.active = filters.active;
     }
 
     return { where: conditions.length ? conditions.join(' AND ') : '1=1', params: whereParams };

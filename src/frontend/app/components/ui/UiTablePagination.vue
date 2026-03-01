@@ -10,6 +10,7 @@
     <template v-else>
       <UTable
         ref="table"
+        :key="`table-limit-${props.limit ?? 10}`"
         :data="props.data"
         :columns="props.columns"
         :pagination-options="paginationOptions"

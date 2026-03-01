@@ -23,6 +23,19 @@
           @action:input="setFilter('id', $event)"
           @action:on-search="onSearch"
         />
+        <div class="admin-table-filter__field">
+          <UiSelect
+            :model-value="props.filters.active ?? undefined"
+            :label="$t('filter.active')"
+            :items="selectActiveItems"
+            value-key="value"
+            label-key="label"
+            :placeholder="$t('filter.placeholderActive')"
+            size="md"
+            class="admin-table-filter__select"
+            @update:model-value="setFilter('active', $event as boolean | undefined)"
+          />
+        </div>
       </div>
       <div class="admin-table-filter__row admin-table-filter__actions">
         <UiSwitcherFilter
@@ -56,16 +69,22 @@
 
 <script setup lang="ts">
 import type { AdminFilters, TableType } from '../types';
-import { useAdminStore } from '../stores/adminStore';
-import { storeToRefs } from 'pinia';
 
 const emits = defineEmits<{
-  (e: 'action:search'): void;
+  (e: 'action:search' | 'input:clear-filters'): void;
+  (e: 'input:table-type', value: TableType): void;
+  (e: 'input:set-filters', field: keyof AdminFilters, value: string | boolean | undefined): void;
 }>();
 
-const adminStore = useAdminStore();
-
-const { filters, tableType } = storeToRefs(adminStore);
+const props = withDefaults(
+  defineProps<{
+    filters: AdminFilters;
+    tableType?: TableType;
+  }>(),
+  {
+    tableType: 'products'
+  }
+);
 
 const tabs = [
   {
@@ -78,15 +97,30 @@ const tabs = [
   }
 ];
 
-const setFilter = (field: keyof AdminFilters, value: string) => {
-  adminStore.setFilters({
-    [field]: value || undefined
-  });
+const selectActiveItems = ref([
+  {
+    label: 'Все',
+    value: undefined
+  },
+  {
+    label: 'Активные',
+    value: 'true'
+  },
+  {
+    label: 'Неактивные',
+    value: 'false'
+  }
+]);
+
+const setFilter = (field: keyof AdminFilters, value: string | boolean | undefined) => {
+  emits('input:set-filters', field, value);
 };
 
 const setTableType = (type: TableType) => {
-  adminStore.setTableType(type);
-  emits('action:search');
+  if (type !== props.tableType) {
+    emits('input:table-type', type);
+    onSearch();
+  }
 };
 
 const onSearch = () => {
@@ -94,8 +128,8 @@ const onSearch = () => {
 };
 
 const clearFilters = () => {
-  adminStore.clearFilters();
-  emits('action:search');
+  emits('input:clear-filters');
+  onSearch();
 };
 </script>
 
@@ -129,6 +163,16 @@ $border: #e2e8f0;
     border-bottom: 1px solid $border;
   }
 
+  &__field {
+    flex: 1;
+    min-width: 140px;
+    max-width: 220px;
+  }
+
+  &__select {
+    width: 100%;
+  }
+
   &__actions {
     justify-content: space-between;
     align-items: center;
@@ -142,7 +186,9 @@ $border: #e2e8f0;
   }
 
   &__btn-clear {
-    transition: opacity 0.2s ease, background 0.2s ease;
+    transition:
+      opacity 0.2s ease,
+      background 0.2s ease;
 
     &:hover {
       opacity: 1;

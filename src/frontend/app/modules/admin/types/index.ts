@@ -84,6 +84,7 @@ export type AdminFilters = {
   name?: string;
   code?: string;
   id?: string;
+  active?: boolean;
 };
 
 export type SectionForm = {

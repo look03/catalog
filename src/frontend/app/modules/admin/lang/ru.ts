@@ -26,7 +26,9 @@ export default {
     placeholderId: 'Поиск по ид',
     clear: 'Очистить',
     search: 'Найти',
-    table: 'Таблица'
+    table: 'Таблица',
+    active: 'Активность',
+    placeholderActive: 'Все'
   },
   formSection: {
     nameSection: 'Название раздела',

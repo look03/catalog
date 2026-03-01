@@ -98,12 +98,14 @@ export const useAdminStore = defineStore('admin-store', {
       this.filters.name = payload.name;
       this.filters.code = payload.code;
       this.filters.id = payload.id;
+      this.filters.active = payload.active;
       this.page = 1;
     },
     clearFilters() {
       this.filters.name = undefined;
       this.filters.code = undefined;
       this.filters.id = undefined;
+      this.filters.active = undefined;
 
       this.page = 1;
     },

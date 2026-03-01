@@ -1,7 +1,14 @@
 <template>
   <div class="wg-table-with-filters">
     <AdminPanelHeader :table-type="adminStore.tableType" @action:open-panel="setOpenActionsAside" />
-    <AdminTableFilter @action:search="onSearch" />
+    <AdminTableFilter
+      :table-type="tableType"
+      :filters="filters"
+      @input:table-type="adminStore.setTableType"
+      @input:set-filters="setFilter"
+      @input:clear-filters="adminStore.clearFilters"
+      @action:search="onSearch"
+    />
     <AdminTable
       :table-data="tableData"
       :total="adminStore.total"
@@ -44,6 +51,7 @@ import AdminPanelHeader from '../components/AdminPanelHeader.vue';
 import AdminTableFilter from '../components/AdminTableFilter.vue';
 import { useAdminStore } from '../stores/adminStore';
 import type {
+  AdminFilters,
   CatalogProduct,
   CatalogSection,
   PayloadProduct,
@@ -62,7 +70,7 @@ const emits = defineEmits<{
 
 const { t } = useI18n();
 const adminStore = useAdminStore();
-const { loadingForm, editIdItem } = storeToRefs(adminStore);
+const { loadingForm, editIdItem, filters, tableType } = storeToRefs(adminStore);
 
 const deleteModalTitle = computed(() =>
   adminStore.tableType === 'products' ? t('delete.product') : t('delete.section')
@@ -74,6 +82,12 @@ const itemToDelete = ref<CatalogProduct | CatalogSection | null>(null);
 const tableData = computed(() =>
   adminStore.tableType === 'products' ? adminStore.tableProductsData : adminStore.tableSectionsData
 );
+
+const setFilter = (field: keyof AdminFilters, value: string | boolean | undefined) => {
+  adminStore.setFilters({
+    [field]: value || undefined
+  });
+};
 
 const setOpenActionsAside = () => {
   if (adminStore.tableType === 'products') {

@@ -1,1 +1,1 @@
-export type Select = string | number | bigint | Record<string, any> | null | undefined;
+export type Select = string | boolean | number | bigint | Record<string, any> | null | undefined;

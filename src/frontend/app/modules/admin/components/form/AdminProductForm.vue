@@ -34,16 +34,17 @@
         size="md"
         maxlength="7"
       />
-      <UiSelect
-        v-model="form.brand_id"
-        :label="$t('formProduct.brand')"
-        :items="brandItems"
-        value-key="id"
-        label-key="name"
-        :placeholder="$t('formProduct.brandPlaceholder')"
-        size="md"
-        class="admin-form__grow"
-      />
+      <div class="admin-form__brand-wrap">
+        <UiSelect
+          v-model="form.brand_id"
+          :label="$t('formProduct.brand')"
+          :items="brandItems"
+          value-key="id"
+          label-key="name"
+          :placeholder="$t('formProduct.brandPlaceholder')"
+          size="md"
+        />
+      </div>
     </div>
     <UiTextarea
       v-model="form.preview_text"
@@ -123,10 +124,21 @@ defineExpose({ reset });
 .admin-form__row {
   display: flex;
   gap: 1rem;
+  align-items: flex-start;
+}
 
-  .admin-form__grow {
-    flex: 1;
-    min-width: 0;
+.admin-form__brand-wrap {
+  flex: 0 0 12rem;
+  width: 12rem;
+  min-width: 12rem;
+
+  :deep(.ui-field),
+  :deep(.ui-select),
+  :deep(button),
+  :deep([role='combobox']) {
+    width: 100% !important;
+    min-width: 100% !important;
+    box-sizing: border-box;
   }
 }
 </style>

@@ -1,4 +1,10 @@
-import type { PayloadProduct, ProductsResponse, SectionForm, SectionsResponse } from '../types';
+import type {
+  AdminFilters,
+  PayloadProduct,
+  ProductsResponse,
+  SectionForm,
+  SectionsResponse
+} from '../types';
 import { useAdminStore } from '../stores/adminStore';
 import type { User } from '~/types';
 import { isNotEmptyObject } from '~/utils/object.operations';
