@@ -107,6 +107,7 @@ const columns = computed<TableColumn<object, unknown>[]>(() => {
   const headers = Object.entries(props.tableHeaders || {}).map(([key, header]) => {
     if (['id', 'active', 'name', 'createdAt', 'updatedAt'].includes(key)) {
       const isSorted = sortedColumn.value === key;
+
       return {
         accessorKey: key,
         header: () => {
@@ -117,11 +118,17 @@ const columns = computed<TableColumn<object, unknown>[]>(() => {
               variant: 'ghost',
               class: 'admin-table__sort-btn',
               onClick: () => {
-                sortedColumn.value = key;
+                if (props.order === 'asc' && sortedColumn.value === key) {
+                  sortedColumn.value = '';
+                  emits('action:change-sort', { sort: 'id' as SortType, order: 'asc' });
+                  return;
+                }
+
                 emits('action:change-sort', {
                   sort: key as SortType,
-                  order: props.order === 'asc' ? 'desc' : 'asc'
+                  order: props.order === 'asc' && !sortedColumn.value ? 'desc' : 'asc'
                 });
+                sortedColumn.value = key;
               }
             },
             {
