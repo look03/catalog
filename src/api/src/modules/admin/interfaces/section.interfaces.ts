@@ -9,6 +9,11 @@ export interface ParentSection {
   path: string | undefined;
 }
 
+export interface EditSection {
+  sectionName: string;
+  parentSectionId: number | null;
+}
+
 export interface CatalogSection {
   id: number;
   name: string;

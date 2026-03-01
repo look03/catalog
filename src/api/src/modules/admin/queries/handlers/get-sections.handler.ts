@@ -8,7 +8,6 @@ import { formatDate } from '../../../../common/utils/date-format.util';
 import { BasePaginationFilterHandler } from './base-pagination-filter.handler';
 import { CatalogSection, SectionHeaders, Sections } from '../../interfaces/section.interfaces';
 import { getDetailsErrorUtil } from '../../../../common/utils/error.utils';
-import { ProductHeaders } from '../../interfaces/product.interfaces';
 import { AdminFilters } from '../../interfaces/products-and-sections.interfaces';
 
 @QueryHandler(GetSectionsQuery)

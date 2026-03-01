@@ -44,6 +44,7 @@ import { UserInfo } from './interfaces/user.interface';
 import { GetUserDataQuery } from './queries/impl/get-user-data.query';
 import { ParseJsonPipe } from '../../common/pipes/parse-json.pipe';
 import { AdminFiltersDto } from './dto/admin-filters.dto';
+import { GetSectionByIdQuery } from './queries/impl/get-section-by-id.query';
 
 @Roles('admin')
 @UseGuards(DecryptJwtGuard, JwtGuard, RolesGuard)
@@ -112,6 +113,17 @@ export class AdminController {
   }
 
   /**
+   * Получить секцию по id
+   * @param id
+   */
+  @Get('section/:id')
+  @ApiOperation({ summary: 'Получить секцию по id' })
+  @ApiParam({ name: 'id', type: Number })
+  async getSectionById(@Param('id', ParseIntPipe) id: number): Promise<Sections> {
+    return this.queryBus.execute(new GetSectionByIdQuery(id));
+  }
+
+  /**
    * Возвращает список секций с пагинацией и фильтрами (name, sort, order).
    * @param query — параметры пагинации и сортировки
    * @returns список секций
@@ -120,7 +132,7 @@ export class AdminController {
   async getSections(
     @Query() query: Omit<BasePaginationFilterDto, 'filters'>,
     @Query('filters', ParseJsonPipe) filters: AdminFiltersDto,
-  ): Promise<Products> {
+  ): Promise<Sections> {
     const { page, limit, sort, order } = query;
     return this.queryBus.execute(new GetSectionsQuery(page, limit, sort, order, filters));
   }

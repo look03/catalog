@@ -4,6 +4,7 @@ import { GetSectionsHandler } from './get-sections.handler';
 import { GetBrandsHandler } from './get-brands.handler';
 import { GetModalSectionsHandler } from './get-modal-sections.handler';
 import { GetUserDataHandler } from './get-user-data.handler';
+import { GetSectionByIdHandler } from './get-section-by-id.handler';
 
 export const queryHandlers = [
   GetCatalogUpdatesHandler,
@@ -12,4 +13,5 @@ export const queryHandlers = [
   GetBrandsHandler,
   GetModalSectionsHandler,
   GetUserDataHandler,
+  GetSectionByIdHandler,
 ];
