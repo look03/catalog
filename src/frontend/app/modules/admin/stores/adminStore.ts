@@ -4,6 +4,8 @@ import type {
   AdminStore,
   CatalogProduct,
   CatalogSection,
+  ProductForm,
+  ProductFormFields,
   ProductsResponse,
   SectionsResponse,
   Sort,
@@ -32,8 +34,15 @@ export const useAdminStore = defineStore('admin-store', {
       active: undefined
     },
     productForm: {
-      sectionName: '',
-      parentSectionId: undefined as number | undefined
+      title: '',
+      price: 0,
+      section_ids: [],
+      color: '',
+      preview_text: '',
+      brand_id: undefined as number | undefined,
+      files: [] as File[],
+      images: [] as { id: number; path: string }[],
+      active: undefined as boolean | undefined
     },
     filters: {
       name: undefined,
@@ -56,7 +65,28 @@ export const useAdminStore = defineStore('admin-store', {
       this.sectionForm.sectionName = '';
       this.sectionForm.parentSectionId = undefined;
       this.sectionForm.active = undefined;
-
+      this.editIdItem = undefined;
+    },
+    setProductFormValues(form: ProductFormFields) {
+      (
+        Object.entries(form) as [keyof ProductFormFields, ProductFormFields[keyof ProductFormFields]][]
+      ).forEach(([field, value]) => {
+        this.setProductFormValue(field, value);
+      });
+    },
+    setProductFormValue<K extends keyof ProductFormFields>(field: K, value: ProductFormFields[K]) {
+      (this.productForm as Record<string, unknown>)[field] = value;
+    },
+    clearProductForm() {
+      this.productForm.title = '';
+      this.productForm.price = 0;
+      this.productForm.section_ids = [];
+      this.productForm.color = '';
+      this.productForm.preview_text = '';
+      this.productForm.brand_id = undefined;
+      this.productForm.files = [];
+      this.productForm.images = [];
+      this.productForm.active = undefined;
       this.editIdItem = undefined;
     },
     setOpenActionsAside(value: boolean) {

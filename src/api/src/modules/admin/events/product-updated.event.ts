@@ -5,5 +5,6 @@ export class ProductUpdatedEvent implements ProductIndexEvent {
   constructor(
     public readonly images: UpdateFiles[] | null | undefined,
     public readonly oldFileDir?: string | null,
+    public readonly filesToDelete?: string[],
   ) {}
 }

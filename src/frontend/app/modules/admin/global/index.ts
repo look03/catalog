@@ -5,7 +5,8 @@ import {
   createSection,
   createProduct,
   openEditForm,
-  updateSection
+  updateSection,
+  updateProduct
 } from '../api';
 import { useAdminStore } from '../stores/adminStore';
 
@@ -22,6 +23,7 @@ export function useAdminModule() {
     createProduct,
     openEditForm,
     updateSection,
+    updateProduct,
     tableProductsData,
     tableProductsHeaders,
     total,

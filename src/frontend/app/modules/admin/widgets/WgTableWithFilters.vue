@@ -39,6 +39,7 @@
       @action:save-section="emits('action:save-section', $event)"
       @action:update-section="updateSection"
       @action:save-product="emits('action:save-product', $event)"
+      @action:update-product="updateProduct"
       @success="onSearch"
     />
   </div>
@@ -54,9 +55,10 @@ import type {
   AdminFilters,
   CatalogProduct,
   CatalogSection,
-  PayloadProduct,
+  ProductForm,
   SectionForm,
-  Sort
+  Sort,
+  UpdateProductPayload
 } from '~/modules/admin/types';
 import AdminAddAside from '../components/AdminActionsAside.vue';
 
@@ -65,7 +67,8 @@ const emits = defineEmits<{
   (e: 'action:delete' | 'action:show-edit-form', id: number): void;
   (e: 'action:save-section', payload: SectionForm): void;
   (e: 'action:update-section', id: number, payload: SectionForm): void;
-  (e: 'action:save-product', payload: PayloadProduct): void;
+  (e: 'action:save-product', payload: ProductForm): void;
+  (e: 'action:update-product', id: number, payload: UpdateProductPayload): void;
 }>();
 
 const { t } = useI18n();
@@ -91,7 +94,7 @@ const setFilter = (field: keyof AdminFilters, value: string | boolean | undefine
 
 const setOpenActionsAside = () => {
   if (adminStore.tableType === 'products') {
-    // adminStore.clearSectionForm();
+    adminStore.clearProductForm();
   } else {
     adminStore.clearSectionForm();
   }
@@ -127,6 +130,10 @@ const confirmDelete = () => {
 
 const updateSection = (id: number, payload: SectionForm) => {
   emits('action:update-section', id, payload);
+};
+
+const updateProduct = (id: number, payload: UpdateProductPayload) => {
+  emits('action:update-product', id, payload);
 };
 
 const onEditRow = (id: number) => {

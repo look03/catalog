@@ -12,12 +12,18 @@ export class ProductChangesSaga {
   constructor(private readonly fileStorage: FileStorageService) {}
 
   /**
-   * Переносит файлы из temp в целевую директорию; при ошибке очищает temp.
-   * @param event — событие с путями к изображениям и старой директорией
+   * Удаляет указанные файлы, переносит новые из temp; при ошибке очищает temp.
+   * @param event — событие с путями к изображениям, старой директорией и файлами для удаления
    * @returns Observable
    */
   private handleFilesAndIndex(event: ProductIndexEvent): Observable<void> {
-    return from(this.fileStorage.moveFromTemp(event.images, event.oldFileDir)).pipe(
+    const run = async (): Promise<void> => {
+      if (event.filesToDelete?.length) {
+        await this.fileStorage.deleteFiles(event.filesToDelete);
+      }
+      await this.fileStorage.moveFromTemp(event.images, event.oldFileDir);
+    };
+    return from(run()).pipe(
       catchError(async (error) => {
         await this.fileStorage.cleanupTemp(event.images);
         throw error;

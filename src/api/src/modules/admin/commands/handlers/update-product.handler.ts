@@ -58,9 +58,18 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
 
         await manager.save(product);
 
+        let removedPaths: string[] = [];
+        if (command.image_ids_to_remove?.length) {
+          removedPaths = await this.productService.removeProductImagesByIds(
+            manager,
+            product.id,
+            command.image_ids_to_remove,
+          );
+        }
+
         let imagesData: UpdateImage | null = null;
         if (command.images?.length) {
-          imagesData = await this.productService.updateProductImages(
+          imagesData = await this.productService.addProductImages(
             product,
             manager,
             command.images,
@@ -68,7 +77,11 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
         }
 
         this.eventBus.publish(
-          new ProductUpdatedEvent(imagesData?.newImages, imagesData?.oldFileDir),
+          new ProductUpdatedEvent(
+            imagesData?.newImages,
+            imagesData?.oldFileDir,
+            removedPaths.length ? removedPaths : undefined,
+          ),
         );
       });
     } catch (error) {

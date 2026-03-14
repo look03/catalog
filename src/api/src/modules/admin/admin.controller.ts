@@ -45,6 +45,8 @@ import { GetUserDataQuery } from './queries/impl/get-user-data.query';
 import { ParseJsonPipe } from '../../common/pipes/parse-json.pipe';
 import { AdminFiltersDto } from './dto/admin-filters.dto';
 import { GetSectionByIdQuery } from './queries/impl/get-section-by-id.query';
+import { GetProductByIdQuery } from './queries/impl/get-product-by-id.query';
+import type { EditProduct } from './interfaces/product.interfaces';
 
 @Roles('admin')
 @UseGuards(DecryptJwtGuard, JwtGuard, RolesGuard)
@@ -196,6 +198,7 @@ export class AdminController {
         dto.preview_text,
         dto.brand_id,
         images,
+        dto.image_ids_to_remove,
       ),
     );
 
@@ -219,6 +222,17 @@ export class AdminController {
 
     const { page, limit, sort, order } = query;
     return this.queryBus.execute(new GetProductsQuery(page, limit, sort, order, filters));
+  }
+
+  /**
+   * Получить товар по id для редактирования (включая изображения).
+   * @param id — id товара
+   */
+  @Get('product/:id')
+  @ApiOperation({ summary: 'Получить товар по id для редактирования' })
+  @ApiParam({ name: 'id', type: Number })
+  async getProductById(@Param('id', ParseIntPipe) id: number): Promise<EditProduct | null> {
+    return this.queryBus.execute(new GetProductByIdQuery(id));
   }
 
   /**

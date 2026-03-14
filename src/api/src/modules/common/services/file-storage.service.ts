@@ -91,6 +91,28 @@ export class FileStorageService {
   }
 
   /**
+   * Удаляет файлы по путям (абсолютным или относительно cwd).
+   * @param filePaths — массив путей к файлам для удаления
+   */
+  async deleteFiles(filePaths: string[]): Promise<void> {
+    if (!filePaths?.length) {
+      return;
+    }
+    try {
+      for (const filePath of filePaths) {
+        const fullPath = path.isAbsolute(filePath) ? filePath : path.resolve(filePath);
+        await fs.unlink(fullPath).catch(() => {});
+      }
+    } catch (error) {
+      throw new InternalServerErrorException({
+        success: false,
+        message: 'Failed to delete files',
+        details: getDetailsErrorUtil(error),
+      });
+    }
+  }
+
+  /**
    * Удаляет временные файлы и пустую temp-директорию (при ошибке после загрузки).
    * @param files — массив путей к временным файлам
    */

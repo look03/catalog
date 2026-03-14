@@ -6,6 +6,8 @@ import { HttpExceptionFilter } from './core/filters/http-exception.filter';
 import { LoggingMiddleware } from './core/middleware/logging.middleware';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import * as path from 'path';
+import express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,6 +29,9 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.use(new LoggingMiddleware().use);
   app.use(cookieParser());
+
+  const uploadsPath = path.join(process.cwd(), 'uploads');
+  app.use('/uploads', express.static(uploadsPath));
 
   if (process.env.NODE_ENV === 'development') {
     app.enableCors({

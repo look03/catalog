@@ -31,6 +31,7 @@ export default {
     placeholderActive: 'Все'
   },
   formSection: {
+    editSection: 'Редактировать раздел',
     nameSection: 'Название раздела',
     nameSectionPlaceholder: 'Введите название',
     parentSection: 'Родительский раздел',
@@ -41,6 +42,8 @@ export default {
     buttonUpdateSection: 'Обновить раздел'
   },
   formProduct: {
+    editProduct: 'Редактировать товар',
+    active: 'Активен',
     nameProduct: 'Название товара',
     nameProductPlaceholder: 'Введите название',
     price: 'Цена',
@@ -53,6 +56,7 @@ export default {
     previewText: 'Краткое описание',
     previewPlaceholder: 'Необязательно',
     images: 'Изображения',
+    existingImages: 'Текущие изображения',
     buttonCancel: 'Отмена',
     buttonAddProduct: 'Создать товар',
     buttonUpdateProduct: 'Обновить товар'

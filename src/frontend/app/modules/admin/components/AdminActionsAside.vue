@@ -13,7 +13,8 @@
         ref="productFormRef"
         :section-items="productSectionItems"
         :brand-items="brandSelectItems"
-        @submit="emits('action:save-product', $event)"
+        @action:save-product="emits('action:save-product', $event)"
+        @action:update-product="updateProduct"
       />
     </template>
     <template #footer>
@@ -29,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import type { PayloadProduct, SectionForm, TableType } from '../types';
+import type { ProductForm, SectionForm, TableType, UpdateProductPayload } from '../types';
 import AdminSectionForm from '~/modules/admin/components/form/AdminSectionForm.vue';
 import AdminProductForm from '~/modules/admin/components/form/AdminProductForm.vue';
 import AdminFormActions from '~/modules/admin/components/form/AdminFormActions.vue';
@@ -53,7 +54,8 @@ const emits = defineEmits<{
   (e: 'success' | 'action:close'): void;
   (e: 'action:save-section', payload: SectionForm): void;
   (e: 'action:update-section', id: number, payload: SectionForm): void;
-  (e: 'action:save-product', payload: PayloadProduct): void;
+  (e: 'action:save-product', payload: ProductForm): void;
+  (e: 'action:update-product', id: number, payload: UpdateProductPayload): void;
 }>();
 
 const sectionFormRef = ref<InstanceType<typeof AdminSectionForm> | null>(null);
@@ -64,9 +66,14 @@ const brandOptions = ref<BrandOption[]>([]);
 
 const { t } = useI18n();
 
-const asideTitle = computed(() =>
-  props.tableType === 'products' ? 'Добавить товар' : 'Добавить раздел'
-);
+const asideTitle = computed(() => {
+  if (props.editIdItem) {
+    return props.tableType === 'products'
+      ? `${t('formProduct.editProduct')} ${props.editIdItem}`
+      : `${t('formSection.editSection')} ${props.editIdItem}`;
+  }
+  return props.tableType === 'products' ? 'Добавить товар' : 'Добавить раздел';
+});
 
 const footerCancelLabel = computed(() =>
   props.tableType === 'sections' ? t('formSection.buttonCancel') : t('formProduct.buttonCancel')
@@ -93,6 +100,10 @@ const onFooterSubmit = () => {
 
 const updateSection = (id: number, payload: SectionForm) => {
   emits('action:update-section', id, payload);
+};
+
+const updateProduct = (id: number, payload: UpdateProductPayload) => {
+  emits('action:update-product', id, payload);
 };
 
 const sectionSelectItems = computed(() =>

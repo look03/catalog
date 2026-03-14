@@ -9,5 +9,6 @@ export class UpdateProductCommand {
     public readonly preview_text?: string,
     public readonly brand_id?: number,
     public readonly images?: Express.Multer.File[],
+    public readonly image_ids_to_remove?: number[],
   ) {}
 }

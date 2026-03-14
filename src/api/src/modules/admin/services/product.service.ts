@@ -106,6 +106,74 @@ export class ProductService {
   }
 
   /**
+   * Удаляет изображения продукта по id и возвращает пути для удаления с диска.
+   * @param manager — менеджер транзакции
+   * @param productId — id продукта
+   * @param ids — массив id изображений для удаления
+   * @returns пути удалённых изображений
+   */
+  async removeProductImagesByIds(
+    manager: EntityManager,
+    productId: number,
+    ids: number[],
+  ): Promise<string[]> {
+    if (!ids?.length) {
+      return [];
+    }
+    const toRemove = await manager.find(ProductImage, {
+      where: { productId, id: In(ids) },
+      select: ['path'],
+    });
+    const paths = toRemove.map((img) => img.path);
+    if (paths.length) {
+      await manager.delete(ProductImage, { productId, id: In(ids) });
+    }
+    return paths;
+  }
+
+  /**
+   * Добавляет новые изображения к продукту (без удаления существующих).
+   * @param product — сущность продукта
+   * @param manager — менеджер транзакции
+   * @param files — загруженные файлы
+   * @returns данные для переноса файлов
+   */
+  async addProductImages(
+    product: Product,
+    manager: EntityManager,
+    files: Express.Multer.File[],
+  ): Promise<UpdateImage> {
+    const relativeTargetDir = this.getRelativeTargetDir(product.id);
+    const images = files.map((file) => {
+      const fullPath = path.join(relativeTargetDir, file.originalname);
+      return {
+        entity: manager.create(ProductImage, {
+          product,
+          filename: file.originalname,
+          path: fullPath,
+        }),
+        destPath: fullPath,
+        name: file.originalname,
+        tmpPath: file.path,
+      };
+    });
+
+    await manager.save(
+      ProductImage,
+      images.map((i) => i.entity),
+    );
+
+    return {
+      newImages: images.map((i) => ({
+        destPath: i.destPath,
+        name: i.name,
+        tmpPath: i.tmpPath,
+      })),
+      oldFileDir: null,
+    };
+  }
+
+  /**
    * Находит секции по id и создаёт связи ProductSection для продукта (в транзакции при переданном manager).
    * @param sectionIds — массив id секций
    * @param product — сущность продукта

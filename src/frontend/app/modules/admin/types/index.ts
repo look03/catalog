@@ -106,13 +106,16 @@ export type AdminStore = {
   openActionsAside: boolean;
   loadingForm: boolean;
   sectionForm: SectionForm;
-  productForm: SectionForm;
+  productForm: ProductForm;
   editIdItem: number | undefined;
 } & Sort;
 
 export type SelectOption = { id: number; name: string };
 
-export type PayloadProduct = {
+/** Элемент изображения: id — для удаления при редактировании, path — URL для отображения */
+export type ProductImageItem = { id: number; path: string };
+
+export type ProductForm = {
   title: string;
   price: number;
   section_ids: number[];
@@ -120,4 +123,15 @@ export type PayloadProduct = {
   preview_text: string;
   brand_id: number | undefined;
   files: File[];
+  images: ProductImageItem[];
+  active?: boolean;
+};
+
+/** Ответ API GET /admin/product/:id (без files) */
+export type ProductFormFields = Omit<ProductForm, 'files'>;
+
+/** Payload для PATCH (files и image_ids_to_remove опциональны) */
+export type UpdateProductPayload = Omit<ProductForm, 'files'> & {
+  files?: File[];
+  image_ids_to_remove?: number[];
 };

@@ -1,14 +1,15 @@
 <template>
   <form class="admin-form admin-form--product" @submit.prevent="onSubmit">
+    <UiCheckbox v-if="editIdItem" v-model="productForm.active" :label="$t('formProduct.active')" />
     <UiInput
-      v-model="form.title"
+      v-model="productForm.title"
       :label="$t('formProduct.nameProduct')"
       required
       :placeholder="$t('formProduct.nameProductPlaceholder')"
       size="md"
     />
     <UiInput
-      v-model.number="form.price"
+      v-model.number="productForm.price"
       :label="$t('formProduct.price')"
       required
       min="0"
@@ -16,10 +17,10 @@
       size="md"
     />
     <UiSelectMenu
-      v-model="form.section_ids"
+      v-model="productForm.section_ids"
       :label="$t('formProduct.sections')"
       required
-      :items="sectionItems"
+      :items="props.sectionItems"
       value-key="id"
       label-key="name"
       multiple
@@ -28,7 +29,7 @@
     />
     <div class="admin-form__row">
       <UiInput
-        v-model="form.color"
+        v-model="productForm.color"
         :label="$t('formProduct.color')"
         :placeholder="$t('formProduct.colorPlaceholder')"
         size="md"
@@ -36,9 +37,9 @@
       />
       <div class="admin-form__brand-wrap">
         <UiSelect
-          v-model="form.brand_id"
+          v-model="productForm.brand_id"
           :label="$t('formProduct.brand')"
-          :items="brandItems"
+          :items="props.brandItems"
           value-key="id"
           label-key="name"
           :placeholder="$t('formProduct.brandPlaceholder')"
@@ -47,18 +48,26 @@
       </div>
     </div>
     <UiTextarea
-      v-model="form.preview_text"
+      v-model="productForm.preview_text"
       :label="$t('formProduct.previewText')"
       :placeholder="$t('formProduct.previewPlaceholder')"
       :rows="3"
       size="md"
     />
-    <UiFileUpload v-model="files" :label="$t('formProduct.images')" />
+    <UiFileUpload
+      v-model="files"
+      :label="$t('formProduct.images')"
+      :existing-items="existingUploadItems"
+      :removable-existing="!!editIdItem"
+      :remove-label="$t('modal.delete')"
+      @remove-existing="removeExistingImage"
+    />
   </form>
 </template>
 
 <script setup lang="ts">
-import type { PayloadProduct, SelectOption } from '~/modules/admin/types';
+import { useAdminStore } from '../../stores/adminStore';
+import type { ProductForm, SelectOption, UpdateProductPayload } from '~/modules/admin/types';
 
 const props = withDefaults(
   defineProps<{
@@ -69,45 +78,70 @@ const props = withDefaults(
 );
 
 const emits = defineEmits<{
-  (e: 'submit', payload: PayloadProduct): void;
+  (e: 'action:save-product', payload: ProductForm): void;
+  (e: 'action:update-product', id: number, payload: UpdateProductPayload): void;
 }>();
 
-const defaultForm = {
-  title: '',
-  price: 0,
-  section_ids: [],
-  color: '',
-  preview_text: '',
-  brand_id: undefined
-};
-
-const form = ref(defaultForm);
+const config = useRuntimeConfig();
+const adminStore = useAdminStore();
+const { productForm, editIdItem } = storeToRefs(adminStore);
 
 const files = ref<File[] | File | null>(null);
+const removedImageIds = ref<number[]>([]);
+
+const displayedImages = computed(() =>
+  (productForm.value.images ?? []).filter((img) => !removedImageIds.value.includes(img.id))
+);
+
+const imageUrl = (path: string) => {
+  const apiBase = (config.public.apiBase as string)?.replace(/\/$/, '') || '';
+  const normalizedPath = path.replace(/^\.\//, '').replace(/\\/g, '/');
+  return `${apiBase}/${normalizedPath}`;
+};
+
+const existingUploadItems = computed(() =>
+  displayedImages.value.map((img) => ({ id: img.id, url: imageUrl(img.path) }))
+);
+
+const removeExistingImage = (id: number) => {
+  removedImageIds.value.push(id);
+};
 
 const onSubmit = () => {
-  if (!form.value.title?.trim() || form.value.section_ids.length === 0) {
+  if (!productForm.value.title?.trim() || productForm.value.section_ids.length === 0) {
     return;
   }
-  if (Number(form.value.price) < 0) {
+  if (Number(productForm.value.price) < 0) {
     return;
   }
 
   const fileList = Array.isArray(files.value) ? files.value : files.value ? [files.value] : [];
-  emits('submit', {
-    title: form.value.title.trim(),
-    price: Number(form.value.price),
-    section_ids: form.value.section_ids,
-    color: form.value.color?.trim() ?? '',
-    preview_text: form.value.preview_text?.trim() ?? '',
-    brand_id: form.value.brand_id,
-    files: fileList
-  });
+  const payload: UpdateProductPayload = {
+    title: productForm.value.title.trim(),
+    price: Number(productForm.value.price),
+    section_ids: productForm.value.section_ids,
+    color: productForm.value.color?.trim() ?? '',
+    preview_text: productForm.value.preview_text?.trim() ?? '',
+    brand_id: productForm.value.brand_id,
+    files: fileList,
+    images: productForm.value.images ?? [],
+    active: editIdItem.value
+      ? (productForm.value.active ?? undefined)
+      : (productForm.value.active ?? true),
+    image_ids_to_remove: editIdItem.value ? removedImageIds.value : undefined
+  };
+
+  if (editIdItem.value) {
+    emits('action:update-product', editIdItem.value, payload);
+  } else {
+    emits('action:save-product', payload as ProductForm);
+  }
 };
 
 const reset = () => {
-  form.value = defaultForm;
+  adminStore.clearProductForm();
   files.value = null;
+  removedImageIds.value = [];
 };
 
 defineExpose({ reset });
