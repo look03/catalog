@@ -181,6 +181,13 @@ const formatsHint = computed(() =>
   pointer-events: none;
 }
 
+/* первый элемент в каждой строке (3 в ряд) — сдвиг выпадающего окна вправо */
+.ui-file-upload__existing-item:nth-child(3n + 1) .ui-file-upload__existing-preview,
+.ui-file-upload__existing-item:first-child .ui-file-upload__existing-preview {
+  left: 0;
+  transform: translateX(2rem);
+}
+
 .ui-file-upload__existing-preview-img {
   display: block;
   max-width: 20rem;
