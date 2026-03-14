@@ -12,6 +12,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { TransformStringToNumberArray } from '../../../common/transforms/string-to-number-array.transformer';
+import { TransformStringToBoolean } from '../../../common/transforms/string-to-boolean.transformer';
 
 export class BaseProductDto {
   @IsString()
@@ -53,6 +54,6 @@ export class BaseProductDto {
 
   @IsOptional()
   @IsBoolean()
-  @ApiProperty({ example: 'true', description: 'Активность' })
+  @Transform(TransformStringToBoolean())
   active?: boolean;
 }

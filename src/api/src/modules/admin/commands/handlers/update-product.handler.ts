@@ -69,11 +69,7 @@ export class UpdateProductHandler implements ICommandHandler<UpdateProductComman
 
         let imagesData: UpdateImage | null = null;
         if (command.images?.length) {
-          imagesData = await this.productService.addProductImages(
-            product,
-            manager,
-            command.images,
-          );
+          imagesData = await this.productService.addProductImages(product, manager, command.images);
         }
 
         this.eventBus.publish(

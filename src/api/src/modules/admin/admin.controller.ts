@@ -186,6 +186,7 @@ export class AdminController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateProductDto,
     @UploadedFiles() images: Express.Multer.File[],
+    @Query() query: Omit<BasePaginationFilterDto, 'filters'>,
   ): Promise<Products> {
     await this.commandBus.execute(
       new UpdateProductCommand(
@@ -201,8 +202,9 @@ export class AdminController {
         dto.image_ids_to_remove,
       ),
     );
+    const { page, limit, sort, order } = query;
 
-    return this.queryBus.execute(new GetProductsQuery(1, 10, undefined));
+    return this.queryBus.execute(new GetProductsQuery(page, limit, sort, order));
   }
 
   /**

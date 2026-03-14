@@ -91,7 +91,30 @@ export class FileStorageService {
   }
 
   /**
+   * Удаляет пустые директории рекурсивно вверх, пока не достигнет uploads/images.
+   * @param dirPath — путь к директории
+   */
+  private async removeEmptyDirsUpToImages(dirPath: string): Promise<void> {
+    const imagesRoot = path.resolve(this.uploadRoot, 'images');
+    let currentDir = path.resolve(dirPath);
+
+    while (currentDir !== imagesRoot && currentDir.startsWith(imagesRoot)) {
+      try {
+        const entries = await fs.readdir(currentDir);
+        if (entries.length > 0) {
+          break;
+        }
+        await fs.rmdir(currentDir);
+        currentDir = path.dirname(currentDir);
+      } catch {
+        break;
+      }
+    }
+  }
+
+  /**
    * Удаляет файлы по путям (абсолютным или относительно cwd).
+   * Если директория осталась пустой, удаляет её из uploads/images.
    * @param filePaths — массив путей к файлам для удаления
    */
   async deleteFiles(filePaths: string[]): Promise<void> {
@@ -99,9 +122,14 @@ export class FileStorageService {
       return;
     }
     try {
+      const affectedDirs = new Set<string>();
       for (const filePath of filePaths) {
         const fullPath = path.isAbsolute(filePath) ? filePath : path.resolve(filePath);
+        affectedDirs.add(path.dirname(fullPath));
         await fs.unlink(fullPath).catch(() => {});
+      }
+      for (const dir of affectedDirs) {
+        await this.removeEmptyDirsUpToImages(dir);
       }
     } catch (error) {
       throw new InternalServerErrorException({
