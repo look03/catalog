@@ -57,8 +57,7 @@ import type {
   CatalogSection,
   ProductForm,
   SectionForm,
-  Sort,
-  UpdateProductPayload
+  Sort
 } from '~/modules/admin/types';
 import AdminAddAside from '../components/AdminActionsAside.vue';
 
@@ -68,7 +67,7 @@ const emits = defineEmits<{
   (e: 'action:save-section', payload: SectionForm): void;
   (e: 'action:update-section', id: number, payload: SectionForm): void;
   (e: 'action:save-product', payload: ProductForm): void;
-  (e: 'action:update-product', id: number, payload: UpdateProductPayload): void;
+  (e: 'action:update-product', id: number, payload: ProductForm): void;
 }>();
 
 const { t } = useI18n();
@@ -132,7 +131,7 @@ const updateSection = (id: number, payload: SectionForm) => {
   emits('action:update-section', id, payload);
 };
 
-const updateProduct = (id: number, payload: UpdateProductPayload) => {
+const updateProduct = (id: number, payload: ProductForm) => {
   emits('action:update-product', id, payload);
 };
 

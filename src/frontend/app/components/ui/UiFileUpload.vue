@@ -27,10 +27,7 @@
             ×
           </button>
           <Transition name="ui-file-upload__preview">
-            <div
-              v-show="hoveredId === item.id"
-              class="ui-file-upload__existing-preview"
-            >
+            <div v-show="hoveredId === item.id" class="ui-file-upload__existing-preview">
               <img
                 :src="item.url"
                 :alt="`Изображение ${item.id}`"
@@ -54,11 +51,7 @@
       <p v-if="formatsHint" class="ui-file-upload__hint">{{ formatsHint }}</p>
       <div v-else class="ui-file-upload__badges">
         <span class="ui-file-upload__badges-label">Форматы:</span>
-        <span
-          v-for="ext in formatList"
-          :key="ext"
-          class="ui-file-upload__badge"
-        >{{ ext }}</span>
+        <span v-for="ext in formatList" :key="ext" class="ui-file-upload__badge">{{ ext }}</span>
       </div>
     </div>
   </div>
@@ -182,7 +175,9 @@ const formatsHint = computed(() =>
   padding: 0.5rem;
   background: #fff;
   border-radius: 0.5rem;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.15),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
   pointer-events: none;
 }
 

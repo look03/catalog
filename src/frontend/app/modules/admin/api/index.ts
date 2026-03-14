@@ -1,11 +1,4 @@
-import type {
-  AdminFilters,
-  ProductForm,
-  ProductFormFields,
-  ProductsResponse,
-  SectionForm,
-  SectionsResponse
-} from '../types';
+import type { ProductForm, ProductsResponse, SectionForm, SectionsResponse } from '../types';
 import { useAdminStore } from '../stores/adminStore';
 import type { User } from '~/types';
 import { isNotEmptyObject } from '~/utils/object.operations';
@@ -214,12 +207,7 @@ export async function openEditFormProduct(
   adminStore: ReturnType<typeof useAdminStore>
 ): Promise<void> {
   try {
-    const response = await useApi.get<ProductFormFields>(
-      `/admin/product/${id}/`,
-      {},
-      {},
-      { auth: true }
-    );
+    const response = await useApi.get<ProductForm>(`/admin/product/${id}/`, {}, {}, { auth: true });
 
     adminStore.clearProductForm();
     adminStore.setProductFormValues(response);
@@ -267,26 +255,38 @@ export async function updateSection(id: number, payload: SectionForm): Promise<v
   }
 }
 
+function buildProductFormData(payload: ProductForm): FormData {
+  const formData = new FormData();
+  formData.append('title', payload.title);
+  formData.append('price', String(payload.price));
+  formData.append('section_ids', JSON.stringify(payload.section_ids));
+  if (payload.color) {
+    formData.append('color', payload.color);
+  }
+  if (payload.preview_text) {
+    formData.append('preview_text', payload.preview_text);
+  }
+  if (payload.brand_id != null && payload.brand_id > 0) {
+    formData.append('brand_id', String(payload.brand_id));
+  }
+  if ('active' in payload && payload.active !== undefined) {
+    formData.append('active', String(payload.active));
+  }
+  if ('image_ids_to_remove' in payload && payload.image_ids_to_remove?.length) {
+    formData.append('image_ids_to_remove', JSON.stringify(payload.image_ids_to_remove));
+  }
+  if (payload.files?.length) {
+    payload.files.forEach((file) => formData.append('images', file));
+  }
+  return formData;
+}
+
 export async function createProduct(payload: ProductForm): Promise<void> {
   const adminStore = useAdminStore();
   adminStore.setLoadingForm(true);
   adminStore.setAddElementTableOptions();
   try {
-    const formData = new FormData();
-    formData.append('title', payload.title);
-    formData.append('price', String(payload.price));
-    formData.append('section_ids', JSON.stringify(payload.section_ids));
-    if (payload.color) {
-      formData.append('color', payload.color);
-    }
-    if (payload.preview_text) {
-      formData.append('preview_text', payload.preview_text);
-    }
-    if (payload.brand_id != null && payload.brand_id > 0) {
-      formData.append('brand_id', String(payload.brand_id));
-    }
-    payload.files.forEach((file) => formData.append('images', file));
-
+    const formData = buildProductFormData(payload);
     const response = await useApi.post<ProductsResponse>(
       '/admin/product/',
       formData,
@@ -309,45 +309,12 @@ export async function createProduct(payload: ProductForm): Promise<void> {
   }
 }
 
-export type UpdateProductPayload = Omit<ProductForm, 'files'> & {
-  files?: File[];
-  image_ids_to_remove?: number[];
-};
-
-export async function updateProduct(
-  id: number,
-  payload: UpdateProductPayload
-): Promise<void> {
+export async function updateProduct(id: number, payload: ProductForm): Promise<void> {
   const adminStore = useAdminStore();
   adminStore.setLoadingForm(true);
   try {
-    const formData = new FormData();
-    formData.append('title', payload.title);
-    formData.append('price', String(payload.price));
-    formData.append('section_ids', JSON.stringify(payload.section_ids));
-    if (payload.color) {
-      formData.append('color', payload.color);
-    }
-    if (payload.preview_text) {
-      formData.append('preview_text', payload.preview_text);
-    }
-    if (payload.brand_id != null && payload.brand_id > 0) {
-      formData.append('brand_id', String(payload.brand_id));
-    }
-    if (payload.active !== undefined) {
-      formData.append('active', String(payload.active));
-    }
-    if (payload.image_ids_to_remove?.length) {
-      formData.append('image_ids_to_remove', JSON.stringify(payload.image_ids_to_remove));
-    }
-    (payload.files ?? []).forEach((file) => formData.append('images', file));
-
-    await useApi.patch<ProductsResponse>(
-      `/admin/product/${id}/`,
-      formData,
-      {},
-      { auth: true }
-    );
+    const formData = buildProductFormData(payload);
+    await useApi.patch<ProductsResponse>(`/admin/product/${id}/`, formData, {}, { auth: true });
 
     adminStore.clearProductForm();
     await getListProducts(adminStore);

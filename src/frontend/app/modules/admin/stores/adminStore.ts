@@ -5,7 +5,6 @@ import type {
   CatalogProduct,
   CatalogSection,
   ProductForm,
-  ProductFormFields,
   ProductsResponse,
   SectionsResponse,
   Sort,
@@ -67,14 +66,14 @@ export const useAdminStore = defineStore('admin-store', {
       this.sectionForm.active = undefined;
       this.editIdItem = undefined;
     },
-    setProductFormValues(form: ProductFormFields) {
-      (
-        Object.entries(form) as [keyof ProductFormFields, ProductFormFields[keyof ProductFormFields]][]
-      ).forEach(([field, value]) => {
-        this.setProductFormValue(field, value);
-      });
+    setProductFormValues(form: ProductForm) {
+      (Object.entries(form) as [keyof ProductForm, ProductForm[keyof ProductForm]][]).forEach(
+        ([field, value]) => {
+          this.setProductFormValue(field, value);
+        }
+      );
     },
-    setProductFormValue<K extends keyof ProductFormFields>(field: K, value: ProductFormFields[K]) {
+    setProductFormValue<K extends keyof ProductForm>(field: K, value: ProductForm[K]) {
       (this.productForm as Record<string, unknown>)[field] = value;
     },
     clearProductForm() {

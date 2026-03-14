@@ -11,8 +11,15 @@
 </template>
 
 <script setup lang="ts">
-const { getList, deleteRow, createSection, createProduct, openEditForm, updateSection, updateProduct } =
-  useAdminModule();
+const {
+  getList,
+  deleteRow,
+  createSection,
+  createProduct,
+  openEditForm,
+  updateSection,
+  updateProduct
+} = useAdminModule();
 
 await getList();
 </script>

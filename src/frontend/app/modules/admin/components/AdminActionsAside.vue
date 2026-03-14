@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ProductForm, SectionForm, TableType, UpdateProductPayload } from '../types';
+import type { ProductForm, SectionForm, TableType } from '../types';
 import AdminSectionForm from '~/modules/admin/components/form/AdminSectionForm.vue';
 import AdminProductForm from '~/modules/admin/components/form/AdminProductForm.vue';
 import AdminFormActions from '~/modules/admin/components/form/AdminFormActions.vue';
@@ -55,7 +55,7 @@ const emits = defineEmits<{
   (e: 'action:save-section', payload: SectionForm): void;
   (e: 'action:update-section', id: number, payload: SectionForm): void;
   (e: 'action:save-product', payload: ProductForm): void;
-  (e: 'action:update-product', id: number, payload: UpdateProductPayload): void;
+  (e: 'action:update-product', id: number, payload: ProductForm): void;
 }>();
 
 const sectionFormRef = ref<InstanceType<typeof AdminSectionForm> | null>(null);
@@ -102,7 +102,7 @@ const updateSection = (id: number, payload: SectionForm) => {
   emits('action:update-section', id, payload);
 };
 
-const updateProduct = (id: number, payload: UpdateProductPayload) => {
+const updateProduct = (id: number, payload: ProductForm) => {
   emits('action:update-product', id, payload);
 };
 

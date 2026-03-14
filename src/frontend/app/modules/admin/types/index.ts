@@ -122,16 +122,8 @@ export type ProductForm = {
   color: string;
   preview_text: string;
   brand_id: number | undefined;
-  files: File[];
+  files?: File[];
   images: ProductImageItem[];
   active?: boolean;
-};
-
-/** Ответ API GET /admin/product/:id (без files) */
-export type ProductFormFields = Omit<ProductForm, 'files'>;
-
-/** Payload для PATCH (files и image_ids_to_remove опциональны) */
-export type UpdateProductPayload = Omit<ProductForm, 'files'> & {
-  files?: File[];
   image_ids_to_remove?: number[];
 };

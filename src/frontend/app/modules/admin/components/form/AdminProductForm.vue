@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 import { useAdminStore } from '../../stores/adminStore';
-import type { ProductForm, SelectOption, UpdateProductPayload } from '~/modules/admin/types';
+import type { ProductForm, SelectOption } from '~/modules/admin/types';
 
 const props = withDefaults(
   defineProps<{
@@ -79,7 +79,7 @@ const props = withDefaults(
 
 const emits = defineEmits<{
   (e: 'action:save-product', payload: ProductForm): void;
-  (e: 'action:update-product', id: number, payload: UpdateProductPayload): void;
+  (e: 'action:update-product', id: number, payload: ProductForm): void;
 }>();
 
 const config = useRuntimeConfig();
@@ -116,7 +116,7 @@ const onSubmit = () => {
   }
 
   const fileList = Array.isArray(files.value) ? files.value : files.value ? [files.value] : [];
-  const payload: UpdateProductPayload = {
+  const payload: ProductForm = {
     title: productForm.value.title.trim(),
     price: Number(productForm.value.price),
     section_ids: productForm.value.section_ids,
