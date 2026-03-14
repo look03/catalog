@@ -1,3 +1,9 @@
+export interface SectionOption {
+  id: number;
+  name: string;
+  level?: number;
+}
+
 export interface SectionForProduct {
   name: string;
   path: string;

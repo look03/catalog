@@ -10,7 +10,6 @@ import {
   UploadedFiles,
   Query,
   Req,
-  ValidationPipe,
   UseGuards,
 } from '@nestjs/common';
 import type { Request } from 'express';
@@ -31,9 +30,10 @@ import { GetProductsQuery } from './queries/impl/get-products.query';
 import { GetSectionsQuery } from './queries/impl/get-sections.query';
 import { GetBrandsQuery } from './queries/impl/get-brands.query';
 import { GetModalSectionQuery } from './queries/impl/get-modal-sections.query';
+import { GetSectionsForSelectQuery } from './queries/impl/get-sections-for-select.query';
 import { BasePaginationFilterDto } from './dto/base-pagination-filter.query.dto';
 import { Products } from './interfaces/product.interfaces';
-import { Sections } from './interfaces/section.interfaces';
+import { Sections, SectionOption } from './interfaces/section.interfaces';
 import { JwtGuard } from '../auth/infrastructure/jwt.guard';
 import { RolesGuard } from '../auth/infrastructure/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -132,6 +132,15 @@ export class AdminController {
    * @param query — параметры пагинации и сортировки
    * @returns список секций
    */
+  /**
+   * Возвращает секции для выпадающих списков в иерархическом виде (без ограничения вложенности).
+   */
+  @Get('sections/options')
+  @ApiOperation({ summary: 'Секции для select (иерархия)' })
+  async getSectionsForSelect(): Promise<SectionOption[]> {
+    return this.queryBus.execute(new GetSectionsForSelectQuery());
+  }
+
   @Get('sections/')
   async getSections(
     @Query() query: Omit<BasePaginationFilterDto, 'filters'>,

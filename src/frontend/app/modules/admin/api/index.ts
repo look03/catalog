@@ -1,11 +1,21 @@
-import type { ProductForm, ProductsResponse, SectionForm, SectionsResponse } from '../types';
+import type {
+  CatalogSection,
+  ProductForm,
+  ProductsResponse,
+  SectionForm,
+  SectionsResponse
+} from '../types';
 import { useAdminStore } from '../stores/adminStore';
 import type { User } from '~/types';
 import { isNotEmptyObject } from '~/utils/object.operations';
 import { useApi } from '~/composables/useApi';
 
 export type BrandOption = { id: number; name: string };
-export type SectionOption = { id: number; name: string; parent_section?: { id: number } | null };
+export type SectionOption = {
+  id: number;
+  name: string;
+  level?: number;
+};
 
 export async function getListProducts(adminStore: ReturnType<typeof useAdminStore>): Promise<void> {
   try {
@@ -145,14 +155,14 @@ export async function getBrands(): Promise<BrandOption[]> {
 
 export async function getSectionsForSelect(): Promise<SectionOption[]> {
   try {
-    const response = await useApi.get<SectionsResponse>(
-      '/admin/sections',
-      { page: 1, limit: 500, order: 'asc', sort: 'id', filters: '{}' },
+    const data = await useApi.get<SectionOption[]>(
+      '/admin/sections/options',
+      {},
       {},
       { auth: true }
     );
-    const items = response?.items ?? [];
-    return items.map((s) => ({ id: s.id, name: s.name, parent_section: null }));
+
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     logError('ADMIN_GET_SECTIONS_FOR_SELECT', 'GET', error);
     return [];

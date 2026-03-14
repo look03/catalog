@@ -42,7 +42,9 @@ const adminStore = useAdminStore();
 const { sectionForm, editIdItem } = storeToRefs(adminStore);
 
 const parentSectionItems = computed(() => {
-  const items = props.sectionItems.map((s) => ({ id: s.id, name: s.name }));
+  const items = props.sectionItems
+    .filter((s) => !editIdItem.value || s.id !== editIdItem.value)
+    .map((s) => ({ id: s.id, name: s.name }));
   return [{ id: 0, name: '— Без родителя' }, ...items];
 });
 
