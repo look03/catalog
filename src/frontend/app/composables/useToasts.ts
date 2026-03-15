@@ -14,7 +14,8 @@ export function useToasts() {
       toast.add({
         title: t(key),
         color: 'error',
-        icon: 'i-lucide-alert-circle'
+        icon: 'i-lucide-alert-circle',
+        duration: 5000
       });
       appStore.clearToastError();
     }
@@ -30,7 +31,8 @@ export function useToasts() {
       toast.add({
         title: t(key),
         color: 'success',
-        icon: 'i-lucide-circle-check'
+        icon: 'i-lucide-circle-check',
+        duration: 2000
       });
       appStore.clearToastSuccess();
     }

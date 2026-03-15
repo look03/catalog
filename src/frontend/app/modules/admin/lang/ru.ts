@@ -2,8 +2,10 @@ export default {
   toast: {
     productAdded: 'Товар добавлен',
     productUpdated: 'Товар обновлён',
+    productDeleted: 'Товар удален',
     sectionAdded: 'Раздел добавлен',
-    sectionUpdated: 'Раздел обновлён'
+    sectionUpdated: 'Раздел обновлён',
+    sectionDeleted: 'Раздел удалён'
   },
   auth: {
     login: 'Войти',

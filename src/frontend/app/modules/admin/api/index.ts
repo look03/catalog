@@ -68,6 +68,7 @@ export async function deleteProduct(
   id: number,
   adminStore: ReturnType<typeof useAdminStore>
 ): Promise<void> {
+  const appStore = useAppStore();
   try {
     const response = await useApi.delete<ProductsResponse>(
       `/admin/product/${id}/`,
@@ -85,6 +86,8 @@ export async function deleteProduct(
     adminStore.setProductsData(response);
   } catch (error) {
     logError('ADMIN_GET_LIST_SECTIONS', 'GET', error);
+  } finally {
+    appStore.setToastSuccess('toast.productDeleted');
   }
 }
 
@@ -92,6 +95,7 @@ export async function deleteSection(
   id: number,
   adminStore: ReturnType<typeof useAdminStore>
 ): Promise<void> {
+  const appStore = useAppStore();
   try {
     const response = await useApi.delete<SectionsResponse>(
       `/admin/section/${id}/`,
@@ -109,6 +113,8 @@ export async function deleteSection(
     adminStore.setSectionsData(response);
   } catch (error) {
     logError('ADMIN_GET_LIST_SECTIONS', 'GET', error);
+  } finally {
+    appStore.setToastSuccess('toast.sectionDeleted');
   }
 }
 
