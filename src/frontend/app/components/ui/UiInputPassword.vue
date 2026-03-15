@@ -1,11 +1,11 @@
 <template>
-  <div class="ui-field">
+  <div class="ui-input-password">
     <UiFieldLabel v-if="label" :label="label" :required="required" />
     <UInput
       v-bind="inputAttrs"
       :type="showPassword ? 'text' : 'password'"
       :model-value="modelValue"
-      class="ui-input ui-input-password"
+      class="ui-input-password__input"
       v-on="inputListeners"
     >
       <template #trailing>
@@ -55,19 +55,19 @@ const inputListeners = computed(() => ({
 </script>
 
 <style scoped lang="scss">
-.ui-field {
+.ui-input-password {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-}
 
-.ui-input-password {
-  width: 100%;
-}
+  &__input {
+    width: 100%;
+  }
 
-.ui-input-password__trailing {
-  display: flex;
-  align-items: center;
-  padding-right: 0.25rem;
+  &__trailing {
+    display: flex;
+    align-items: center;
+    padding-right: 0.25rem;
+  }
 }
 </style>

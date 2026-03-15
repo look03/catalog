@@ -31,7 +31,8 @@ const handleLogin = async () => {
   display: flex;
   flex-direction: column;
 
-  &__form :deep(.ui-field) {
+  &__form :deep(.ui-input),
+  &__form :deep(.ui-input-password) {
     margin-bottom: 1rem;
   }
 
@@ -40,9 +41,13 @@ const handleLogin = async () => {
   }
 
   &__form :deep(.ui-input),
-  &__form input {
+  &__form :deep(.ui-input-password),
+  &__form :deep(input) {
     font-size: 1rem;
-    margin-bottom: 1rem;
+  }
+
+  &__form :deep(input) {
+    border-radius: 4px;
   }
 
   &__form :deep(.ui-input__trailing) {

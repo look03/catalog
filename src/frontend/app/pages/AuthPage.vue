@@ -113,7 +113,6 @@ const tab = ref<'login' | 'register'>('login');
     font-size: 0.9375rem;
     color: #334155;
     background: #fff;
-    border: 1px solid #e2e8f0;
     border-radius: 6px;
     outline: none;
     transition:
