@@ -127,3 +127,14 @@ export type ProductForm = {
   active?: boolean;
   image_ids_to_remove?: number[];
 };
+
+export type BrandOption = {
+  id: number;
+  name: string;
+};
+
+export type SectionOption = {
+  id: number;
+  name: string;
+  parentSectionId?: number | null;
+};

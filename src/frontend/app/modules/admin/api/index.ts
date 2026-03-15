@@ -1,21 +1,15 @@
 import type {
-  CatalogSection,
+  BrandOption,
   ProductForm,
   ProductsResponse,
   SectionForm,
+  SectionOption,
   SectionsResponse
 } from '../types';
 import { useAdminStore } from '../stores/adminStore';
 import type { User } from '~/types';
 import { isNotEmptyObject } from '~/utils/object.operations';
 import { useApi } from '~/composables/useApi';
-
-export type BrandOption = { id: number; name: string };
-export type SectionOption = {
-  id: number;
-  name: string;
-  parentSectionId?: number | null;
-};
 
 export async function getListProducts(adminStore: ReturnType<typeof useAdminStore>): Promise<void> {
   try {

@@ -4,12 +4,6 @@ export interface SectionOption {
   parentSectionId?: number | null;
 }
 
-export interface SectionTreeNode {
-  id: number;
-  label: string;
-  children?: SectionTreeNode[];
-}
-
 export interface SectionForProduct {
   name: string;
   path: string;

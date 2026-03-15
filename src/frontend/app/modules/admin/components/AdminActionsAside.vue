@@ -30,11 +30,11 @@
 </template>
 
 <script setup lang="ts">
-import type { ProductForm, SectionForm, TableType } from '../types';
+import type { ProductForm, SectionForm, TableType, BrandOption, SectionOption } from '../types';
 import AdminSectionForm from '~/modules/admin/components/form/AdminSectionForm.vue';
 import AdminProductForm from '~/modules/admin/components/form/AdminProductForm.vue';
 import AdminFormActions from '~/modules/admin/components/form/AdminFormActions.vue';
-import { getSectionsForSelect, getBrands, type BrandOption, type SectionOption } from '../api';
+import { getSectionsForSelect, getBrands } from '../api';
 
 const props = withDefaults(
   defineProps<{
@@ -105,14 +105,6 @@ const updateSection = (id: number, payload: SectionForm) => {
 const updateProduct = (id: number, payload: ProductForm) => {
   emits('action:update-product', id, payload);
 };
-
-const sectionSelectItems = computed(() =>
-  sectionOptions.value.map((s) => ({ id: s.id, name: s.name }))
-);
-
-const productSectionItems = computed(() =>
-  sectionOptions.value.map((s) => ({ id: s.id, name: s.name }))
-);
 
 const brandSelectItems = computed(() =>
   brandOptions.value.map((b) => ({ id: b.id, name: b.name }))
