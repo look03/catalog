@@ -4,14 +4,14 @@
       <AdminSectionForm
         v-if="tableType === 'sections'"
         ref="sectionFormRef"
-        :section-items="sectionSelectItems"
+        :section-items="sectionOptions"
         @action:save-section="emits('action:save-section', $event)"
         @action:update-section="updateSection"
       />
       <AdminProductForm
         v-else
         ref="productFormRef"
-        :section-items="productSectionItems"
+        :section-items="sectionOptions"
         :brand-items="brandSelectItems"
         @action:save-product="emits('action:save-product', $event)"
         @action:update-product="updateProduct"

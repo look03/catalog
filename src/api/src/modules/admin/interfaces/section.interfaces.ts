@@ -1,7 +1,13 @@
 export interface SectionOption {
   id: number;
-  name: string;
-  level?: number;
+  name?: string;
+  parentSectionId?: number | null;
+}
+
+export interface SectionTreeNode {
+  id: number;
+  label: string;
+  children?: SectionTreeNode[];
 }
 
 export interface SectionForProduct {

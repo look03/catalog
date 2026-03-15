@@ -16,16 +16,14 @@
       step="0.01"
       size="md"
     />
-    <UiSelectMenu
+    <UiSectionTreeSelect
       v-model="productForm.section_ids"
       :label="$t('formProduct.sections')"
       required
-      :items="props.sectionItems"
-      value-key="id"
-      label-key="name"
       multiple
+      :show-no-parent="false"
+      :items="props.sectionItems"
       :placeholder="$t('formProduct.sectionsPlaceholder')"
-      size="md"
     />
     <div class="admin-form__row">
       <UiInput
@@ -67,12 +65,19 @@
 
 <script setup lang="ts">
 import { useAdminStore } from '../../stores/adminStore';
-import type { ProductForm, SelectOption } from '~/modules/admin/types';
+import type { ProductForm } from '~/modules/admin/types';
+
+export type SectionTreeItem = {
+  id: number;
+  name: string;
+  title?: string;
+  parentSectionId?: number | null;
+};
 
 const props = withDefaults(
   defineProps<{
-    sectionItems?: SelectOption[];
-    brandItems?: SelectOption[];
+    sectionItems?: SectionTreeItem[];
+    brandItems?: { id: number; name: string }[];
   }>(),
   { sectionItems: () => [], brandItems: () => [] }
 );

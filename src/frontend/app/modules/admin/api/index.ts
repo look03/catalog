@@ -14,7 +14,7 @@ export type BrandOption = { id: number; name: string };
 export type SectionOption = {
   id: number;
   name: string;
-  level?: number;
+  parentSectionId?: number | null;
 };
 
 export async function getListProducts(adminStore: ReturnType<typeof useAdminStore>): Promise<void> {

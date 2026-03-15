@@ -7,8 +7,8 @@ import { GetSectionsForSelectQuery } from '../impl/get-sections-for-select.query
 import { Section } from '../../entities/section.entity';
 import type { SectionOption } from '../../interfaces/section.interfaces';
 
-const INDENT_PER_LEVEL = 3;
-const CHILD_PREFIX = '-';
+// const INDENT_PER_LEVEL = 3;
+// const CHILD_PREFIX = '└ ';
 
 @QueryHandler(GetSectionsForSelectQuery)
 export class GetSectionsForSelectHandler implements IQueryHandler<GetSectionsForSelectQuery> {
@@ -32,8 +32,13 @@ export class GetSectionsForSelectHandler implements IQueryHandler<GetSectionsFor
     children.sort((a, b) => a.title.localeCompare(b.title));
 
     for (const s of children) {
-      const indent = CHILD_PREFIX.repeat(depth * INDENT_PER_LEVEL);
-      result.push({ id: s.id, name: indent + s.title, level: depth });
+      // const indent = ' '.repeat(depth * INDENT_PER_LEVEL);
+      // const prefix = depth > 0 ? CHILD_PREFIX : '';
+      result.push({
+        id: s.id,
+        name: s.title,
+        parentSectionId: s.parent_section?.id ?? null,
+      });
       result.push(...this.collectHierarchical(sections, s.id, depth + 1));
     }
 

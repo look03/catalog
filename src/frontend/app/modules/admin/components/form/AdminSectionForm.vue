@@ -8,14 +8,12 @@
       :placeholder="$t('formSection.nameSectionPlaceholder')"
       size="md"
     />
-    <UiSelect
-      v-model="sectionForm.parentSectionId"
+    <UiSectionTreeSelect
+      v-model="parentSectionIdModel"
       :label="$t('formSection.parentSection')"
-      :items="parentSectionItems"
-      value-key="id"
-      label-key="name"
+      :items="props.sectionItems"
       :placeholder="$t('formSection.parentSectionPlaceholder')"
-      size="md"
+      :exclude-id="editIdItem ?? undefined"
     />
   </form>
 </template>
@@ -24,11 +22,16 @@
 import { useAdminStore } from '../../stores/adminStore';
 import type { SectionForm } from '~/modules/admin/types';
 
-export type SectionOption = { id: number; name: string };
+export type SectionTreeItem = {
+  id: number;
+  name: string;
+  title?: string;
+  parentSectionId?: number | null;
+};
 
 const props = withDefaults(
   defineProps<{
-    sectionItems?: SectionOption[];
+    sectionItems?: SectionTreeItem[];
   }>(),
   { sectionItems: () => [] }
 );
@@ -41,11 +44,11 @@ const emits = defineEmits<{
 const adminStore = useAdminStore();
 const { sectionForm, editIdItem } = storeToRefs(adminStore);
 
-const parentSectionItems = computed(() => {
-  const items = props.sectionItems
-    .filter((s) => !editIdItem.value || s.id !== editIdItem.value)
-    .map((s) => ({ id: s.id, name: s.name }));
-  return [{ id: 0, name: '— Без родителя' }, ...items];
+const parentSectionIdModel = computed({
+  get: () => sectionForm.value.parentSectionId ?? 0,
+  set: (v: number) => {
+    sectionForm.value.parentSectionId = v === 0 ? undefined : v;
+  }
 });
 
 const onSubmit = () => {
