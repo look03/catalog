@@ -3,19 +3,19 @@
     <h2>{{ $t('auth.signIn') }}</h2>
     <form class="wg-auth__form" @submit.prevent="handleLogin">
       <UiInput
-        v-model="loginEmail"
+        :model-value="loginEmail"
         :label="$t('email')"
         type="email"
         required
         :error="emailError"
-        @update:model-value="onEmailInput"
+        @update:model-value="onEmailUpdate"
       />
       <UiInputPassword
-        v-model="loginPassword"
+        :model-value="loginPassword"
         :label="$t('password')"
         required
         :error="passwordError"
-        @update:model-value="onPasswordInput"
+        @update:model-value="onPasswordUpdate"
       />
       <UiButton type="submit" class="auth-form__submit" :name="$t('auth.login')" />
     </form>
@@ -43,7 +43,7 @@ const wrongCredentialsMessage = computed(() =>
 );
 
 const emailError = computed(() => {
-  if (!submitted.value) {
+  if (!submitted.value && !loginEmail.value) {
     return wrongCredentialsMessage.value;
   }
 
@@ -59,7 +59,7 @@ const emailError = computed(() => {
 });
 
 const passwordError = computed(() => {
-  if (!submitted.value) {
+  if (!submitted.value && !loginPassword.value) {
     return wrongCredentialsMessage.value;
   }
 
@@ -70,13 +70,15 @@ const passwordError = computed(() => {
   return wrongCredentialsMessage.value;
 });
 
-const onEmailInput = () => {
+function onEmailUpdate(value: string | number | undefined) {
+  loginEmail.value = value !== undefined && value !== null ? String(value) : '';
   authStore.clearLoginError();
-};
+}
 
-const onPasswordInput = () => {
+function onPasswordUpdate(value: string | undefined) {
+  loginPassword.value = value ?? '';
   authStore.clearLoginError();
-};
+}
 
 const validate = (): boolean => {
   const trimmed = loginEmail.value.trim();
