@@ -46,9 +46,10 @@ export async function register(email: string, password: string): Promise<void> {
     if (response.userId) {
       await login(email, password);
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logError('AUTH_REGISTER', 'POST', error);
-    authStore.setRegisterError('auth.registerFailed');
+    const status = (error as { statusCode?: number })?.statusCode;
+    authStore.setRegisterError(status === 409 ? 'auth.emailExists' : 'auth.registerFailed');
   }
 }
 

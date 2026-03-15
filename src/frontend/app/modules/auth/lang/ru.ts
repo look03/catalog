@@ -11,6 +11,7 @@ export default {
     passwordComplex: 'Пароль должен содержать буквы и цифры',
     confirmRequired: 'Подтвердите пароль',
     passwordsNotMatch: 'Пароли не совпадают',
-    registerFailed: 'Не удалось создать профиль'
+    registerFailed: 'Не удалось создать профиль',
+    emailExists: 'Пользователь с такой почтой уже существует'
   }
 };

@@ -42,9 +42,11 @@ const { register } = useAuthModule();
 const authStore = useAuthStore();
 const { registerError: storeRegisterError } = storeToRefs(authStore);
 
-const registerError = computed(() =>
-  storeRegisterError?.value ? t(storeRegisterError.value) : undefined
-);
+const registerError = computed(() => {
+  const key = storeRegisterError?.value;
+  if (!key || key === 'auth.emailExists') return undefined;
+  return t(key);
+});
 
 const registerEmail = ref('');
 const registerPassword = ref('');
@@ -57,18 +59,18 @@ const PASSWORD_HAS_LETTER = /[a-zA-Z]/;
 const PASSWORD_HAS_DIGIT = /\d/;
 
 const emailError = computed(() => {
+  if (storeRegisterError?.value === 'auth.emailExists') {
+    return t('auth.emailExists');
+  }
   if (!submitted.value && !registerEmail.value) {
     return undefined;
   }
-
   if (!registerEmail.value.trim()) {
     return t('auth.emailRequired');
   }
-
   if (!EMAIL_REGEX.test(registerEmail.value.trim())) {
     return t('auth.emailInvalid');
   }
-
   return undefined;
 });
 
