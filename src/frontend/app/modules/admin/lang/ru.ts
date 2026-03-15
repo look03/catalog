@@ -1,4 +1,10 @@
 export default {
+  toast: {
+    productAdded: 'Товар добавлен',
+    productUpdated: 'Товар обновлён',
+    sectionAdded: 'Раздел добавлен',
+    sectionUpdated: 'Раздел обновлён'
+  },
   auth: {
     login: 'Войти',
     signIn: 'Вход',

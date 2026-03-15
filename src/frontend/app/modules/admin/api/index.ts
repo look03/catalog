@@ -165,6 +165,7 @@ export async function getSectionsForSelect(): Promise<SectionOption[]> {
 
 export async function createSection(payload: SectionForm): Promise<void> {
   const adminStore = useAdminStore();
+  const appStore = useAppStore();
   adminStore.setLoadingForm(true);
   adminStore.setAddElementTableOptions();
   try {
@@ -187,6 +188,7 @@ export async function createSection(payload: SectionForm): Promise<void> {
     logError('ADMIN_CREATE_SECTION', 'POST', err);
   } finally {
     adminStore.resetFormLoading();
+    appStore.setToastSuccess('toast.sectionAdded');
   }
 }
 
@@ -235,6 +237,7 @@ export async function openEditForm(id: number): Promise<void> {
 
 export async function updateSection(id: number, payload: SectionForm): Promise<void> {
   const adminStore = useAdminStore();
+  const appStore = useAppStore();
   adminStore.setLoadingForm(true);
   try {
     const response = await useApi.patch<SectionsResponse>(
@@ -256,6 +259,7 @@ export async function updateSection(id: number, payload: SectionForm): Promise<v
     logError('ADMIN_UPDATE_SECTION', 'PATCH', err);
   } finally {
     adminStore.resetFormLoading();
+    appStore.setToastSuccess('toast.sectionUpdated');
   }
 }
 
@@ -287,6 +291,7 @@ function buildProductFormData(payload: ProductForm): FormData {
 
 export async function createProduct(payload: ProductForm): Promise<void> {
   const adminStore = useAdminStore();
+  const appStore = useAppStore();
   adminStore.setLoadingForm(true);
   adminStore.setAddElementTableOptions();
   try {
@@ -310,11 +315,13 @@ export async function createProduct(payload: ProductForm): Promise<void> {
     logError('ADMIN_CREATE_PRODUCT', 'POST', err);
   } finally {
     adminStore.resetFormLoading();
+    appStore.setToastSuccess('toast.productAdded');
   }
 }
 
 export async function updateProduct(id: number, payload: ProductForm): Promise<void> {
   const adminStore = useAdminStore();
+  const appStore = useAppStore();
   adminStore.setLoadingForm(true);
   try {
     const formData = buildProductFormData(payload);
@@ -326,5 +333,6 @@ export async function updateProduct(id: number, payload: ProductForm): Promise<v
     logError('ADMIN_UPDATE_PRODUCT', 'PATCH', err);
   } finally {
     adminStore.resetFormLoading();
+    appStore.setToastSuccess('toast.productUpdated');
   }
 }

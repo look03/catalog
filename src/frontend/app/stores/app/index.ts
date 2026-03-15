@@ -7,7 +7,8 @@ export const useAppStore = defineStore('app-store', {
     user: {
       email: undefined
     },
-    toastError: undefined
+    toastError: undefined,
+    toastSuccess: undefined
   }),
   actions: {
     setUserData(userData: User) {
@@ -18,6 +19,12 @@ export const useAppStore = defineStore('app-store', {
     },
     clearToastError() {
       this.toastError = undefined;
+    },
+    setToastSuccess(i18nKey: string) {
+      this.toastSuccess = i18nKey;
+    },
+    clearToastSuccess() {
+      this.toastSuccess = undefined;
     }
   }
 });

@@ -2,7 +2,7 @@
  * Глобальные тосты при ошибках (регистрация, API, любой экран).
  * Вызвать один раз в корне приложения (app.vue), затем использовать show() где угодно.
  */
-export function useErrorToast() {
+export function useToasts() {
   const { t } = useI18n();
   const toast = useToast();
   const appStore = useAppStore();
@@ -10,10 +10,7 @@ export function useErrorToast() {
   watch(
     () => appStore.toastError,
     (key) => {
-      if (!key) {
-        return;
-      }
-
+      if (!key) return;
       toast.add({
         title: t(key),
         color: 'error',
@@ -23,7 +20,24 @@ export function useErrorToast() {
     }
   );
 
+  watch(
+    () => appStore.toastSuccess,
+    (key) => {
+      if (!key) {
+        return;
+      }
+
+      toast.add({
+        title: t(key),
+        color: 'success',
+        icon: 'i-lucide-circle-check'
+      });
+      appStore.clearToastSuccess();
+    }
+  );
+
   return {
-    show: (i18nKey: string) => appStore.setToastError(i18nKey)
+    show: (i18nKey: string) => appStore.setToastError(i18nKey),
+    showSuccess: (i18nKey: string) => appStore.setToastSuccess(i18nKey)
   };
 }

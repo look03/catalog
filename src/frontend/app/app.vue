@@ -7,6 +7,6 @@
 </template>
 
 <script setup lang="ts">
-useErrorToast();
+useToasts();
 </script>
 <style scoped></style>
