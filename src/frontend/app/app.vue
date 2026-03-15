@@ -6,5 +6,7 @@
   </UApp>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+useErrorToast();
+</script>
 <style scoped></style>

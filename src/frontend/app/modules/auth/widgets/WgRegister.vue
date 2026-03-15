@@ -24,9 +24,6 @@
         :error="confirmError"
         @update:model-value="onConfirmUpdate"
       />
-      <p v-if="registerError" class="wg-register__error" role="alert">
-        {{ registerError }}
-      </p>
       <UiButton type="submit" class="register-form__submit" :name="$t('register.toRegister')" />
     </form>
   </div>
@@ -41,12 +38,6 @@ const { t } = useI18n();
 const { register } = useAuthModule();
 const authStore = useAuthStore();
 const { registerError: storeRegisterError } = storeToRefs(authStore);
-
-const registerError = computed(() => {
-  const key = storeRegisterError?.value;
-  if (!key || key === 'auth.emailExists') return undefined;
-  return t(key);
-});
 
 const registerEmail = ref('');
 const registerPassword = ref('');
@@ -152,13 +143,6 @@ const handleRegister = async () => {
   &__form :deep(.ui-input),
   &__form :deep(.ui-input-password) {
     margin-bottom: 1rem;
-  }
-
-  &__error {
-    margin: 0 0 1rem;
-    font-size: 0.875rem;
-    line-height: 1.25;
-    color: var(--ui-error, #dc2626);
   }
 
   &__form :deep(.ui-field-label) {

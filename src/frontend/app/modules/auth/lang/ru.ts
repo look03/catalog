@@ -12,6 +12,7 @@ export default {
     confirmRequired: 'Подтвердите пароль',
     passwordsNotMatch: 'Пароли не совпадают',
     registerFailed: 'Не удалось создать профиль',
-    emailExists: 'Пользователь с такой почтой уже существует'
+    emailExists: 'Пользователь с такой почтой уже существует',
+    serverError: 'Произошла ошибка. Попробуйте позже.'
   }
 };

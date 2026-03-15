@@ -3,7 +3,7 @@ import { LoginCommand } from '../impl/login.command';
 import { UserService } from '../../services/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { RefreshTokenService } from '../../services/refresh-token.service';
-import { InternalServerErrorException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { Tokens } from '../../types/auth.types';
 import { randomUUID } from 'crypto';
 import { JwtTokenService } from '../../services/jwt-token.service';
@@ -29,15 +29,16 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
     const user = await this.userService.findByEmail(command.email);
 
     if (!user) {
-      throw new InternalServerErrorException('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
+
     const isPasswordValid = await this.userService.validatePassword(
       user.passwordHash,
       command.password,
     );
 
     if (!isPasswordValid) {
-      throw new InternalServerErrorException('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const sessionId = randomUUID();

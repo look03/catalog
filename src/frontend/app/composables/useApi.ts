@@ -88,6 +88,10 @@ const handleApiError = async <T>(
     });
   }
 
+  if (status !== 404 && status !== 409) {
+    useAppStore().setToastError('auth.serverError');
+  }
+
   logError('USE_API', String(error));
 
   throw error;
@@ -128,6 +132,10 @@ const request = async <T>(
     return response.data;
   } catch (error: unknown) {
     if (retryCount <= 0 || !apiOptions.auth) {
+      const status = (error as FetchError)?.statusCode ?? (error as FetchError)?.response?.status;
+      if (status !== 404 && status !== 409 && status !== 401) {
+        useAppStore().setToastError('auth.serverError');
+      }
       throw error;
     }
 

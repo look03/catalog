@@ -23,7 +23,10 @@ export async function login(email: string, password: string): Promise<void> {
     }
   } catch (error) {
     logError('AUTH_LOGIN', 'POST', error);
-    authStore.setLoginError('auth.wrongCredentials');
+    const status = (error as { statusCode?: number })?.statusCode;
+    if (status === 401) {
+      authStore.setLoginError('auth.wrongCredentials');
+    }
   }
 }
 

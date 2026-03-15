@@ -6,11 +6,18 @@ export const useAppStore = defineStore('app-store', {
   state: (): AppState => ({
     user: {
       email: undefined
-    }
+    },
+    toastError: undefined
   }),
   actions: {
     setUserData(userData: User) {
       this.user = userData;
+    },
+    setToastError(i18nKey: string) {
+      this.toastError = i18nKey;
+    },
+    clearToastError() {
+      this.toastError = undefined;
     }
   }
 });
