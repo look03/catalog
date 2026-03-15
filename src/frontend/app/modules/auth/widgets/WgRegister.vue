@@ -1,5 +1,5 @@
 <template>
-  <div class="form-wrapper">
+  <div class="wg-register">
     <h2>{{ $t('register.register') }}</h2>
     <form @submit.prevent="handleRegister">
       <label>
@@ -39,7 +39,7 @@ const handleRegister = async () => {
 </script>
 
 <style scoped lang="scss">
-.form-wrapper {
+.wg-register {
   display: flex;
   flex-direction: column;
 }

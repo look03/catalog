@@ -1,11 +1,13 @@
 <template>
-  <div class="ui-field">
+  <div class="ui-input">
     <UiFieldLabel v-if="label" :label="label" :required="required" />
     <UInput v-bind="$attrs" :model-value="modelValue" class="ui-input" v-on="inputListeners">
       <template #trailing>
-        <button v-if="modelValue" type="button" class="ui-input-filter__clear" @click="clear">
-          <span class="ui-input-filter__clear-icon" aria-hidden="true">×</span>
-        </button>
+        <span v-if="modelValue" class="ui-input__trailing">
+          <button type="button" class="ui-input__clear" aria-label="Очистить" @click="clear">
+            <span class="ui-input__clear-icon" aria-hidden="true">×</span>
+          </button>
+        </span>
       </template>
     </UInput>
   </div>
@@ -37,7 +39,7 @@ const clear = () => {
 </script>
 
 <style scoped lang="scss">
-.ui-field {
+.ui-input {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -45,5 +47,38 @@ const clear = () => {
 
 .ui-input {
   width: 100%;
+}
+
+.ui-input__trailing {
+  display: flex;
+  align-items: center;
+}
+
+.ui-input__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0 -0.25rem 0 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.ui-input__clear:hover {
+  color: #64748b;
+  background: #f1f5f9;
+}
+
+.ui-input__clear-icon {
+  font-size: 1.125rem;
+  line-height: 1;
 }
 </style>

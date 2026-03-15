@@ -1,16 +1,10 @@
 <template>
-  <div class="form-wrapper">
+  <div class="wg-auth">
     <h2>{{ $t('auth.signIn') }}</h2>
-    <form @submit.prevent="handleLogin">
-      <label>
-        {{ $t('email') }}
-        <input v-model="loginEmail" type="email" required />
-      </label>
-      <label>
-        {{ $t('password') }}
-        <input v-model="loginPassword" type="password" required />
-      </label>
-      <button type="submit">{{ $t('auth.login') }}</button>
+    <form class="wg-auth__form" @submit.prevent="handleLogin">
+      <UiInput v-model="loginEmail" :label="$t('email')" type="email" required />
+      <UiInputPassword v-model="loginPassword" :label="$t('password')" required />
+      <UiButton type="submit" class="auth-form__submit" :name="$t('auth.login')" />
     </form>
   </div>
 </template>
@@ -33,35 +27,51 @@ const handleLogin = async () => {
 </script>
 
 <style scoped lang="scss">
-.form-wrapper {
+.wg-auth {
   display: flex;
   flex-direction: column;
-}
 
-form label {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-  font-weight: 600;
-}
+  &__form :deep(.ui-field) {
+    margin-bottom: 1rem;
+  }
 
-input {
-  padding: 0.5rem;
-  font-size: 1rem;
-  margin-top: 0.25rem;
-}
+  &__form :deep(.ui-field-label) {
+    font-weight: 600;
+  }
 
-button[type='submit'] {
-  padding: 0.5rem;
-  background-color: #0070f3;
-  border: none;
-  color: white;
-  font-weight: 700;
-  cursor: pointer;
-  border-radius: 4px;
-}
+  &__form :deep(.ui-input),
+  &__form input {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
 
-button[type='submit']:hover {
-  background-color: #005bb5;
+  &__form :deep(.ui-input__trailing) {
+    padding-right: 0;
+  }
+
+  &__form :deep(.ui-input__clear) {
+    margin: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0.25rem;
+  }
+
+  &__form :deep(.ui-input__clear-icon) {
+    font-size: 1.25rem;
+  }
+
+  &__form :deep(.auth-form__submit) {
+    padding: 0.5rem;
+    background-color: #0070f3;
+    border: none;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  &__form :deep(.auth-form__submit:hover) {
+    background-color: #005bb5;
+  }
 }
 </style>

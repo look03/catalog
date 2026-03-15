@@ -67,7 +67,9 @@ const tab = ref<'login' | 'register'>('login');
   background: #fff;
   border: none;
   cursor: pointer;
-  transition: color 0.2s ease, background 0.2s ease;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
 
   &:hover:not(.auth-card__tab--active) {
     color: #334155;
@@ -89,7 +91,8 @@ const tab = ref<'login' | 'register'>('login');
   padding: 1.75rem 1.5rem;
 }
 
-.auth-card__content :deep(.form-wrapper) {
+.auth-card__content :deep(.wg-auth),
+.auth-card__content :deep(.wg-register) {
   h2 {
     margin: 0 0 1.25rem;
     font-size: 1.125rem;
@@ -99,7 +102,6 @@ const tab = ref<'login' | 'register'>('login');
   }
 
   label {
-    margin-bottom: 1rem;
     font-size: 0.875rem;
     font-weight: 600;
     color: #475569;
@@ -114,7 +116,9 @@ const tab = ref<'login' | 'register'>('login');
     border: 1px solid #e2e8f0;
     border-radius: 6px;
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
 
     &::placeholder {
       color: #94a3b8;
@@ -141,7 +145,9 @@ const tab = ref<'login' | 'register'>('login');
     border-radius: 6px;
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    transition: opacity 0.2s ease, box-shadow 0.2s ease;
+    transition:
+      opacity 0.2s ease,
+      box-shadow 0.2s ease;
 
     &:hover {
       opacity: 0.92;
