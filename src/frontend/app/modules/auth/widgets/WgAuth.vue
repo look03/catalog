@@ -7,28 +7,91 @@
         :label="$t('email')"
         type="email"
         required
-        :error="`Неправильный логин или пароль`"
+        :error="emailError"
+        @update:model-value="onEmailInput"
       />
-      <UiInputPassword v-model="loginPassword" :label="$t('password')" required />
+      <UiInputPassword
+        v-model="loginPassword"
+        :label="$t('password')"
+        required
+        :error="passwordError"
+        @update:model-value="onPasswordInput"
+      />
       <UiButton type="submit" class="auth-form__submit" :name="$t('auth.login')" />
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useAuthStore } from '../stores/authStore';
 
+const { t } = useI18n();
 const { login } = useAuthModule();
+const authStore = useAuthStore();
+const { loginError } = storeToRefs(authStore);
 
 const loginEmail = ref('');
 const loginPassword = ref('');
+const submitted = ref(false);
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const wrongCredentialsMessage = computed(() =>
+  loginError?.value ? t('auth.wrongCredentials') : undefined
+);
+
+const emailError = computed(() => {
+  if (!submitted.value) {
+    return wrongCredentialsMessage.value;
+  }
+
+  if (!loginEmail.value.trim()) {
+    return t('auth.emailRequired');
+  }
+
+  if (!EMAIL_REGEX.test(loginEmail.value.trim())) {
+    return t('auth.emailInvalid');
+  }
+
+  return wrongCredentialsMessage.value;
+});
+
+const passwordError = computed(() => {
+  if (!submitted.value) {
+    return wrongCredentialsMessage.value;
+  }
+
+  if (!loginPassword.value) {
+    return t('auth.passwordRequired');
+  }
+
+  return wrongCredentialsMessage.value;
+});
+
+const onEmailInput = () => {
+  authStore.clearLoginError();
+};
+
+const onPasswordInput = () => {
+  authStore.clearLoginError();
+};
+
+const validate = (): boolean => {
+  const trimmed = loginEmail.value.trim();
+  const emailValid = !!trimmed && EMAIL_REGEX.test(trimmed);
+  const passwordValid = !!loginPassword.value;
+  return emailValid && passwordValid;
+};
 
 const handleLogin = async () => {
-  if (!loginEmail.value && !loginPassword.value) {
+  submitted.value = true;
+  if (!validate()) {
     return;
   }
 
-  await login(loginEmail.value, loginPassword.value);
+  await login(loginEmail.value.trim(), loginPassword.value);
 };
 </script>
 

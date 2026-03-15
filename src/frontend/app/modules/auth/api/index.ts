@@ -7,8 +7,9 @@ import { useAuthStore } from '../stores/authStore';
  * @param password
  */
 export async function login(email: string, password: string): Promise<void> {
+  const authStore = useAuthStore();
+  authStore.clearLoginError();
   try {
-    const authStore = useAuthStore();
     const response = await useApi.post<LoginResponse>(
       '/auth/login',
       { email, password },
@@ -22,6 +23,7 @@ export async function login(email: string, password: string): Promise<void> {
     }
   } catch (error) {
     logError('AUTH_LOGIN', 'POST', error);
+    authStore.setLoginError('auth.wrongCredentials');
   }
 }
 

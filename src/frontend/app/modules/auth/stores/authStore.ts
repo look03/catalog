@@ -3,7 +3,8 @@ import type { AuthStore } from '../types';
 
 export const useAuthStore = defineStore('auth-store', {
   state: (): AuthStore => ({
-    accessToken: undefined
+    accessToken: undefined,
+    loginError: undefined
   }),
   actions: {
     setAccessToken(accessToken: string) {
@@ -11,6 +12,12 @@ export const useAuthStore = defineStore('auth-store', {
     },
     clearUserInfo() {
       this.accessToken = undefined;
+    },
+    setLoginError(message: string) {
+      this.loginError = message;
+    },
+    clearLoginError() {
+      this.loginError = undefined;
     }
   }
 });
