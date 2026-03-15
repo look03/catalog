@@ -33,6 +33,8 @@ export async function login(email: string, password: string): Promise<void> {
  * @param password
  */
 export async function register(email: string, password: string): Promise<void> {
+  const authStore = useAuthStore();
+  authStore.clearRegisterError();
   try {
     const response = await useApi.post<RegisterResponse>(
       '/auth/register',
@@ -46,6 +48,7 @@ export async function register(email: string, password: string): Promise<void> {
     }
   } catch (error) {
     logError('AUTH_REGISTER', 'POST', error);
+    authStore.setRegisterError('auth.registerFailed');
   }
 }
 

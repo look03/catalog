@@ -2,34 +2,143 @@
   <div class="wg-register">
     <h2>{{ $t('register.register') }}</h2>
     <form class="wg-register__form" @submit.prevent="handleRegister">
-      <UiInput v-model="registerEmail" :label="$t('email')" type="email" required />
-      <UiInputPassword v-model="registerPassword" :label="$t('password')" required />
+      <UiInput
+        :model-value="registerEmail"
+        :label="$t('email')"
+        type="email"
+        required
+        :error="emailError"
+        @update:model-value="onEmailUpdate"
+      />
       <UiInputPassword
-        v-model="registerPasswordConfirm"
+        :model-value="registerPassword"
+        :label="$t('password')"
+        required
+        :error="passwordError"
+        @update:model-value="onPasswordUpdate"
+      />
+      <UiInputPassword
+        :model-value="registerPasswordConfirm"
         :label="$t('register.confirmPassword')"
         required
+        :error="confirmError"
+        @update:model-value="onConfirmUpdate"
       />
+      <p v-if="registerError" class="wg-register__error" role="alert">
+        {{ registerError }}
+      </p>
       <UiButton type="submit" class="register-form__submit" :name="$t('register.toRegister')" />
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useAuthStore } from '../stores/authStore';
 
+const { t } = useI18n();
 const { register } = useAuthModule();
+const authStore = useAuthStore();
+const { registerError: storeRegisterError } = storeToRefs(authStore);
+
+const registerError = computed(() =>
+  storeRegisterError?.value ? t(storeRegisterError.value) : undefined
+);
 
 const registerEmail = ref('');
 const registerPassword = ref('');
 const registerPasswordConfirm = ref('');
+const submitted = ref(false);
 
-const handleRegister = async () => {
-  if (registerPassword.value !== registerPasswordConfirm.value) {
-    alert('Пароли не совпадают');
-    return;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PASSWORD_LENGTH = 8;
+const PASSWORD_HAS_LETTER = /[a-zA-Z]/;
+const PASSWORD_HAS_DIGIT = /\d/;
+
+const emailError = computed(() => {
+  if (!submitted.value && !registerEmail.value) {
+    return undefined;
   }
 
-  await register(registerEmail.value, registerPassword.value);
+  if (!registerEmail.value.trim()) {
+    return t('auth.emailRequired');
+  }
+
+  if (!EMAIL_REGEX.test(registerEmail.value.trim())) {
+    return t('auth.emailInvalid');
+  }
+
+  return undefined;
+});
+
+const passwordError = computed(() => {
+  if (!submitted.value && !registerPassword.value) {
+    return undefined;
+  }
+
+  if (!registerPassword.value) {
+    return t('auth.passwordRequired');
+  }
+  if (registerPassword.value.length < MIN_PASSWORD_LENGTH) {
+    return t('auth.passwordMinLength');
+  }
+  if (
+    !PASSWORD_HAS_LETTER.test(registerPassword.value) ||
+    !PASSWORD_HAS_DIGIT.test(registerPassword.value)
+  ) {
+    return t('auth.passwordComplex');
+  }
+
+  return undefined;
+});
+
+const confirmError = computed(() => {
+  if (!submitted.value && !registerPasswordConfirm.value) {
+    return undefined;
+  }
+  if (!registerPasswordConfirm.value) {
+    return t('auth.confirmRequired');
+  }
+  if (registerPassword.value !== registerPasswordConfirm.value) {
+    return t('auth.passwordsNotMatch');
+  }
+
+  return undefined;
+});
+
+const onEmailUpdate = (value: string | number | undefined) => {
+  registerEmail.value = value !== undefined && value !== null ? String(value) : '';
+  authStore.clearRegisterError();
+};
+
+const onPasswordUpdate = (value: string | undefined) => {
+  registerPassword.value = value ?? '';
+  authStore.clearRegisterError();
+};
+
+const onConfirmUpdate = (value: string | undefined) => {
+  registerPasswordConfirm.value = value ?? '';
+  authStore.clearRegisterError();
+};
+
+const validate = (): boolean => {
+  const trimmed = registerEmail.value.trim();
+  const emailValid = !!trimmed && EMAIL_REGEX.test(trimmed);
+  const pwd = registerPassword.value;
+  const passwordValid =
+    pwd.length >= MIN_PASSWORD_LENGTH &&
+    PASSWORD_HAS_LETTER.test(pwd) &&
+    PASSWORD_HAS_DIGIT.test(pwd);
+  const confirmValid = pwd === registerPasswordConfirm.value && !!registerPasswordConfirm.value;
+  return emailValid && passwordValid && confirmValid;
+};
+
+const handleRegister = async () => {
+  submitted.value = true;
+  if (!validate()) return;
+
+  await register(registerEmail.value.trim(), registerPassword.value);
 };
 </script>
 
@@ -41,6 +150,13 @@ const handleRegister = async () => {
   &__form :deep(.ui-input),
   &__form :deep(.ui-input-password) {
     margin-bottom: 1rem;
+  }
+
+  &__error {
+    margin: 0 0 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25;
+    color: var(--ui-error, #dc2626);
   }
 
   &__form :deep(.ui-field-label) {
