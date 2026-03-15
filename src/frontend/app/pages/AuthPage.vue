@@ -108,7 +108,6 @@ const tab = ref<'login' | 'register'>('login');
   }
 
   input {
-    margin-top: 0.35rem;
     padding: 0.65rem 0.75rem;
     font-size: 0.9375rem;
     color: #334155;

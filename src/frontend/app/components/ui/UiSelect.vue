@@ -1,7 +1,7 @@
 <template>
-  <div class="ui-field">
-    <UiFieldLabel v-if="label" :label="label" :required="required" />
-    <USelect v-bind="$attrs" :model-value="modelValue" class="ui-select" v-on="selectListeners" />
+  <div class="ui-select">
+    <UiFieldLabel v-if="label" :label="label" class="ui-select__label" :required="required" />
+    <USelect v-bind="$attrs" :model-value="modelValue" v-on="selectListeners" />
   </div>
 </template>
 
@@ -29,13 +29,16 @@ const selectListeners = computed(() => ({
 </script>
 
 <style scoped lang="scss">
-.ui-field {
+.ui-select {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-}
 
-.ui-select {
-  width: 100%;
+  &__select {
+    width: 100%;
+  }
+
+  &__label {
+    margin-bottom: 8px;
+  }
 }
 </style>

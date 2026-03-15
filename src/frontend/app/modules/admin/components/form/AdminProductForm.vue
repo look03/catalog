@@ -15,6 +15,7 @@
       min="0"
       step="0.01"
       size="md"
+      :error="`Обязательное поле`"
     />
     <UiSectionTreeSelect
       v-model="productForm.section_ids"

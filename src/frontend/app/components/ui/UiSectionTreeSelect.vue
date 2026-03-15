@@ -1,9 +1,15 @@
 <template>
-  <div class="ui-field">
-    <UiFieldLabel v-if="label" :label="label" :required="required" />
+  <div class="ui-section-tree-select">
+    <UiFieldLabel
+      v-if="label"
+      :label="label"
+      class="ui-section-tree-select__label"
+      :required="required"
+    />
     <UPopover
       v-model:open="isOpen"
       mode="click"
+      class="ui-section-tree-select__select"
       :dismissible="false"
       :content="{ align: 'start' }"
       :ui="{ content: 'w-[var(--reka-popper-anchor-width)]' }"
@@ -27,13 +33,7 @@
           />
         </div>
         <div v-if="props.multiple" class="mt-2 pt-2 border-t border-default">
-          <UButton
-            variant="soft"
-            block
-            size="sm"
-            label="Готово"
-            @click="isOpen = false"
-          />
+          <UButton variant="soft" block size="sm" label="Готово" @click="isOpen = false" />
         </div>
       </template>
     </UPopover>
@@ -123,8 +123,7 @@ function buildTree(
 ): TreeItemWithId[] {
   const filtered = items.filter(
     (s) =>
-      (s.parentSectionId ?? null) === parentId &&
-      (excludeId === undefined || s.id !== excludeId)
+      (s.parentSectionId ?? null) === parentId && (excludeId === undefined || s.id !== excludeId)
   );
   filtered.sort((a, b) => (a.title ?? a.name).localeCompare(b.title ?? b.name));
 
@@ -155,9 +154,7 @@ function buildTree(
 function handleSelect(id: number) {
   if (props.multiple) {
     const current = (props.modelValue as number[]) ?? [];
-    const next = current.includes(id)
-      ? current.filter((x) => x !== id)
-      : [...current, id];
+    const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
     emit('update:modelValue', next);
   } else {
     emit('update:modelValue', id);
@@ -212,9 +209,12 @@ watch(
 </script>
 
 <style scoped lang="scss">
-.ui-field {
+.ui-section-tree-select {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+
+  &__label {
+    margin-bottom: 8px;
+  }
 }
 </style>

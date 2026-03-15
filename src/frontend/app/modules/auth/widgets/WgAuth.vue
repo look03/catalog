@@ -2,7 +2,13 @@
   <div class="wg-auth">
     <h2>{{ $t('auth.signIn') }}</h2>
     <form class="wg-auth__form" @submit.prevent="handleLogin">
-      <UiInput v-model="loginEmail" :label="$t('email')" type="email" required />
+      <UiInput
+        v-model="loginEmail"
+        :label="$t('email')"
+        type="email"
+        required
+        :error="`Неправильный логин или пароль`"
+      />
       <UiInputPassword v-model="loginPassword" :label="$t('password')" required />
       <UiButton type="submit" class="auth-form__submit" :name="$t('auth.login')" />
     </form>

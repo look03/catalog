@@ -1,7 +1,13 @@
 <template>
-  <div class="ui-input">
+  <div class="ui-input" :class="{ 'ui-input--error': error }">
     <UiFieldLabel v-if="label" :label="label" :required="required" />
-    <UInput v-bind="$attrs" :model-value="modelValue" class="ui-input__input" v-on="inputListeners">
+    <UInput
+      v-bind="$attrs"
+      :model-value="modelValue"
+      :error="!!error"
+      class="ui-input__input"
+      v-on="inputListeners"
+    >
       <template #trailing>
         <span v-if="modelValue" class="ui-input__trailing">
           <button type="button" class="ui-input__clear" aria-label="Очистить" @click="clear">
@@ -10,6 +16,11 @@
         </span>
       </template>
     </UInput>
+    <Transition name="ui-input-error">
+      <p v-if="error" class="ui-input__error" role="alert">
+        {{ error }}
+      </p>
+    </Transition>
   </div>
 </template>
 
@@ -21,8 +32,9 @@ withDefaults(
     modelValue?: string | number;
     label?: string;
     required?: boolean;
+    error?: string;
   }>(),
-  { modelValue: undefined, label: undefined, required: false }
+  { modelValue: undefined, label: undefined, required: false, error: undefined }
 );
 
 const emits = defineEmits<{
@@ -42,9 +54,15 @@ const clear = () => {
 .ui-input {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+
+  &--error :deep(input) {
+    border-color: var(--ui-error, #dc2626);
+    outline-color: var(--ui-error, #dc2626);
+  }
+
   &__input {
     width: 100%;
+    margin-top: 8px;
   }
 
   &__trailing {
@@ -79,5 +97,25 @@ const clear = () => {
     font-size: 1.125rem;
     line-height: 1;
   }
+
+  &__error {
+    margin: 4px 4px 0;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--ui-error, #dc2626);
+  }
+}
+
+.ui-input-error-enter-active,
+.ui-input-error-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.ui-input-error-enter-from,
+.ui-input-error-leave-to {
+  opacity: 0;
+  transform: translateY(-0.25rem);
 }
 </style>
