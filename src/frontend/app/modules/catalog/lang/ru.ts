@@ -10,5 +10,24 @@ export default {
     toRegister: 'Зарегистрироваться'
   },
   email: 'Email:',
-  password: 'Пароль:'
+  password: 'Пароль:',
+  catalogNav: {
+    brandName: 'Магазин',
+    tagline: 'Удобные покупки онлайн',
+    burgerLabel: 'Открыть меню разделов',
+    sectionsTitle: 'Разделы',
+    allCatalog: 'Весь каталог',
+    login: 'Войти',
+    emptySectionsHint: 'Разделы скоро появятся — пока загляните в общий каталог ниже.'
+  },
+  catalogFooter: {
+    aboutTitle: 'О магазине',
+    aboutText: 'Мы собираем актуальный ассортимент и помогаем быстро найти нужное в каталоге.',
+    buyersTitle: 'Покупателям',
+    linkCatalog: 'Каталог',
+    linkDelivery: 'Доставка и оплата',
+    contactsTitle: 'Контакты',
+    emailLabel: 'Email для связи',
+    copyright: '© {year} Магазин. Все права защищены.'
+  }
 };

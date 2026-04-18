@@ -1,20 +1,27 @@
 <template>
-  <div>
-    <header>
-      <nav>
-        <h1>Каталddddог</h1>
-      </nav>
-    </header>
-
-    <main>
+  <div class="catalog-layout">
+    <WgCatalogSiteHeader />
+    <main class="catalog-layout__main">
       <NuxtPage />
     </main>
-
-    <footer>
-      <p>© 2026 Моя компания</p>
-    </footer>
+    <WgCatalogSiteFooter />
   </div>
 </template>
-<script setup lang="ts"></script>
 
-<style scoped></style>
+<script setup lang="ts">
+defineOptions({ name: 'CatalogLayout' });
+</script>
+
+<style scoped lang="scss">
+.catalog-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+
+  &__main {
+    flex: 1;
+    width: 100%;
+  }
+}
+</style>

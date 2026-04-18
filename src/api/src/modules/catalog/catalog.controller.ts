@@ -5,9 +5,11 @@ import { QueryBus } from '@nestjs/cqrs';
 import { GetPageByUrlQuery } from './queries/impl/get-page-by-url.query';
 import { GetSectionPageQuery } from './queries/impl/get-section-page.query';
 import { GetProductPageQuery } from './queries/impl/get-product-page.query';
+import { GetRootSectionsQuery } from './queries/impl/get-root-sections.query';
 import { ParseJsonPipe } from '../../common/pipes/parse-json.pipe';
 import { CatalogFiltersDto } from './dto/catalog-filters.dto';
 import { SearchProducts, SearchSections } from './types/document.types';
+import type { CatalogRootSectionNav } from './queries/handlers/get-root-sections.handler';
 
 @ApiTags('search')
 @Controller('catalog/')
@@ -43,5 +45,14 @@ export class CatalogController {
     }
 
     return this.queryBus.execute(new GetProductPageQuery(query.url));
+  }
+
+  /**
+   * Корневые разделы каталога для навигации (меню витрины).
+   */
+  @Get('sections/root')
+  @ApiOperation({ summary: 'Корневые разделы каталога (навигация)' })
+  async getRootSections(): Promise<{ items: CatalogRootSectionNav[] }> {
+    return await this.queryBus.execute(new GetRootSectionsQuery());
   }
 }

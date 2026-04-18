@@ -5,3 +5,5 @@ export type AuthStore = {
 export type LoginResponse = {
   accessToken?: string;
 };
+
+export type { CatalogNavSection } from './navigation';

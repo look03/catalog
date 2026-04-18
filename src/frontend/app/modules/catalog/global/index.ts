@@ -1,10 +1,8 @@
-import { getCatalogData } from '../api';
+import { getCatalogData, getCatalogRootSections } from '../api';
 
 export function useCatalogModule() {
-  // const authStore = useAuthStore();
-  // const { accessToken } = storeToRefs(authStore);
-
   return {
-    getCatalogData
+    getCatalogData,
+    getCatalogRootSections
   };
 }
