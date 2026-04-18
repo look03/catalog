@@ -65,6 +65,28 @@ export class SectionService {
     return rows.map((r) => Number(r.id));
   }
 
+  /** Порядок удаления: от листьев к корню (глубина по убыванию), чтобы не оставлять потомков с SET NULL. */
+  async getSubtreeSectionIdsDepthDesc(manager: EntityManager, rootId: number): Promise<number[]> {
+    const raw: unknown = await manager.query(
+      `
+      WITH RECURSIVE subtree AS (
+        SELECT id, parent_section_id, 0 AS depth
+        FROM sections
+        WHERE id = $1
+        UNION ALL
+        SELECT s.id, s.parent_section_id, t.depth + 1
+        FROM sections s
+        INNER JOIN subtree t ON s.parent_section_id = t.id
+      )
+      SELECT id FROM subtree ORDER BY depth DESC
+      `,
+      [rootId],
+    );
+    const rows = raw as SectionIdRow[];
+
+    return rows.map((r) => Number(r.id));
+  }
+
   /**
    * Каскад active только вниз от переданной секции (она сама + все потомки).
    * Родительские разделы не меняются.
