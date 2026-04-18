@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 import { Section } from '../entities/section.entity';
+import { Product } from '../entities/product.entity';
+
+type SectionIdRow = { id: string | number };
 
 @Injectable()
 export class SectionService {
@@ -35,5 +38,66 @@ export class SectionService {
     if (code) {
       section.path = `${parentSection.path}${code}/`;
     }
+  }
+
+  async getAllChildrenIds(manager: EntityManager, sectionId: number): Promise<number[]> {
+    const raw: unknown = await manager.query(
+      `
+    WITH RECURSIVE tree AS (
+      -- старт: текущая секция
+      SELECT id
+      FROM sections
+      WHERE id = $1
+
+      UNION ALL
+
+      -- рекурсивно ищем детей
+      SELECT s.id
+      FROM sections s
+      INNER JOIN tree t ON s.parent_section_id = t.id
+    )
+    SELECT id FROM tree
+    `,
+      [sectionId],
+    );
+    const rows = raw as SectionIdRow[];
+
+    return rows.map((r) => Number(r.id));
+  }
+
+  /**
+   * Каскад active только вниз от переданной секции (она сама + все потомки).
+   * Родительские разделы не меняются.
+   * Товары обновляются, если привязаны хотя бы к одной секции из этого поддерева.
+   */
+  async updateSectionActivityTree(
+    manager: EntityManager,
+    sectionId: number,
+    isActive: boolean,
+  ): Promise<void> {
+    const subtreeSectionIds = await this.getAllChildrenIds(manager, sectionId);
+
+    await manager
+      .createQueryBuilder()
+      .update(Section)
+      .set({ active: isActive })
+      .whereInIds(subtreeSectionIds)
+      .execute();
+
+    await manager
+      .createQueryBuilder()
+      .update(Product)
+      .set({ active: isActive })
+      .where(
+        `
+        id IN (
+          SELECT ps.product_id
+          FROM product_sections ps
+          WHERE ps.section_id IN (:...ids)
+        )
+      `,
+        { ids: subtreeSectionIds },
+      )
+      .execute();
   }
 }
