@@ -41,6 +41,8 @@ export default {
   formSection: {
     editSection: 'Редактировать раздел',
     nameSection: 'Название раздела',
+    nameSectionRequired: 'Укажите название раздела',
+    nameSectionMinLength: 'Название должно содержать не менее 3 символов',
     nameSectionPlaceholder: 'Введите название',
     parentSection: 'Родительский раздел',
     parentSectionPlaceholder: 'Без родителя',

@@ -2,11 +2,13 @@
   <form class="admin-form admin-form--section" @submit.prevent="onSubmit">
     <UiCheckbox v-if="editIdItem" v-model="sectionForm.active" :label="$t('formSection.active')" />
     <UiInput
-      v-model="sectionForm.sectionName"
+      :model-value="sectionForm.sectionName"
       :label="$t('formSection.nameSection')"
       required
       :placeholder="$t('formSection.nameSectionPlaceholder')"
       size="md"
+      :error="sectionNameError"
+      @update:model-value="onSectionNameUpdate"
     />
     <UiSectionTreeSelect
       v-model="parentSectionIdModel"
@@ -41,8 +43,34 @@ const emits = defineEmits<{
   (e: 'action:update-section', id: number, payload: SectionForm): void;
 }>();
 
+const { t } = useI18n();
 const adminStore = useAdminStore();
 const { sectionForm, editIdItem } = storeToRefs(adminStore);
+
+const submitted = ref(false);
+const MIN_SECTION_NAME_LENGTH = 3;
+
+const sectionNameError = computed(() => {
+  const name = sectionForm.value.sectionName ?? '';
+  const trimmed = name.trim();
+  if (!submitted.value && !trimmed) {
+    return undefined;
+  }
+
+  if (!trimmed) {
+    return t('formSection.nameSectionRequired');
+  }
+
+  if (trimmed.length < MIN_SECTION_NAME_LENGTH) {
+    return t('formSection.nameSectionMinLength');
+  }
+
+  return undefined;
+});
+
+const onSectionNameUpdate = (value: string | number | undefined) => {
+  sectionForm.value.sectionName = value !== undefined && value !== null ? String(value) : '';
+};
 
 const parentSectionIdModel = computed({
   get: () => sectionForm.value.parentSectionId ?? 0,
@@ -51,8 +79,14 @@ const parentSectionIdModel = computed({
   }
 });
 
+const validate = (): boolean => {
+  const trimmed = sectionForm.value.sectionName?.trim() ?? '';
+  return trimmed.length >= MIN_SECTION_NAME_LENGTH;
+};
+
 const onSubmit = () => {
-  if (!sectionForm.value.sectionName?.trim()) {
+  submitted.value = true;
+  if (!validate()) {
     return;
   }
 
@@ -76,6 +110,7 @@ const onSubmit = () => {
 };
 
 const reset = () => {
+  submitted.value = false;
   adminStore.clearSectionForm();
 };
 
