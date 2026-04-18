@@ -3,13 +3,22 @@
     <header class="admin-layout__header">
       <NuxtLink to="/admin" class="admin-layout__brand">
         <span class="admin-layout__brand-icon" aria-hidden="true">◇</span>
-        <span class="admin-layout__brand-text">Админка</span>
+        <span class="admin-layout__brand-text"> {{ $t('panel.admin') }}</span>
       </NuxtLink>
-      <div class="admin-layout__user">
-        <span v-if="appStore.user.email" class="admin-layout__email">
-          {{ appStore.user.email }}
-        </span>
-        <LazyUiButton :name="$t('auth.logout')" @click="logoutAction" />
+      <div class="admin-layout__toolbar">
+        <UiButton
+          color="neutral"
+          variant="outline"
+          type="button"
+          :name="$t('panel.toCatalog')"
+          @click="navigateTo('/catalog/')"
+        />
+        <div class="admin-layout__user">
+          <span v-if="appStore.user.email" class="admin-layout__email">
+            {{ appStore.user.email }}
+          </span>
+          <LazyUiButton :name="$t('auth.logout')" @click="logoutAction" />
+        </div>
       </div>
     </header>
 
@@ -70,6 +79,13 @@ const logoutAction = async () => {
 
   &__brand-text {
     letter-spacing: 0.03em;
+  }
+
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
   }
 
   &__user {

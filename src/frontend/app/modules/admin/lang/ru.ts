@@ -23,7 +23,9 @@ export default {
   panel: {
     title: 'Административная панель',
     addProduct: 'Добавить товар',
-    addSection: 'Добавить раздел'
+    addSection: 'Добавить раздел',
+    toCatalog: 'В каталог',
+    admin: 'Админка'
   },
   filter: {
     name: 'Наименование',
