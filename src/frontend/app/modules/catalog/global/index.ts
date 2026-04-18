@@ -1,8 +1,9 @@
-import { getCatalogData, getCatalogRootSections } from '../api';
+import { getCatalogData, getCatalogRootSections, getCatalogSectionTree } from '../api';
 
 export function useCatalogModule() {
   return {
     getCatalogData,
-    getCatalogRootSections
+    getCatalogRootSections,
+    getCatalogSectionTree
   };
 }

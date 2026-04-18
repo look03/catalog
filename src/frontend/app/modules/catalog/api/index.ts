@@ -1,4 +1,4 @@
-import type { CatalogNavSection } from '../types';
+import type { CatalogNavSection, CatalogNavSectionTree } from '../types';
 
 export async function getCatalogData(path: string): Promise<void> {
   try {
@@ -30,6 +30,21 @@ export async function getCatalogRootSections(): Promise<CatalogNavSection[]> {
     return data?.items ?? [];
   } catch (error) {
     logError('CATALOG_NAV_SECTIONS', 'GET', error);
+    return [];
+  }
+}
+
+export async function getCatalogSectionTree(): Promise<CatalogNavSectionTree[]> {
+  try {
+    const data = await useApi.get<{ items: CatalogNavSectionTree[] }>(
+      '/catalog/sections/tree',
+      {},
+      {},
+      { auth: false }
+    );
+    return data?.items ?? [];
+  } catch (error) {
+    logError('CATALOG_NAV_TREE', 'GET', error);
     return [];
   }
 }

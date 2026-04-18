@@ -6,10 +6,12 @@ import { GetPageByUrlQuery } from './queries/impl/get-page-by-url.query';
 import { GetSectionPageQuery } from './queries/impl/get-section-page.query';
 import { GetProductPageQuery } from './queries/impl/get-product-page.query';
 import { GetRootSectionsQuery } from './queries/impl/get-root-sections.query';
+import { GetSectionTreeQuery } from './queries/impl/get-section-tree.query';
 import { ParseJsonPipe } from '../../common/pipes/parse-json.pipe';
 import { CatalogFiltersDto } from './dto/catalog-filters.dto';
 import { SearchProducts, SearchSections } from './types/document.types';
 import type { CatalogRootSectionNav } from './queries/handlers/get-root-sections.handler';
+import type { CatalogSectionTreeNode } from './queries/handlers/get-section-tree.handler';
 
 @ApiTags('search')
 @Controller('catalog/')
@@ -53,6 +55,17 @@ export class CatalogController {
   @Get('sections/root')
   @ApiOperation({ summary: 'Корневые разделы каталога (навигация)' })
   async getRootSections(): Promise<{ items: CatalogRootSectionNav[] }> {
-    return await this.queryBus.execute(new GetRootSectionsQuery());
+    const items: CatalogRootSectionNav[] = await this.queryBus.execute(new GetRootSectionsQuery());
+    return { items };
+  }
+
+  /**
+   * Дерево разделов каталога (корень и дочерние) для многоуровневого меню витрины.
+   */
+  @Get('sections/tree')
+  @ApiOperation({ summary: 'Дерево разделов каталога (навигация)' })
+  async getSectionTree(): Promise<{ items: CatalogSectionTreeNode[] }> {
+    const items: CatalogSectionTreeNode[] = await this.queryBus.execute(new GetSectionTreeQuery());
+    return { items };
   }
 }

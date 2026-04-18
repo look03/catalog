@@ -10,17 +10,17 @@
       </NuxtLink>
 
       <nav
-        v-if="sections.length"
+        v-if="sectionTree.length"
         class="catalog-site-header__nav-desktop"
         :aria-label="$t('catalogNav.sectionsTitle')"
       >
         <NuxtLink
-          v-for="item in sections.slice(0, 6)"
-          :key="item.id"
-          :to="item.path"
+          v-for="root in sectionTree"
+          :key="root.id"
+          :to="root.path"
           class="catalog-site-header__nav-link"
         >
-          {{ item.title }}
+          {{ root.title }}
         </NuxtLink>
       </nav>
 
@@ -29,12 +29,7 @@
           {{ $t('catalogNav.login') }}
         </NuxtLink>
 
-        <UiPopover
-          v-model:open="menuOpen"
-          mode="click"
-          :content="{ align: 'end', side: 'bottom', sideOffset: 6 }"
-          class="catalog-site-header__menu-popover"
-        >
+        <USlideover v-model:open="menuOpen" side="right" :close="false" :ui="slideoverUi">
           <UiButton
             color="neutral"
             variant="ghost"
@@ -44,54 +39,86 @@
             :title="$t('catalogNav.burgerLabel')"
             :aria-label="$t('catalogNav.burgerLabel')"
             :aria-expanded="menuOpen"
-            aria-haspopup="true"
           />
-          <template #content="{ close }">
-            <nav class="catalog-site-header__dropdown" :aria-label="$t('catalogNav.sectionsTitle')">
-              <p class="catalog-site-header__dropdown-title">
-                {{ $t('catalogNav.sectionsTitle') }}
-              </p>
-              <ul class="catalog-site-header__dropdown-list">
-                <li v-for="item in sections" :key="item.id">
-                  <NuxtLink
-                    :to="item.path"
-                    class="catalog-site-header__dropdown-link"
-                    @click="close?.()"
-                  >
-                    {{ item.title }}
-                  </NuxtLink>
-                </li>
-                <li v-if="!sections.length" class="catalog-site-header__dropdown-empty">
-                  {{ $t('catalogNav.emptySectionsHint') }}
-                </li>
-              </ul>
-              <NuxtLink to="/catalog/" class="catalog-site-header__dropdown-all" @click="close?.()">
-                {{ $t('catalogNav.allCatalog') }}
-              </NuxtLink>
-            </nav>
+
+          <template #header>
+            <div class="catalog-site-header__mega-bar">
+              <div class="catalog-site-header__mega-bar-start">
+                <button
+                  type="button"
+                  class="catalog-site-header__mega-close"
+                  :aria-label="$t('catalogNav.closeMenu')"
+                  @click="closeCatalogMenu"
+                >
+                  <UIcon name="i-lucide-x" class="catalog-site-header__mega-close-icon" />
+                </button>
+                <span class="catalog-site-header__mega-title">{{ $t('catalogNav.menuTitle') }}</span>
+              </div>
+              <nav
+                v-if="sectionTree.length"
+                class="catalog-site-header__mega-quick"
+                :aria-label="$t('catalogNav.quickSections')"
+              >
+                <NuxtLink
+                  v-for="r in sectionTree.slice(0, 3)"
+                  :key="r.id"
+                  :to="r.path"
+                  class="catalog-site-header__mega-quick-link"
+                  @click="closeCatalogMenu"
+                >
+                  {{ r.title }}
+                </NuxtLink>
+              </nav>
+            </div>
           </template>
-        </UiPopover>
+
+          <template #body>
+            <div class="catalog-site-header__drawer-body">
+              <div v-if="sectionTree.length" class="catalog-site-header__drawer-inner">
+                <WgCatalogMegaMenu
+                  :tree="sectionTree"
+                  :open="menuOpen"
+                  @navigate="closeCatalogMenu"
+                />
+              </div>
+              <p v-else class="catalog-site-header__drawer-empty">
+                {{ $t('catalogNav.emptySectionsHint') }}
+              </p>
+            </div>
+          </template>
+        </USlideover>
       </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import type { CatalogNavSection } from '../types';
+import type { CatalogNavSectionTree } from '../types';
 
 defineOptions({ name: 'WgCatalogSiteHeader' });
 
-const { getCatalogRootSections } = useCatalogModule();
+const { getCatalogSectionTree } = useCatalogModule();
 
 const menuOpen = ref(false);
 
-const { data: sectionsData } = await useAsyncData<CatalogNavSection[]>(
-  'catalog-root-sections',
-  () => getCatalogRootSections(),
+const slideoverUi = {
+  content:
+    'w-[min(100vw-10px,min(92vw,38rem))] sm:max-w-xl md:max-w-2xl flex flex-col bg-white shadow-lg ring-1 ring-stone-200',
+  header: 'flex-shrink-0 px-4 py-3 bg-white',
+  body: 'flex min-h-0 flex-1 flex-col overflow-hidden p-0 bg-white'
+};
+
+const { data: treeData } = await useAsyncData<CatalogNavSectionTree[]>(
+  'catalog-section-tree',
+  () => getCatalogSectionTree(),
   { default: () => [] }
 );
 
-const sections = computed(() => sectionsData.value ?? []);
+const sectionTree = computed(() => treeData.value ?? []);
+
+function closeCatalogMenu(): void {
+  menuOpen.value = false;
+}
 </script>
 
 <style scoped lang="scss">
@@ -160,10 +187,12 @@ const sections = computed(() => sectionsData.value ?? []);
   &__nav-desktop {
     display: none;
     align-items: center;
-    gap: 0.35rem 1rem;
-    flex-wrap: wrap;
-    justify-content: center;
+    gap: 0.25rem;
     flex: 1;
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
 
     @media (min-width: 900px) {
       display: flex;
@@ -171,19 +200,20 @@ const sections = computed(() => sectionsData.value ?? []);
   }
 
   &__nav-link {
-    padding: 0.35rem 0.6rem;
-    border-radius: 8px;
+    padding: 0.45rem 0.75rem;
+    border-radius: 999px;
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
     color: #475569;
     text-decoration: none;
+    white-space: nowrap;
     transition:
       background 0.15s ease,
       color 0.15s ease;
 
     &:hover {
       background: #f1f5f9;
-      color: #0ea5e9;
+      color: #0284c7;
     }
   }
 
@@ -226,67 +256,104 @@ const sections = computed(() => sectionsData.value ?? []);
     padding: 0.45rem !important;
   }
 
-  &__dropdown {
-    padding: 0.25rem;
-    min-width: 14rem;
-    max-height: min(70vh, 22rem);
-    overflow-y: auto;
+  &__mega-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 100%;
   }
 
-  &__dropdown-title {
-    margin: 0 0 0.35rem;
-    padding: 0.35rem 0.65rem 0.25rem;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: #94a3b8;
+  &__mega-bar-start {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
   }
 
-  &__dropdown-list {
-    margin: 0;
+  &__mega-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
     padding: 0;
-    list-style: none;
-  }
-
-  &__dropdown-link {
-    display: block;
-    padding: 0.55rem 0.65rem;
+    border: none;
     border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #334155;
-    text-decoration: none;
-    transition:
-      background 0.15s ease,
-      color 0.15s ease;
+    background: transparent;
+    color: #44403c;
+    cursor: pointer;
+    transition: background 0.15s ease;
 
     &:hover {
-      background: #f1f5f9;
-      color: #0284c7;
+      background: rgba(0, 0, 0, 0.05);
     }
   }
 
-  &__dropdown-empty {
-    padding: 0.45rem 0.65rem;
-    font-size: 0.85rem;
-    color: #94a3b8;
+  &__mega-close-icon {
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
-  &__dropdown-all {
-    display: block;
-    margin-top: 0.35rem;
-    padding: 0.55rem 0.65rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
+  &__mega-title {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 1.05rem;
     font-weight: 600;
-    color: #0284c7;
+    letter-spacing: 0.02em;
+    color: #1c1917;
+  }
+
+  &__mega-quick {
+    display: none;
+    align-items: center;
+    gap: 0.35rem 0.85rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+
+    @media (min-width: 380px) {
+      display: flex;
+    }
+  }
+
+  &__mega-quick-link {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #78716c;
     text-decoration: none;
-    border-top: 1px solid #f1f5f9;
+    white-space: nowrap;
+    padding: 0.2rem 0;
+    transition: color 0.15s ease;
 
     &:hover {
-      background: #f0f9ff;
+      color: #44403c;
     }
+  }
+
+  &__drawer-body {
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__drawer-inner {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__drawer-empty {
+    margin: 0;
+    padding: 1rem 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #78716c;
   }
 }
 </style>

@@ -16,9 +16,14 @@ export default {
     tagline: 'Удобные покупки онлайн',
     burgerLabel: 'Открыть меню разделов',
     sectionsTitle: 'Разделы',
-    allCatalog: 'Весь каталог',
     login: 'Войти',
-    emptySectionsHint: 'Разделы скоро появятся — пока загляните в общий каталог ниже.'
+    emptySectionsHint: 'Разделы скоро появятся — пока загляните в общий каталог ниже.',
+    menuTitle: 'Меню',
+    closeMenu: 'Закрыть меню',
+    quickSections: 'Быстрые разделы',
+    allProductsInSection: 'Все товары',
+    expandSub: 'Показать подразделы',
+    noSubsections: 'В этом разделе пока нет подразделов.'
   },
   catalogFooter: {
     aboutTitle: 'О магазине',

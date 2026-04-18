@@ -6,4 +6,4 @@ export type LoginResponse = {
   accessToken?: string;
 };
 
-export type { CatalogNavSection } from './navigation';
+export type { CatalogNavSection, CatalogNavSectionTree } from './navigation';

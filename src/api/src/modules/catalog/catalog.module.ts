@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { commandHandlers } from './commands/handlers';
 import { services } from './services';
 import { CatalogController } from './catalog.controller';
@@ -7,9 +8,15 @@ import { workers } from './workers';
 import { CommonModule } from '../common/common.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { queryHandlers } from './queries/handlers';
+import { Section } from '../admin/entities/section.entity';
 
 @Module({
-  imports: [CqrsModule, CommonModule, ScheduleModule.forRoot()],
+  imports: [
+    CqrsModule,
+    CommonModule,
+    ScheduleModule.forRoot(),
+    TypeOrmModule.forFeature([Section]),
+  ],
   controllers: [CatalogController],
   providers: [...commandHandlers, ...queryHandlers, ...services, ...workers],
   exports: [...services, ...workers],

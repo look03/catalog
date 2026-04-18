@@ -1,8 +1,9 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { GetRootSectionsQuery } from '../impl/get-root-sections.query';
-import { ElasticService } from '../../services/elastic.service';
-import type { SearchSection } from '../../../../types/global.catalog';
+import { Section } from '../../../admin/entities/section.entity';
 
 export type CatalogRootSectionNav = {
   id: number;
@@ -10,36 +11,40 @@ export type CatalogRootSectionNav = {
   path: string;
 };
 
+function sectionPath(row: Section): string {
+  const p = row.path?.trim();
+  if (p) {
+    return p;
+  }
+  return `/catalog/${row.code}/`;
+}
+
 @QueryHandler(GetRootSectionsQuery)
 export class GetRootSectionsHandler implements IQueryHandler<GetRootSectionsQuery> {
   private readonly logger = new Logger(GetRootSectionsHandler.name);
 
-  constructor(private readonly elasticService: ElasticService) {}
+  constructor(
+    @InjectRepository(Section)
+    private readonly sectionRepo: Repository<Section>,
+  ) {}
 
   async execute(): Promise<CatalogRootSectionNav[]> {
     try {
-      const result = await this.elasticService.search<SearchSection>({
-        size: 200,
-        query: {
-          bool: {
-            filter: [{ term: { type: 'section' } }, { term: { active: true } }],
-            must_not: [{ exists: { field: 'parent_section_id' } }],
-          },
-        },
-      });
+      const rows = await this.sectionRepo
+        .createQueryBuilder('s')
+        .where('s.active = :active', { active: true })
+        .andWhere('s.parent_section_id IS NULL')
+        .orderBy('s.title', 'ASC')
+        .getMany();
 
-      const items = result.hits.hits.map((hit) => ({
-        id: Number(hit._source.id),
-        title: hit._source.title,
-        path: hit._source.path,
+      return rows.map((s) => ({
+        id: s.id,
+        title: s.title,
+        path: sectionPath(s),
       }));
-
-      items.sort((a, b) => a.title.localeCompare(b.title, 'ru'));
-
-      return items;
     } catch (error) {
       this.logger.warn(
-        `Catalog root sections: ${error instanceof Error ? error.message : String(error)}`,
+        `Catalog root sections (DB): ${error instanceof Error ? error.message : String(error)}`,
       );
       return [];
     }
