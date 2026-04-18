@@ -85,10 +85,18 @@ const tableData = computed(() =>
   adminStore.tableType === 'products' ? adminStore.tableProductsData : adminStore.tableSectionsData
 );
 
-const setFilter = (field: keyof AdminFilters, value: string | boolean | undefined) => {
+const setFilter = (
+  field: keyof AdminFilters,
+  value: string | boolean | number | number[] | undefined
+) => {
+  if (field === 'section_ids') {
+    const ids = Array.isArray(value) ? value : typeof value === 'number' ? [value] : [];
+    adminStore.setFilters({ section_ids: ids.length ? ids : undefined });
+    return;
+  }
   adminStore.setFilters({
     [field]: value || undefined
-  });
+  } as Partial<AdminFilters>);
 };
 
 const setOpenActionsAside = () => {

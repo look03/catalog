@@ -31,10 +31,13 @@ export class GetProductsHandler
 
   private buildWhereParams(alias: string, filters?: AdminFilters) {
     const conditions: string[] = [];
-    const whereParams: Record<string, string | number | boolean> = {};
+    const whereParams: Record<string, string | number | boolean | number[]> = {};
     if (filters?.name) {
-      conditions.push(`${alias}.title ILIKE :title`);
-      whereParams.title = `%${filters.name}%`;
+      const nameStr = Array.isArray(filters.name) ? filters.name[0] : filters.name;
+      if (nameStr) {
+        conditions.push(`${alias}.title ILIKE :title`);
+        whereParams.title = `%${nameStr}%`;
+      }
     }
 
     if (filters?.code) {
@@ -49,6 +52,13 @@ export class GetProductsHandler
     if (filters?.active != null) {
       conditions.push(`${alias}.active = :active`);
       whereParams.active = filters.active;
+    }
+
+    if (filters?.section_ids?.length) {
+      conditions.push(
+        `EXISTS (SELECT 1 FROM product_sections ps_filter WHERE ps_filter.product_id = ${alias}.id AND ps_filter.section_id IN (:...section_ids))`,
+      );
+      whereParams.section_ids = filters.section_ids;
     }
 
     return { where: conditions.length ? conditions.join(' AND ') : '1=1', params: whereParams };

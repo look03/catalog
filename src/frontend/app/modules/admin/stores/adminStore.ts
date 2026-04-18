@@ -46,7 +46,9 @@ export const useAdminStore = defineStore('admin-store', {
     filters: {
       name: undefined,
       code: undefined,
-      id: undefined
+      id: undefined,
+      active: undefined,
+      section_ids: undefined
     }
   }),
   actions: {
@@ -123,11 +125,12 @@ export const useAdminStore = defineStore('admin-store', {
         order: 'asc'
       });
     },
-    setFilters(payload: AdminFilters) {
-      this.filters.name = payload.name;
-      this.filters.code = payload.code;
-      this.filters.id = payload.id;
-      this.filters.active = payload.active;
+    setFilters(payload: Partial<AdminFilters>) {
+      if ('name' in payload) this.filters.name = payload.name;
+      if ('code' in payload) this.filters.code = payload.code;
+      if ('id' in payload) this.filters.id = payload.id;
+      if ('active' in payload) this.filters.active = payload.active;
+      if ('section_ids' in payload) this.filters.section_ids = payload.section_ids;
       this.page = 1;
     },
     clearFilters() {
@@ -135,6 +138,7 @@ export const useAdminStore = defineStore('admin-store', {
       this.filters.code = undefined;
       this.filters.id = undefined;
       this.filters.active = undefined;
+      this.filters.section_ids = undefined;
 
       this.page = 1;
     },

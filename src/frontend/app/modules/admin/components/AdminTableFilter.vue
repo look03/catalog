@@ -23,6 +23,21 @@
           @action:input="setFilter('id', $event)"
           @action:on-search="onSearch"
         />
+        <div
+          v-if="props.tableType === 'products'"
+          class="admin-table-filter__field admin-table-filter__field--sections"
+        >
+          <UiSectionTreeSelect
+            :model-value="props.filters.section_ids ?? []"
+            :label="$t('formProduct.sections')"
+            multiple
+            :show-no-parent="false"
+            :items="sectionItems"
+            :placeholder="$t('formProduct.sectionsPlaceholder')"
+            class="admin-table-filter__section-tree"
+            @update:model-value="setFilter('section_ids', $event)"
+          />
+        </div>
         <div class="admin-table-filter__field">
           <UiSelect
             :model-value="props.filters.active ?? undefined"
@@ -68,12 +83,17 @@
 </template>
 
 <script setup lang="ts">
-import type { AdminFilters, TableType } from '../types';
+import type { AdminFilters, SectionOption, TableType } from '../types';
+import { getSectionsForSelect } from '../api';
 
 const emits = defineEmits<{
   (e: 'action:search' | 'input:clear-filters'): void;
   (e: 'input:table-type', value: TableType): void;
-  (e: 'input:set-filters', field: keyof AdminFilters, value: string | boolean | undefined): void;
+  (
+    e: 'input:set-filters',
+    field: keyof AdminFilters,
+    value: string | boolean | number | number[] | undefined
+  ): void;
 }>();
 
 const props = withDefaults(
@@ -97,6 +117,16 @@ const tabs = [
   }
 ];
 
+const sectionItems = ref<SectionOption[]>([]);
+
+const loadSectionItems = async () => {
+  sectionItems.value = await getSectionsForSelect();
+};
+
+onMounted(() => {
+  loadSectionItems();
+});
+
 const selectActiveItems = ref([
   {
     label: 'Все',
@@ -112,8 +142,16 @@ const selectActiveItems = ref([
   }
 ]);
 
-const setFilter = (field: keyof AdminFilters, value: string | boolean | undefined) => {
-  emits('input:set-filters', field, value);
+const setFilter = (
+  field: keyof AdminFilters,
+  value: string | boolean | number | number[] | undefined
+) => {
+  if (field === 'section_ids') {
+    const ids = Array.isArray(value) ? value : typeof value === 'number' ? [value] : [];
+    emits('input:set-filters', field, ids.length ? ids : undefined);
+    return;
+  }
+  emits('input:set-filters', field, value || undefined);
 };
 
 const setTableType = (type: TableType) => {
@@ -167,6 +205,16 @@ $border: #e2e8f0;
     flex: 1;
     min-width: 140px;
     max-width: 220px;
+  }
+
+  &__field--sections {
+    flex: 1 1 100%;
+    min-width: min(100%, 22rem);
+    max-width: 28rem;
+  }
+
+  &__section-tree {
+    width: 100%;
   }
 
   &__select {

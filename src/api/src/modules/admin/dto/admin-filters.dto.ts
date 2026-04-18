@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AdminFiltersDto {
@@ -26,4 +26,11 @@ export class AdminFiltersDto {
   @IsString()
   @ApiProperty({ example: 'тест', description: 'name' })
   name?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  @Type(() => Number)
+  @ApiProperty({ example: [1, 2], description: 'ID разделов для фильтра списка товаров' })
+  section_ids?: number[];
 }
