@@ -18,6 +18,7 @@
           size="xs"
           icon="i-lucide-package"
           class="admin-table__action-btn"
+          :title="t('tableActions.tooltipSectionProducts')"
           @click="emits('action:show-section-products', (row.original as CatalogSection).id)"
         />
         <UiButton
@@ -26,6 +27,7 @@
           size="xs"
           icon="i-lucide-pencil"
           class="admin-table__action-btn"
+          :title="t('tableActions.tooltipEdit')"
           @click="
             emits('action:show-edit-form', (row.original as CatalogProduct | CatalogSection).id)
           "
@@ -36,6 +38,7 @@
           size="xs"
           icon="i-lucide-x"
           class="admin-table__action-btn admin-table__action-btn--delete"
+          :title="t('tableActions.tooltipDelete')"
           @click="emits('action:delete', row.original as CatalogProduct | CatalogSection)"
         />
       </div>

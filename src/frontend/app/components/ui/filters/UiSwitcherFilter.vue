@@ -68,15 +68,18 @@ const selectTab = (tab: TabItemBase, index: number) => {
     overflow: hidden;
     box-shadow: 0 0 0 1px var(--ui-border, #e2e8f0);
 
-    button {
+    /* Кнопки рендерятся внутри UiButton / UButton — без :deep() scoped не попадает в DOM дочернего компонента */
+    :deep(button) {
       border-radius: 0;
       border: none;
       box-shadow: none;
     }
-    button:first-child {
+
+    :deep(button:first-child) {
       border-radius: 6px 0 0 6px;
     }
-    button:last-child {
+
+    :deep(button:last-child) {
       border-radius: 0 6px 6px 0;
     }
   }

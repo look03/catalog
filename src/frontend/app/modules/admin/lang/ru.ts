@@ -20,6 +20,11 @@ export default {
     cancel: 'Отменить',
     delete: 'Удалить'
   },
+  tableActions: {
+    tooltipSectionProducts: 'Показать товары этого раздела',
+    tooltipEdit: 'Редактировать',
+    tooltipDelete: 'Удалить'
+  },
   panel: {
     title: 'Административная панель',
     addProduct: 'Добавить товар',

@@ -6,6 +6,7 @@
     :label="props.name"
     :size="props.size"
     :variant="props.variant"
+    :title="props.title"
     @click="$emit('click', $event)"
   />
 </template>
@@ -22,6 +23,8 @@ defineEmits<{
 const props = withDefaults(
   defineProps<{
     name?: string;
+    /** Нативная подсказка при наведении */
+    title?: string;
     icon?: string;
     color?: 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral';
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -29,6 +32,7 @@ const props = withDefaults(
   }>(),
   {
     name: undefined,
+    title: undefined,
     icon: undefined,
     size: undefined,
     color: 'primary',
