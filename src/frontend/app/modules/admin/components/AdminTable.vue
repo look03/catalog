@@ -11,36 +11,63 @@
   >
     <template #icons-cell="{ row }">
       <div class="admin-table__actions">
-        <UiButton
-          v-if="props.tableType === 'sections'"
-          color="neutral"
-          variant="ghost"
-          size="xs"
-          icon="i-lucide-package"
-          class="admin-table__action-btn"
-          :title="t('tableActions.tooltipSectionProducts')"
-          @click="emits('action:show-section-products', (row.original as CatalogSection).id)"
-        />
-        <UiButton
-          color="neutral"
-          variant="ghost"
-          size="xs"
-          icon="i-lucide-pencil"
-          class="admin-table__action-btn"
-          :title="t('tableActions.tooltipEdit')"
-          @click="
-            emits('action:show-edit-form', (row.original as CatalogProduct | CatalogSection).id)
-          "
-        />
-        <UiButton
-          color="neutral"
-          variant="ghost"
-          size="xs"
-          icon="i-lucide-x"
-          class="admin-table__action-btn admin-table__action-btn--delete"
-          :title="t('tableActions.tooltipDelete')"
-          @click="emits('action:delete', row.original as CatalogProduct | CatalogSection)"
-        />
+        <UiPopover mode="click" :content="{ align: 'end', side: 'bottom', sideOffset: 4 }">
+          <UiButton
+            color="neutral"
+            variant="ghost"
+            size="xs"
+            icon="i-lucide-menu"
+            class="admin-table__action-btn admin-table__actions-trigger"
+            :title="t('tableActions.tooltipMenu')"
+          />
+          <template #content="{ close }">
+            <div class="admin-table__action-menu">
+              <UiButton
+                v-if="props.tableType === 'sections'"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                icon="i-lucide-package"
+                class="admin-table__action-btn admin-table__action-menu-item"
+                :name="t('panel.sectionProducts')"
+                :title="t('tableActions.tooltipSectionProducts')"
+                @click="
+                  close?.();
+                  emits('action:show-section-products', (row.original as CatalogSection).id);
+                "
+              />
+              <UiButton
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                icon="i-lucide-pencil"
+                class="admin-table__action-btn admin-table__action-menu-item"
+                :name="t('tableActions.tooltipEdit')"
+                :title="t('tableActions.tooltipEdit')"
+                @click="
+                  close?.();
+                  emits(
+                    'action:show-edit-form',
+                    (row.original as CatalogProduct | CatalogSection).id
+                  );
+                "
+              />
+              <UiButton
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                icon="i-lucide-x"
+                class="admin-table__action-btn admin-table__action-menu-item admin-table__action-btn--delete"
+                :name="t('tableActions.tooltipDelete')"
+                :title="t('tableActions.tooltipDelete')"
+                @click="
+                  close?.();
+                  emits('action:delete', row.original as CatalogProduct | CatalogSection);
+                "
+              />
+            </div>
+          </template>
+        </UiPopover>
       </div>
     </template>
     <template #[`paths-cell`]="{ row }">
@@ -223,6 +250,19 @@ $hover-bg: #f1f5f9;
   display: flex;
   align-items: center;
   gap: 0.35rem;
+}
+
+.admin-table__action-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.35rem;
+  min-width: 10.5rem;
+}
+
+.admin-table__action-menu-item {
+  width: 100%;
+  justify-content: flex-start;
 }
 
 .admin-table__action-btn {

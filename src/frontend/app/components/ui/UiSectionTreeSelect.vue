@@ -6,7 +6,7 @@
       class="ui-section-tree-select__label"
       :required="required"
     />
-    <UPopover
+    <UiPopover
       v-model:open="isOpen"
       mode="click"
       class="ui-section-tree-select__select"
@@ -39,7 +39,7 @@
           <UButton variant="soft" block size="sm" label="Готово" @click="isOpen = false" />
         </div>
       </template>
-    </UPopover>
+    </UiPopover>
     <Transition name="ui-section-tree-select-error">
       <p v-if="props.error" class="ui-section-tree-select__error" role="alert">
         {{ props.error }}

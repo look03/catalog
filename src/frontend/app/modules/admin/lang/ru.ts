@@ -21,6 +21,7 @@ export default {
     delete: 'Удалить'
   },
   tableActions: {
+    tooltipMenu: 'Открыть меню действий',
     tooltipSectionProducts: 'Показать товары этого раздела',
     tooltipEdit: 'Редактировать',
     tooltipDelete: 'Удалить'
