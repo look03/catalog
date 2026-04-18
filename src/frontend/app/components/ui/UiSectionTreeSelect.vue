@@ -17,7 +17,10 @@
       <UButton
         variant="outline"
         block
-        :class="{ 'text-left justify-start': true }"
+        :class="[
+          'text-left justify-start',
+          { 'ui-section-tree-select__trigger--error': !!props.error }
+        ]"
         color="neutral"
         trailing-icon="i-lucide-chevron-down"
       >
@@ -37,6 +40,11 @@
         </div>
       </template>
     </UPopover>
+    <Transition name="ui-section-tree-select-error">
+      <p v-if="props.error" class="ui-section-tree-select__error" role="alert">
+        {{ props.error }}
+      </p>
+    </Transition>
   </div>
 </template>
 
@@ -58,11 +66,13 @@ const props = withDefaults(
     excludeId?: number;
     /** Показывать пункт «Без родителя» (только для формы раздела) */
     showNoParent?: boolean;
+    error?: string;
   }>(),
   {
     label: undefined,
     required: false,
     placeholder: 'Выберите раздел',
+    error: undefined,
     multiple: false,
     items: () => [],
     excludeId: undefined,
@@ -78,7 +88,7 @@ const isOpen = ref(false);
 const toggleJustFired = ref(false);
 const expandedKeys = ref<string[]>([]);
 
-function collectExpandableKeys(items: TreeItemWithId[]): string[] {
+const collectExpandableKeys = (items: TreeItemWithId[]): string[] => {
   const keys: string[] = [];
   for (const item of items) {
     if (item.children?.length) {
@@ -87,11 +97,11 @@ function collectExpandableKeys(items: TreeItemWithId[]): string[] {
     }
   }
   return keys;
-}
+};
 
-function hasChildren(id: number): boolean {
+const hasChildren = (id: number): boolean => {
   return props.items?.some((i) => i.parentSectionId === id) ?? false;
-}
+};
 
 const displayText = computed(() => {
   if (props.multiple) {
@@ -115,12 +125,12 @@ const displayText = computed(() => {
   return item?.title ?? item?.name ?? props.placeholder;
 });
 
-function buildTree(
+const buildTree = (
   items: typeof props.items,
   parentId: number | null,
   excludeId: number | undefined,
   selectHandler: (id: number) => void
-): TreeItemWithId[] {
+): TreeItemWithId[] => {
   const filtered = items.filter(
     (s) =>
       (s.parentSectionId ?? null) === parentId && (excludeId === undefined || s.id !== excludeId)
@@ -149,9 +159,9 @@ function buildTree(
     });
   }
   return result;
-}
+};
 
-function handleSelect(id: number) {
+const handleSelect = (id: number) => {
   if (props.multiple) {
     const current = (props.modelValue as number[]) ?? [];
     const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
@@ -160,7 +170,7 @@ function handleSelect(id: number) {
     emit('update:modelValue', id);
     isOpen.value = false;
   }
-}
+};
 
 /** Обёртка: при клике по метке (не по стрелке) восстанавливаем раскрытие узла с потомками */
 function createSelectHandler(): (id: number) => void {
@@ -212,9 +222,35 @@ watch(
 .ui-section-tree-select {
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
 
   &__label {
     margin-bottom: 8px;
   }
+
+  &__trigger--error {
+    border-color: var(--ui-error, #dc2626);
+    outline-color: var(--ui-error, #dc2626);
+  }
+
+  &__error {
+    margin: 0 4px;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--ui-error, #dc2626);
+  }
+}
+
+.ui-section-tree-select-error-enter-active,
+.ui-section-tree-select-error-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.ui-section-tree-select-error-enter-from,
+.ui-section-tree-select-error-leave-to {
+  opacity: 0;
+  transform: translateY(-0.25rem);
 }
 </style>

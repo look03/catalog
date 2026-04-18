@@ -1,7 +1,7 @@
 <template>
   <div class="ui-field">
     <UiFieldLabel v-if="label" :label="label" :required="required" />
-    <div class="ui-file-upload__area">
+    <div class="ui-file-upload__area" :class="{ 'ui-file-upload__area--error': !!props.error }">
       <div v-if="props.existingItems?.length" class="ui-file-upload__existing">
         <div
           v-for="item in props.existingItems"
@@ -54,6 +54,9 @@
         <span v-for="ext in formatList" :key="ext" class="ui-file-upload__badge">{{ ext }}</span>
       </div>
     </div>
+    <Transition name="ui-file-upload-error">
+      <p v-if="props.error" class="ui-file-upload__error" role="alert">{{ props.error }}</p>
+    </Transition>
   </div>
 </template>
 
@@ -80,10 +83,12 @@ const props = withDefaults(
     removableExisting?: boolean;
     /** aria-label для кнопки удаления */
     removeLabel?: string;
+    error?: string;
   }>(),
   {
     label: undefined,
     required: false,
+    error: undefined,
     accept: ACCEPT,
     multiple: true,
     formatsHint: undefined,
@@ -135,6 +140,31 @@ const formatsHint = computed(() =>
   border: 2px dashed var(--ui-color-gray-300, #cbd5e1);
   border-radius: 0.5rem;
   background: var(--ui-color-gray-50, #f8fafc);
+
+  &--error {
+    border-color: var(--ui-error, #dc2626);
+    background: color-mix(in srgb, var(--ui-error, #dc2626) 6%, transparent);
+  }
+}
+
+.ui-file-upload__error {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ui-error, #dc2626);
+}
+
+.ui-file-upload-error-enter-active,
+.ui-file-upload-error-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.ui-file-upload-error-enter-from,
+.ui-file-upload-error-leave-to {
+  opacity: 0;
+  transform: translateY(-0.25rem);
 }
 
 .ui-file-upload__area :deep(.ui-file-upload) {

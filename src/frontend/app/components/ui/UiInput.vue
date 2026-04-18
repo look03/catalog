@@ -9,7 +9,10 @@
       v-on="inputListeners"
     >
       <template #trailing>
-        <span v-if="modelValue" class="ui-input__trailing">
+        <span
+          v-if="modelValue !== undefined && modelValue !== null && modelValue !== ''"
+          class="ui-input__trailing"
+        >
           <button type="button" class="ui-input__clear" aria-label="Очистить" @click="clear">
             <span class="ui-input__clear-icon" aria-hidden="true">×</span>
           </button>
