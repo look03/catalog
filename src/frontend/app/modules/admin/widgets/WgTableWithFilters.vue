@@ -11,6 +11,7 @@
     />
     <AdminTable
       :table-data="tableData"
+      :table-type="adminStore.tableType"
       :total="adminStore.total"
       :table-headers="tableHeaders"
       :limit="adminStore.limit"
@@ -22,6 +23,7 @@
       @action:change-sort="changeSort"
       @action:delete="openDeleteModal"
       @action:show-edit-form="onEditRow"
+      @action:show-section-products="onShowSectionProducts"
     />
     <AdminDeleteModal
       :open="deleteModalOpen"
@@ -145,6 +147,11 @@ const updateProduct = (id: number, payload: ProductForm) => {
 
 const onEditRow = (id: number) => {
   emits('action:show-edit-form', id);
+};
+
+const onShowSectionProducts = (sectionId: number) => {
+  adminStore.openProductsForSection(sectionId);
+  emits('action:update-data');
 };
 
 const changeSort = (payload: Sort): void => {

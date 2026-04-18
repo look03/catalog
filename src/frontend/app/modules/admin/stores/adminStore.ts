@@ -125,6 +125,16 @@ export const useAdminStore = defineStore('admin-store', {
         order: 'asc'
       });
     },
+    /** Таблица товаров с фильтром по выбранному разделу (из строки таблицы разделов). */
+    openProductsForSection(sectionId: number) {
+      this.tableType = 'products';
+      this.clearFilters();
+      this.setFilters({ section_ids: [sectionId] });
+      this.setSort({
+        sort: 'id',
+        order: 'asc'
+      });
+    },
     setFilters(payload: Partial<AdminFilters>) {
       if ('name' in payload) this.filters.name = payload.name;
       if ('code' in payload) this.filters.code = payload.code;

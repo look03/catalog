@@ -25,7 +25,8 @@ export default {
     addProduct: 'Добавить товар',
     addSection: 'Добавить раздел',
     toCatalog: 'В каталог',
-    admin: 'Админка'
+    admin: 'Админка',
+    sectionProducts: 'Товары'
   },
   filter: {
     name: 'Наименование',

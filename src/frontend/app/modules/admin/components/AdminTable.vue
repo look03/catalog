@@ -12,6 +12,15 @@
     <template #icons-cell="{ row }">
       <div class="admin-table__actions">
         <UiButton
+          v-if="props.tableType === 'sections'"
+          color="neutral"
+          variant="ghost"
+          size="xs"
+          icon="i-lucide-package"
+          class="admin-table__action-btn"
+          @click="emits('action:show-section-products', (row.original as CatalogSection).id)"
+        />
+        <UiButton
           color="neutral"
           variant="ghost"
           size="xs"
@@ -71,11 +80,19 @@ import type {
   ProductHeaders,
   SectionHeaders,
   Sort,
-  SortType
+  SortType,
+  TableType
 } from '../types';
 const UButton = resolveComponent('UButton');
 const emits = defineEmits<{
-  (e: 'action:change-page' | 'action:show-edit-form' | 'action:change-limit', value: number): void;
+  (
+    e:
+      | 'action:change-page'
+      | 'action:show-edit-form'
+      | 'action:change-limit'
+      | 'action:show-section-products',
+    value: number
+  ): void;
   (e: 'action:change-sort', payload: Sort): void;
   (e: 'action:delete', row: CatalogProduct | CatalogSection): void;
 }>();
@@ -89,6 +106,8 @@ const props = withDefaults(
     page?: number;
     sort?: SortType;
     order?: OrderType;
+    /** Режим таблицы: для разделов показывается кнопка перехода к товарам раздела */
+    tableType?: TableType;
   }>(),
   {
     tableData: undefined,
@@ -97,9 +116,12 @@ const props = withDefaults(
     limit: 0,
     page: 1,
     sort: 'id',
-    order: 'asc'
+    order: 'asc',
+    tableType: 'products'
   }
 );
+
+const { t } = useI18n();
 
 const sortedColumn = ref('');
 
